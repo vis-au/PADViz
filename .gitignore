@@ -218,5 +218,6 @@ dmypy.json
 #
 # SELF-DEFINED
 #
-./dataset
+dataset/
+bundle.js
 
