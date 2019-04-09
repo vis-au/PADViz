@@ -218,5 +218,5 @@ dmypy.json
 #
 # SELF-DEFINED
 #
-./datasets
+./dataset
 
