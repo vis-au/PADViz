@@ -1,0 +1,38 @@
+{
+  "name": "pad-viz",
+  "version": "1.0.0",
+  "description": "viz tool",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "build": "webpack -p --progress --config webpack.config.js",
+    "dev-build": "webpack --progress -d --config webpack.config.js",
+    "watch": "webpack --progress -d --config webpack.config.js --watch"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/kiwi479/viz.git"
+  },
+  "author": "shuxiao",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/kiwi479/viz/issues"
+  },
+  "homepage": "https://github.com/kiwi479/viz#readme",
+  "dependencies": {
+    "@babel/core": "7.4.3",
+    "@babel/polyfill": "7.4.3",
+    "@babel/preset-env": "7.4.3",
+    "@babel/preset-react": "7.0.0",
+    "babel-loader": "8.0.5",
+    "css-loader": "2.1.1",
+    "react": "16.8.6",
+    "react-dom": "16.8.6",
+    "react-redux": "7.0.1",
+    "redux": "4.0.1",
+    "redux-saga": "1.0.2",
+    "style-loader": "0.23.1",
+    "webpack": "4.29.6",
+    "webpack-cli": "3.3.0"
+  }
+}
