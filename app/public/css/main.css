@@ -9,8 +9,74 @@ html {
 body {
 	margin: 0;
 	font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+	min-width: 3000px;
 }
 h1, h2, h3, h4, h5, h6, p, ul {
 	margin: 0;
 	padding: 0;
 }
+
+/* added */
+.split {
+	height: 100%;
+	width: 50%;
+	position: fixed;
+	z-index: 1;
+	top: 0;
+	overflow-x: hidden;
+	padding-top: 20px;
+}
+.left {
+	left: 0;
+	background-color: #111;
+  }
+  .right {
+	right: 0;
+	background-color: red;
+  }
+
+rect.bordered {
+	stroke: #bbb;
+	stroke-width:3px;   
+  }
+
+text.mono {
+font-size: 9pt;
+font-family: verdana;
+fill: #aaa;
+}
+
+text.mono:hover {
+font-size: 12pt;
+font-family: verdana;
+fill: #aaa;
+font-weight: bold;
+}
+
+.square {
+opacity: 0.5;
+}
+
+.square:hover {
+opacity: 1.0;
+}
+
+.d3-tip {
+font-family: Verdana;
+background: rgba(0, 0, 0, 0.8);
+padding: 8px;
+color: #fff; 
+z-index: 5070;
+}
+
+path {
+	stroke: steelblue;
+	stroke-width: 1;
+	fill: none;
+}
+
+/* text {
+	stroke: none;
+	fill: #666666;
+	font-size: .6em;
+	font-family: "Helvetica Neue"} */
