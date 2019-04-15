@@ -22,7 +22,7 @@ export const rootReducer = (state = initialState, action) => {
             console.log(action.count)
             return [...state, {data:{}, clickPos: action.count, loading:action.amp}];
         case SET_POS:
-            console.log(action.pos)
+            console.log("store.pos:  " + action.pos)
             return action.pos;
         default:
             return state;

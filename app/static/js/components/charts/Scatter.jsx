@@ -2,7 +2,8 @@ import React, { Component } from 'react';
 import PropTypes from "prop-types";
 import { withFauxDOM } from 'react-faux-dom';
 import * as d3 from 'd3';
-
+import deepEqual from 'deep-equal';
+// import { deepEqual } from '../../utils/utils';
 
 class Scatter extends Component {
     
@@ -16,7 +17,9 @@ class Scatter extends Component {
     }
 
     componentDidUpdate(prevProps) {
-        if(this.props.pos !== prevProps.pos) {
+        console.log("pos now: " + this.props.pos +"   pose before:  " + prevProps.pos)
+        // console.log(pos)
+        if(!deepEqual(this.props.pos, prevProps.pos)) {
             console.log('change')
         }
     }
@@ -35,7 +38,8 @@ class Scatter extends Component {
             height,
             initData,
             chartType,
-            connectFauxDOM
+            connectFauxDOM,
+            pos
         } = this.props;
         
         const margin = {top: 20, right: 20, bottom: 20, left: 20};

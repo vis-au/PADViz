@@ -13,6 +13,8 @@ import json
 
 ori_file ='./dataset/dataframe_all_energy.pkl'
 
+ori_hm = './dataset/ori_hm_wIdx_bins_10.pkl'
+
 idx = [264, 265, 254]
 idx = [256, 263, 266, 268, 269, 253, 254, 255]
 ##
@@ -31,18 +33,18 @@ def read_heatmap():
     elif req_type == 's6':
         df = pd.read_pickle("./dataset/s6_amp_distr_same_bins10.pkl")
     else: # origi
-        df = pd.read_pickle("./dataset/amp_distr_bins10.pkl")
+        df = pd.read_pickle(ori_hm)
     
     # print(df)
-    json_df = pd.DataFrame()
-    t_col = df.columns.values
-    for row in df.itertuples():
-        intv = getattr(row, 'Index')
-        json_df = json_df.append([[t_col[i],intv, row[i]] for i in range(1, len(row) - 1)]) 
+    # json_df = pd.DataFrame()
+    # t_col = df.columns.values
+    # for row in df.itertuples():
+    #     intv = getattr(row, 'Index')
+    #     json_df = json_df.append([[t_col[i],intv, row[i]] for i in range(1, len(row) - 1)]) 
 
-    json_df.columns=["time", "amp_interval",  "count"]
-    print(json_df)
-    return json_df.to_json(orient="records")
+    # json_df.columns=["time", "amp_interval",  "count"]
+    # print(json_df)
+    return df.to_json(orient="records")
 
 @json_blueprint.route('/json/hl')
 def hl():
@@ -97,8 +99,8 @@ def scatter_mean_std():
     df_scatter["std"] = df_std
 
     # print(df_scatter.loc[idx, :])
-    return df_scatter.loc[idx, :].to_json(orient="records")
-    # return df_scatter.to_json(orient="records")
+    # return df_scatter.loc[idx, :].to_json(orient="records")
+    return df_scatter.to_json(orient="records")
 
 @json_blueprint.route('/json/scatter')
 def scatter():

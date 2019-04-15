@@ -36,77 +36,83 @@ def slide_window_amplitude(t_data, w_size=4, step=1):
     # print(amplitudes)
     return w_max, w_min, amplitudes
 
-def write_amplitudes_to_file(w_max, w_min, amplitudes, w_size=4, step=1, t_col=None):
-    w_max.to_pickle("./dataset/s6_max_w" + str(w_size) + "_s" + str(step) + ".pkl")
-    w_min.to_pickle("./dataset/s6_min_w" + str(w_size) + "_s" + str(step) + ".pkl")
-    amplitudes.to_pickle("./dataset/s6_heatmap_w" + str(w_size) + "_s" + str(step) + ".pkl")
-    # w_max.to_pickle("./dataset/max_w" + str(w_size) + "_s" + str(step) + ".pkl")
-    # w_min.to_pickle("./dataset/min_w" + str(w_size) + "_s" + str(step) + ".pkl")
-    # amplitudes.to_pickle("./dataset/heatmap_w" + str(w_size) + "_s" + str(step) + ".pkl")
+def write_amplitudes_to_file(w_max, w_min, amplitudes, w_size=4, step=1, prefix=None):
+    w_max.to_pickle("./dataset/" + prefix + "_max_w" + str(w_size) + "_s" + str(step) + ".pkl")
+    w_min.to_pickle("./dataset/" + prefix + "_min_w" + str(w_size) + "_s" + str(step) + ".pkl")
+    amplitudes.to_pickle("./dataset/" + prefix + "_heatmap_w" + str(w_size) + "_s" + str(step) + ".pkl")
 
-def amplitude_into_bins(w_data, no_bins=10):
+def amplitude_into_bins(w_data, no_bins=10, type='ori'):
     w_min = (np.floor(w_data.min().min())).astype(int)
     w_max = (np.ceil(w_data.max().max())).astype(int)
     col_labels = w_data.columns.values
     # print(w_min, w_max)
-    # r, c = w_data.shape
-    # idx = []
-    # col = []
-    # for i in range(r-1):
-    #     for j in range(c-1):
-    #         if w_data.iloc[i, j] > 130.2 and w_data.iloc[i, j] <= 167.4:
-    #             # print(i, j, w_data.iloc[i, j])
-    #             idx.append(i)
-    #             col.append(j)
-    # print(set(idx))
-    # print(idx, col)
-
-
-    # # bins = pd.interval_range(start=w_min, end=w_max, periods=10, closed='left') 
-    df = pd.read_pickle("./dataset/ori_bins.pkl")
-    left=[]
-    right=[]
-    for v in df.values:
-        left.append(v[0][0])
-        right.append(v[0][1])
-    # print(left, right)
-    bins = pd.IntervalIndex.from_arrays(left, right, closed="left")
-    # print(type(bins))
-    # print(bins.to_tuples())
-    # pd.DataFrame(bins.to_tuples()).to_pickle("./dataset/ori_bins.pkl")
-
+    if type == 'ori':
+        bins = pd.interval_range(start=w_min, end=w_max, periods=10, closed='left')
+        pd.DataFrame(bins.to_tuples()).to_pickle("./dataset/ori_bins.pkl")
+    elif type == 'pad':
+        df = pd.read_pickle("./dataset/ori_bins.pkl")
+        left=[]
+        right=[]
+        for v in df.values:
+            left.append(v[0][0])
+            right.append(v[0][1])
+        bins = pd.IntervalIndex.from_arrays(left, right, closed="left")
+    
     amp_distr = pd.DataFrame(0, index=bins, columns=col_labels)
     data_bins = pd.DataFrame(0, index=w_data.index, columns=col_labels)
-    amp_index = pd.DataFrame(np.array([]), index=bins, columns=col_labels)
-    # # print(bins.round(2))
-    # print(w_data)
-    # for column in w_data:
-    for column in [0]:
-        
+    for column in w_data:
         result = pd.cut(w_data[column], bins=bins, precision=1)
         amp_distr[column] = result.value_counts()
         data_bins[column] = result.to_frame()
-        for i, idx in enumerate(result):
-            print(amp_index.loc[i, column])
-            # amp_index.loc[i, column].append(idx)
-    print(amp_index)
-    # print(data_bins.iloc[1])
-    # print(w_data.iloc[1])
+    
+    amp_distr_list = pd.DataFrame(columns=["time", "amp_interval",  "count", "instances"])
+    no_bins = no_bins if no_bins else len(bins)
+    time_arr = []
+    amp_arr = []
+    count_arr = []
+    ins_arr = []
+    for column in amp_distr:
+        time_arr += [column] * no_bins
+        amp_arr += amp_distr.index.values
+        count_arr += [c for c in amp_distr[column]]
+        ins_list = [[] for _ in range(no_bins)]
+        for idx, value in enumerate(data_bins[column]):
+            ins_list[bins.get_loc(value)].append(idx)
+        ins_arr += ins_list
+    
+    str_amp_arr = [str(np.round(amp.left, 2)) + "-" + str(np.round(amp.right, 2)) for amp in amp_arr]
+    amp_distr_list['time'] = time_arr
+    amp_distr_list['amp_interval'] = str_amp_arr
+    amp_distr_list['count'] = count_arr
+    amp_distr_list['instances'] = ins_arr
+
+    # write to file
+    # amp_distr_list.to_pickle("./dataset/" + type + "_hm_wIdx_bins_" + str(no_bins) + ".pkl")
+
     # amp_index = []
     # for i in range(len(bins)):
     #     amp_index.append(str(np.round(bins[i].left, 2)) + "-" + str(np.round(bins[i].right, 2))) 
     # amp_distr.index = amp_index
-
-    # write to file
-    # amp_distr.to_pickle("./dataset/s2_amp_distr_same_bins" + str(no_bins) + ".pkl")
-    # data_bins.to_pickle("./dataset/s2_data_amp_same_bins" + str(no_bins) + ".pkl")
+    # print(amp_distr)
 
 
 # for debug
 if __name__ == "__main__":
     ori_file ='./dataset/dataframe_all_energy.pkl'
-    
+    s2_file = './dataset/sanitized_profile_best.pkl'
+    s6_file = './dataset/sanitized_profile_best6.pkl'
+
+    ori_hm = './dataset/ori_hm_wIdx_bins_10.pkl'
+
     df = read_data(ori_file)
+    w = 5
+    s = 3
+    w_max, w_min, amplitudes = slide_window_amplitude(df, w, s)
+    # print(amplitudes.shape)
+    amplitude_into_bins(amplitudes)
+    # write_amplitudes_to_file(w_max, w_min, amplitudes, w, s)
+    
+    # amplitude_into_bins(amplitudes)
     # print(df)
     # df1 = read_data("./dataset/heatmap_w5_s3.pkl")
     # df2 = read_data("./dataset/s_heatmap_w5_s3.pkl")
@@ -121,12 +127,9 @@ if __name__ == "__main__":
     # print(left, right)
     # print(pd.IntervalIndex.from_arrays(left, right, closed="right"))
     # print(df.iloc[300])
-    w = 5
-    s = 3
-    w_max, w_min, amplitudes = slide_window_amplitude(df, w, s)
-    amplitude_into_bins(amplitudes)
+    
     # print(amplitudes.iloc[0])
-    # write_amplitudes_to_file(w_max, w_min, amplitudes, w, s)
+    
     # print(w_max, w_min)
     # print("origin............................")
     # amplitude_into_bins(df1)

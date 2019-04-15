@@ -95,9 +95,8 @@ class HeatMap extends Component {
                 .style("stroke-width", 4)
                 .style("stroke", "none")
                 .on('click', d=>{
-                    setPos([1, 11, 12]);
+                    setPos(d.instances);
                 })
-                // .style("opacity", 0.8)
     }
 
 }
