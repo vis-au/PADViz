@@ -39,8 +39,9 @@ def read_heatmap():
     for row in df.itertuples():
         intv = getattr(row, 'Index')
         json_df = json_df.append([[t_col[i],intv, row[i]] for i in range(1, len(row) - 1)]) 
+
     json_df.columns=["time", "amp_interval",  "count"]
-    # print(json_df)
+    print(json_df)
     return json_df.to_json(orient="records")
 
 @json_blueprint.route('/json/hl')

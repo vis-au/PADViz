@@ -4,21 +4,21 @@ import ReactGridLayout,{ WidthProvider } from 'react-grid-layout';
 import 'react-grid-layout/css/styles.css';
 import 'react-resizable/css/styles.css';
 import styled from 'styled-components';
-import { withContentRect } from 'react-measure'; 
 import { withSize } from 'react-sizeme'
 
+import OriHeatMap from '../containers/OriHeatMap';
 import OriStatScatter from '../containers/OriStatScatter';
-import OriHM from '../containers/OriHM';
+import OriSpaghetti from '../containers/OriSpaghetti';
 
 const GridLayout = WidthProvider(ReactGridLayout)
 const Grid = styled(GridLayout)`
     min-width: 2800px;
 `;
 
-const MeasuredHeatMapOri = withContentRect('client')(OriHM);
-
-const withSizeHOC = withSize()
-const SizedHM = withSizeHOC(OriHM);
+const withSizeHOC = withSize();
+const SizedOriHeatMap = withSizeHOC(OriHeatMap);
+const SizedOriStaScatter = withSizeHOC(OriStatScatter);
+const SizedSpaghetti = withSizeHOC(OriSpaghetti);
 
 const Box = styled.div`
     box-sizing: border-box;
@@ -27,22 +27,21 @@ const Box = styled.div`
 `;
 
 
-
 class Dashboard extends Component {
 
     componentDidMount() {
-        window.addEventListener('resize', this.onWindowResize);
+        // window.addEventListener('resize', this.onWindowResize);
     }
 
     componentDidUpdate() {
     }
 
     componentWillUnmount() {
-        window.addEventListener('resize', this.onWindowResize);
+        // window.addEventListener('resize', this.onWindowResize);
     }
 
     onWindowResize(e) {
-        this.forceUpdate()
+        // this.forceUpdate()
         // console.log('resize')
     }
     
@@ -51,10 +50,10 @@ class Dashboard extends Component {
     }
 
     render() {
-        
+        const { hover } = this.props;
         const layout = [
             {i: 'HM_ORI', x: 0, y: 0, w: 6, h: 4, minW: 5},
-            {i: 'SCA1', x: 0, y: 4, w: 3, h: 4},
+            {i: 'SCA1', x: 0, y: 4, w: 3, h: 4, maxW: 4},
             {i: 'SCA2', x: 3, y: 4, w: 3, h: 4},
             {i: 'SPA', x: 0, y: 9, w: 6, h: 4},
 
@@ -66,17 +65,29 @@ class Dashboard extends Component {
 
         return (
             <React.Fragment>
-                <Grid className="dashboard" layout={layout} cols={12} rowHeight={100} onLayoutChange={this.onLayoutChange} {...this.props}>
+                <Grid 
+                    className="dashboard" 
+                    layout={layout} 
+                    cols={12} 
+                    rowHeight={100}
+                    hover={hover} 
+                    {...this.props}>
                     <Box key="HM_ORI"> 
-                        <SizedHM />
+                        <SizedOriHeatMap />
+                        {/* <SizedHM /> */}
+                        {/* <ConButton />
+                        <ConItem /> */}
                     </Box>
                     <Box key="SCA1">
-                        {/* <OriStatScatter /> */}
+                        <SizedOriStaScatter />
                     </Box>
                     <Box key="SCA2"></Box>
-                    <Box key="SPA"></Box>
+                    <Box key="SPA">
+                        <SizedSpaghetti />
+                    </Box>
 
-                    <Box key="HM_PAD"> 
+                    <Box key="HM_PAD">
+                    {/* <MeasuredOriStaScatter />  */}
                     </Box>
                     <Box key="SCA1_PAD">SCA_PAD</Box>
                     <Box key="SCA2_PAD">SCA2_PAD</Box>

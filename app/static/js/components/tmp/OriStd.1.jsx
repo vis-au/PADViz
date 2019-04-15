@@ -41,23 +41,39 @@ class OriStd1 extends Component {
     }
 
     renderD3 () {
-        const margin = {top: 10, right: 20, bottom: 50, left: 50},
-        width = 400 - margin.left - margin.right,
-        height = 400 - margin.top - margin.bottom;
+        const {
+            width,
+            height,
+            initData,
+            chartType,
+            connectFauxDOM
+        } = this.props;
+        
+        const margin = {top: 20, right: 50, bottom: 20, left: 50};
+        const chartWidth = width - margin.left - margin.right;
+        const chartHeight = height - margin.top - margin.bottom;
 
-        const svg = d3.select("#oristat2").append('svg')
-        .attr("width", width + margin.left + margin.right)
-            .attr("height", height + margin.top + margin.bottom)
+        let faux = connectFauxDOM('div', 'chart')
+
+        // Initialize
+        const svg = d3.select(faux).append("svg")
+            .attr("width", width)
+            .attr("height", height)
             .append("g")
-                .attr("transform", `translate(${margin.left}, ${margin.top})`);
-        const color = d3.scaleOrdinal(d3.schemeCategory10);
-        d3.json("/json/stat?type=s2").then(function(data) {
-            console.log(data)
-            
+            .attr("transform", `translate(${margin.left}, ${margin.top})`);
+
+        const dotColor = d3.scaleOrdinal(d3.schemeCategory10);
+        
+        if(chartType == "stat") {
+            xMax = d3.max(data, d=> {return d.mean});
+            yMax = d3.max(data, d=>{return d.std});
+        } else (chartType == "amp") {
+            xMax = d3.max(data, d=> {return d.min});
+            yMax = d3.max(data, d=>{return d.max});
+        }
         
         const x = d3.scaleLinear()
-            // .domain(d3.extent(data, d=> {return d.mean})).nice()
-            .domain([0, d3.max(data, d=> {return d.mean})]).nice()
+            .domain([0, xMax]).nice()
             .range([0, width]);
         const xAxisG = svg.append("g")
             .attr("transform", "translate(" + margin.left + "," + height + ")")
@@ -69,11 +85,9 @@ class OriStd1 extends Component {
                                 (height + margin.top + 20) + ")")
             .style("text-anchor", "middle")
             .text("mean");
-            // console.log(d3.min(data, d=>{return d.std}))
+
         const y = d3.scaleLinear()
-            // .domain(d3.extent(data, d=> {return d.std}))
-            // .domain([d3.min(data, d=>{return d.std})-5,d3.max(data, d=>{return d.std})+10]).nice()
-            .domain([0,d3.max(data, d=>{return d.std})+10]).nice()
+            .domain([0,yMax]).nice()
             .range([ height, 0]);
         svg.append("g")
             .attr("transform", "translate(" +(margin.left -1) +",0)")

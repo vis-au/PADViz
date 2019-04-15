@@ -1,13 +1,15 @@
 import {
     GET_DATA,
     DATA_RECEIVED,
-    GET_CLICK_POS
+    GET_CLICK_POS,
+    SET_POS
 } from '../actions/actionTypes';
 
 export const initialState = {
-    data: [],
-    clickPos: [1],    
-    loading: false
+    data: ['test', '1'],
+    clickPos: {},   
+    loading: false,
+    pos: null
 };
 
 export const rootReducer = (state = initialState, action) => {
@@ -17,7 +19,11 @@ export const rootReducer = (state = initialState, action) => {
         case DATA_RECEIVED:
             return {...state, data: action.json, loading: false};
         case GET_CLICK_POS:
-            return {...state, clickPos: action.pos};
+            console.log(action.count)
+            return [...state, {data:{}, clickPos: action.count, loading:action.amp}];
+        case SET_POS:
+            console.log(action.pos)
+            return action.pos;
         default:
             return state;
     }

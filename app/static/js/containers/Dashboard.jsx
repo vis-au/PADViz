@@ -8,11 +8,12 @@ const mapStatetoProps = (state) => ({
     // clickPos: getClickPos(state)
     clickPos: state.clickPos,
     data: state.data,
-    loading: state.loading
+    loading: state.loading,
+    pos: state.pos
 })
 
 const mapDistpachToProps = (state) => ({
     getData: getData,
 })
 
-export default connect(mapStatetoProps, mapDistpachToProps)(Dashboard);
+export default connect(mapStatetoProps, null)(Dashboard);

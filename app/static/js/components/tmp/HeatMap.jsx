@@ -20,6 +20,9 @@ class HeatMap extends Component {
     }
 
     renderD3 () {
+        const { 
+            clickPos,
+            getClickPos} = this.props;
         const margin = {top: 20, right: 100, bottom: 20, left: 100};
         const graphWidth = 1400-margin.left-margin.right;
         const height = 400 - margin.top - margin.bottom;
@@ -115,7 +118,7 @@ class HeatMap extends Component {
                     })
                     .style("stroke-width", 4)
                     .style("stroke", "none")
-                    .style("opacity", 0.8)
+                    // .style("opacity", 0.8)
                     .on('mouseover', d => {
                         // d3.select(this).style("stroke","orange").style("stroke-width","3px")
                     })
@@ -126,9 +129,11 @@ class HeatMap extends Component {
                         // tooltip.style("visibility","visible");
                         // tooltip.select("div").html("<strong>"+d.product+"</strong><br/> "+(+d.value).toFixed(2))
                     })
-                    // .on('click', d=>{
-                    //     console.log(d)
-                    // });
+                    .on('click', d=>{
+                        // console.log(d);
+                        getClickPos(d.time, d.amp_interval, d.count);
+                        console.log(clickPos)
+                    });
 
         });
     }

@@ -5,7 +5,8 @@ import { getData, dataReceived } from '../actions'
 
 function* fetchStatData() {
     const json = yield fetch('/json/stat_ori')
-        .then(response => response.json(), );    
+        .then(response => {response.json(); console.log(response)}, );  
+          
     yield put(getData);
 }
 

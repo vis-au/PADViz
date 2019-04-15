@@ -2,7 +2,9 @@ import {
     GET_DATA,
     DATA_RECEIVED,
     GET_CLICK_POS,
-    GET_INITIAL_DATA
+    // SET_CLICK_POS
+    GET_INITIAL_DATA,
+    SET_POS
 } from './actionTypes';
 
 export const getData = () => ({
@@ -14,12 +16,19 @@ export const dataReceived = (json) => ({
     json
 })
 
-export const getClickPos = (pos) => ({
+export const getClickPos = (time, amp, count) => ({
     type: GET_CLICK_POS,
-    pos
+    time,
+    amp,
+    count
 })
 
 export const getInitialData = (data) => ({
     type: GET_INITIAL_DATA,
     data
+})
+
+export const setPos = pos => ({
+    type: SET_POS,
+    pos
 })
