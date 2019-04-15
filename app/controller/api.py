@@ -88,8 +88,6 @@ def scatter_mean_std():
         df = pd.read_pickle(ori_file)
     
     df = df.sort_index()
-    # print(df)
-    # idx = [264, 265, 254]
     df_mean = df.mean(axis=1)    
     df_std = df.std(1)
     # print(df_mean)
@@ -98,14 +96,10 @@ def scatter_mean_std():
     df_scatter["mean"] = df_mean
     df_scatter["std"] = df_std
 
-    # print(df_scatter.loc[idx, :])
-    # return df_scatter.loc[idx, :].to_json(orient="records")
     return df_scatter.to_json(orient="records")
 
-@json_blueprint.route('/json/scatter')
+@json_blueprint.route('/json/amp')
 def scatter():
-    # req_amp = request.args.get("amp_interval")
-    # req_t = int(request.args.get("t"))
     req_type = request.args.get("type")
 
     if req_type == "s2":
@@ -118,39 +112,26 @@ def scatter():
         df_max = pd.read_pickle("./dataset/s_max_w5_s3.pkl")
         df_min = pd.read_pickle("./dataset/s_min_w5_s3.pkl")
     
-    # if type(request.args.get("time")) != type(1):
-    #     return json.dumps({"error": "params illegal"}), 404
-    # else:
-    #     req_time = int(request.args.get("time"))
-        # df_max = pd.read_pickle("./dataset/max_w5_s3.pkl")
-        # df_min = pd.read_pickle("./dataset/min_w5_s3.pkl")
-    # req_time=[1]
-    df_max = df_max.loc[idx[0], :]
-    df_min = df_min.loc[idx[0], :]
-    print(df_max)
-    result = pd.DataFrame(columns=["index", "max", "min"])
-    result["index"] = idx[0]
-    result["max"] = df_max
-    result["min"] = df_min
+    # print(df_max)
+    result = pd.DataFrame(columns=["time", "index", "max", "min"])
+    no_idx = df_max.shape[0]
+    time_arr = []
+    index_arr = []
+    max_arr = []
+    min_arr = []
+    for column in df_max:
+        time_arr += [column] * no_idx
+        index_arr += [ _ for _ in df_max.index]
+        max_arr += [ _ for _ in df_max[column]]
+        min_arr += [ _ for _ in df_min[column]]
+    
+    # print(len(time_arr), len(index_arr),len(min_arr),len(max_arr))
+    result["time"] = time_arr
+    result["index"] = index_arr
+    result["max"] = max_arr
+    result["min"] = min_arr
     # print(result)
     return result.to_json(orient="records")
-
-
-
-
-
-
-
-@json_blueprint.route('/json/scatter_n2_best')
-def scatter_ms():
-    df = pd.read_pickle("./dataset/sanitized_profile_best.pkl")
-    df_mean = df.mean(axis=1)    
-    df_std = df.std(1)
-    df_scatter = pd.DataFrame(columns=["mean", "std"])
-    df_scatter["mean"] = df_mean
-    df_scatter["std"] = df_std
-    print(df_scatter.shape)
-    return df_scatter.to_json(orient="records")
 
 @json_blueprint.route('/json/line')
 def all_energy():
@@ -162,15 +143,11 @@ def all_energy():
     else: # origi
         df = pd.read_pickle(ori_file)
     
-    df = df.sort_index().loc[idx, :]
-
-    # print(df)
+    df = df.sort_index()
 
     cols = ['time'] + [str(idx) for idx in df.index.values]
     json_df = pd.concat([pd.DataFrame(df.columns.values, dtype="int"), (df.T).reset_index(drop=True)], ignore_index=True, axis=1)
     json_df.columns = ['time'] + [str(idx) for idx in df.index.values] 
-    # json_df = json_df.loc[idx,:]
-    # print(json_df)
     return json_df.to_json(orient="records")
 
 @json_blueprint.route('/json/line1')

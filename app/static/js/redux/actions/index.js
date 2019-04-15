@@ -1,34 +1,22 @@
 import {
-    GET_DATA,
-    DATA_RECEIVED,
-    GET_CLICK_POS,
-    // SET_CLICK_POS
-    GET_INITIAL_DATA,
-    SET_POS
+    SET_INDEXES,
+    SET_HOVER,
+    SET_AMP_SCATTER
 } from './actionTypes';
 
-export const getData = () => ({
-    type: GET_DATA
+
+export const setIndexes = indexes => ({
+    type: SET_INDEXES,
+    indexes
 })
 
-export const dataReceived = (json) => ({
-    type: DATA_RECEIVED,
-    json
+export const setHover = hover => ({
+    type: SET_HOVER,
+    hover
 })
 
-export const getClickPos = (time, amp, count) => ({
-    type: GET_CLICK_POS,
-    time,
-    amp,
-    count
-})
-
-export const getInitialData = (data) => ({
-    type: GET_INITIAL_DATA,
-    data
-})
-
-export const setPos = pos => ({
-    type: SET_POS,
-    pos
+export const setAmpScatter = (amp_indexes, t_range) => ({
+    type: SET_AMP_SCATTER,
+    amp_indexes,
+    t_range
 })

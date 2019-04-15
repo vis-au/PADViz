@@ -1,20 +1,20 @@
 import {connect} from 'react-redux';
 
 import OriHeatMap from '../components/OriHeatMap';
-import { setPos } from '../redux/actions/index'
+import { setIndexes, setHover, setAmpScatter } from '../redux/actions/index'
 
 
 const mapStateToProps = (state, ownProps) => {
     return {
-        clickPos: state.clickPos
+        hover: state.hover,
+        indexes: state.indexes
     }
 }
+
 const mapDispatchToProps = (dispatch, ownProps) => ({
-    // setClickPos: (time, amp, count) => dispatch(setClickPos(time, amp, count))
-    // getClickPos(time, amp, count ) {
-    //     dispatch(getClickPos(time, amp, count))
-    // }
-    setPos : (pos) => dispatch(setPos(pos))
+    setIndexes : (indexes) => dispatch(setIndexes(indexes)),
+    setHover: (hover) => dispatch(setHover(hover)),
+    setAmpScatter: (amp_indexes, t_range) => dispatch(setAmpScatter(amp_indexes, t_range))
 })
 
 export default connect( mapStateToProps, mapDispatchToProps )(OriHeatMap);

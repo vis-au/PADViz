@@ -1,30 +1,33 @@
 import {
-    GET_DATA,
-    DATA_RECEIVED,
-    GET_CLICK_POS,
-    SET_POS
+    SET_INDEXES,
+    SET_HOVER,
+    SET_AMP_SCATTER
 } from '../actions/actionTypes';
 
 export const initialState = {
-    // data: ['test', '1'],
-    // clickPos: {},   
-    // loading: false,
-    pos: [1,2,3]
+    hover: null,
+    indexes: null,
+    amp_indexes: null,
+    t_range: null
 };
 
 export const rootReducer = (state = initialState, action) => {
     switch(action.type) {
-        case GET_DATA:
-            return {...state, loading: true};
-        case DATA_RECEIVED:
-            return {...state, data: action.json, loading: false};
-        case GET_CLICK_POS:
-            console.log(action.count)
-            return [...state, {data:{}, clickPos: action.count, loading:action.amp}];
-        case SET_POS:
+        case SET_INDEXES:
             return {
                 ...state, 
-                pos: action.pos
+                pos: action.indexes
+            };
+        case SET_HOVER:
+            return {
+                ...state, 
+                pos: action.hover
+            };
+        case SET_AMP_SCATTER:
+            return {
+                ...state,
+                amp_indexes: action.amp_indexes,
+                t_range: action.t_range
             }
         default:
             return state;

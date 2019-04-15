@@ -49,9 +49,11 @@ class Scatter extends Component {
         let faux = connectFauxDOM('div', 'chart')
         let svg, data;
         if(mode === "update") {
-            if(pos) {
+            if(pos && chartType === "stat") {
                 data = initData.filter(d =>  pos.includes(d.index))
-            } 
+            } else if(pos && chartType === "amp") {
+                data = initData.filter(d =>  pos.includes(d.index))
+            }
             svg = d3.select(faux).select('svg').select('g');
         } else {
             svg = d3.select(faux).append("svg")

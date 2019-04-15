@@ -55,7 +55,8 @@ class HeatMap extends Component {
             height,
             initData,
             connectFauxDOM,
-            setPos
+            setPos,
+            setHover
         } = this.props;
         
         const margin = {top: 20, right: 100, bottom: 20, left: 100};
@@ -122,11 +123,13 @@ class HeatMap extends Component {
                 .style("stroke-width", 4)
                 .style("stroke", "none")
                 .on('mouseover', (d, i) => {
-                    this.setToolTip(d.count, xScale(d.time), yScale(d.amp_interval))
-                    d3.selectAll(".tick text").classed("active", function(b, j) { return i == j; })
+                    this.setToolTip(d.count, xScale(d.time), yScale(d.amp_interval));
+                    setHover(d.instances)
+                    // d3.selectAll(".tick text").classed("active", function(b, j) { return i == j; })
                 })
                 .on('mouseout', d => {
-                    this.setToolTip(null)
+                    this.setToolTip(null);
+                    setHover(null);
                 })
                 .on('click', d=>{
                     setPos(d.instances);

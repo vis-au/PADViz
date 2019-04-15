@@ -11,9 +11,7 @@ import OriStatScatter from '../containers/OriStatScatter';
 import OriSpaghetti from '../containers/OriSpaghetti';
 
 const GridLayout = WidthProvider(ReactGridLayout)
-const Grid = styled(GridLayout)`
-    min-width: 2800px;
-`;
+
 
 const withSizeHOC = withSize();
 const SizedOriHeatMap = withSizeHOC(OriHeatMap);
@@ -21,9 +19,32 @@ const SizedOriStaScatter = withSizeHOC(OriStatScatter);
 const SizedSpaghetti = withSizeHOC(OriSpaghetti);
 
 const Box = styled.div`
-    box-sizing: border-box;
+    // box-sizing: border-box;
     width: 100%;
     border: solid #5B6DCD 4px;
+`;
+
+const generateHoverCss = index => `
+    .data-${index} {
+        opacity: 1;
+        -webkit-transition: opacity .2s ease-in;
+    }
+`;
+
+const Grid = styled(GridLayout)`
+    min-width: 2800px;
+    ${({hover}) => hover && hover.map(index => generateHoverCss(index))}
+    .tooltip {
+        position: absolute;
+        z-index: 10;
+        display: inline-block;
+        border: solid 1px;
+        border-radius: 2px;
+        padding: 5px;
+        
+        text-align: center;
+        
+      }
 `;
 
 
@@ -51,6 +72,7 @@ class Dashboard extends Component {
 
     render() {
         const { hover } = this.props;
+        console.log(hover)
         const layout = [
             {i: 'HM_ORI', x: 0, y: 0, w: 6, h: 4, minW: 5},
             {i: 'SCA1', x: 0, y: 4, w: 3, h: 4, maxW: 4},
