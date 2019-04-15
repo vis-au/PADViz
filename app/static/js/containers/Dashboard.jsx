@@ -5,10 +5,6 @@ import {getClickPos} from '../redux/selectors/index'
 import { getData } from '../redux/actions/index';
 
 const mapStatetoProps = (state) => ({
-    // clickPos: getClickPos(state)
-    clickPos: state.clickPos,
-    data: state.data,
-    loading: state.loading,
     pos: state.pos
 })
 

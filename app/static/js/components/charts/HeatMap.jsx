@@ -2,7 +2,8 @@ import React, { Component } from 'react';
 import * as d3 from 'd3';
 import PropTypes from 'prop-types'
 import { withFauxDOM } from 'react-faux-dom';
-import { setPos } from '../../redux/actions';
+
+import Tooltip from './Tooltip';
 
 class HeatMap extends Component {
     constructor(props) {
@@ -10,6 +11,31 @@ class HeatMap extends Component {
         this.renderD3 = this.renderD3.bind(this);
     }
     
+    state = {
+        tooltip: null
+    }
+
+    setToolTip = (count, x, y) => {
+        this.setState(state => ({
+            tooltip: (count > 0) ? {count, x, y} : null
+        }))
+    }
+
+    tooltipProps = () => {
+        const { count, x, y } = this.state.tooltip;
+        
+        if(this.state.tooltip) {
+            return {
+                content: count,
+                style: {top: y, left: x}
+            }
+        } else {
+            return {
+                style: {visibility: 'hidden'}
+            }
+        }
+    }
+
     componentDidMount() {
         this.renderD3()
     }
@@ -18,6 +44,7 @@ class HeatMap extends Component {
         return (
             <div className="heatmap">
                 {this.props.chart}
+                {this.state.tooltip && <Tooltip {...this.tooltipProps() } />}
             </div>
         )
     }
@@ -51,7 +78,7 @@ class HeatMap extends Component {
             .range([ 0, chartWidth])
             .domain(t_interval)
             .padding(0.001);
-
+        
         svg.append("g")
             .style("font-size", 12)
             .attr("transform", "translate(0," + (chartHeight-55) + ")")
@@ -94,6 +121,13 @@ class HeatMap extends Component {
                 })
                 .style("stroke-width", 4)
                 .style("stroke", "none")
+                .on('mouseover', (d, i) => {
+                    this.setToolTip(d.count, xScale(d.time), yScale(d.amp_interval))
+                    d3.selectAll(".tick text").classed("active", function(b, j) { return i == j; })
+                })
+                .on('mouseout', d => {
+                    this.setToolTip(null)
+                })
                 .on('click', d=>{
                     setPos(d.instances);
                 })

@@ -6,10 +6,10 @@ import {
 } from '../actions/actionTypes';
 
 export const initialState = {
-    data: ['test', '1'],
-    clickPos: {},   
-    loading: false,
-    pos: null
+    // data: ['test', '1'],
+    // clickPos: {},   
+    // loading: false,
+    pos: [1,2,3]
 };
 
 export const rootReducer = (state = initialState, action) => {
@@ -22,8 +22,10 @@ export const rootReducer = (state = initialState, action) => {
             console.log(action.count)
             return [...state, {data:{}, clickPos: action.count, loading:action.amp}];
         case SET_POS:
-            console.log("store.pos:  " + action.pos)
-            return action.pos;
+            return {
+                ...state, 
+                pos: action.pos
+            }
         default:
             return state;
     }
