@@ -59,7 +59,7 @@ class HeatMap extends Component {
             setHover,
             setTime
         } = this.props;
-        console.log(initData.length)
+        
         const margin = {top: 20, right: 100, bottom: 20, left: 100};
         const chartWidth = width - margin.left - margin.right;
         const chartHeight = height - margin.top - margin.bottom;

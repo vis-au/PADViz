@@ -34,6 +34,22 @@ class Spaghetti extends Component {
         )
     }
 
+    initDataTransformer(initData) {
+        const keys = Object.keys(initData[0]).filter(k => {return k !== 'time'; });
+
+        return keys.map(function(r){
+            return {
+                r_id: r,
+                values: initData.map(function(d){
+                    return {
+                        time: d.time,
+                        power: +d[r]
+                    }
+                })
+            }
+        });
+    }
+
     renderD3(mode) {
         const {
             width,
@@ -68,40 +84,27 @@ class Spaghetti extends Component {
         } else if(update) {
             svg = d3.select(faux).select('svg').select('g');
         }
-        
-        const color = d3.scaleOrdinal(d3.schemeCategory10);
-        color.domain(d3.keys(initData[0]).filter(function(key){
-                return key != "time";
-        }));
 
-        const energies = color.domain().map(function(r){
-            return {
-                r_id: r,
-                values: initData.map(function(d){
-                    return {
-                        time: d.time,
-                        power: +d[r]
-                    }
-                })
-            }
-        });
         
-        let data;
+        let data = this.initDataTransformer(initData);
         if(indexes && indexes.length > 0) {
-            data = energies.filter(d => indexes.includes(parseInt(d.r_id)))
+            data = data.filter(d => indexes.includes(parseInt(d.r_id)))
         } else {
-            data = energies.filter(d => ["1", "10", "20"].includes(d.r_id))
+            data = data.filter(d => ["1", "10", "20"].includes(d.r_id))
         }
-        const xScale = d3.scaleLinear()
+        const time = initData.map(d => {return d.time});
+        // console.log(time)
+
+        let xScale = d3.scaleLinear()
                 .domain(d3.extent(data[0].values, d=>d.time)).nice()
                 .range([0, chartWidth]);
 
-        const yScale = d3.scaleLinear()
-            .domain([0, 220])
+        let yScale = d3.scaleLinear()
+            .domain([0, 220]).nice()
             .range([chartHeight, 0]);
         
-        const xAxis = d3.axisBottom(xScale).tickSize(0);
-        const yAxis = d3.axisLeft(yScale).tickSize(0);
+        const xAxis = d3.axisBottom(xScale).ticks(time.length / 5);
+        const yAxis = d3.axisLeft(yScale).ticks(10);
         
         const line = d3.line()
             .x(d => xScale(d.time))
@@ -109,32 +112,31 @@ class Spaghetti extends Component {
 
         let pathes = svg.selectAll("path").data(data);
 
-        pathes.exit().transition().attr('stroke-width', 0).remove();
+        
 
         pathes = pathes
             .join("path")
             .style("mix-blend-mode", "multiply")
-            .style("stroke", d => {
-                return color(d.r_id)
-            })
+            .style("stroke", "#666666")
             .attr('class', d => `line data data-${d.r_id}`)
             .attr("d", d => line(d.values))
             .on('mouseover', d => {
-                setHover(d.index);
+                // console.log(d.index)
+                setHover([d.r_id]);
+                d3.select(`.data-${d.r_id}`).style("stroke", "#005073").attr("stroke-width", 3);
             })
             .on('mouseleave', d => {
                 setHover(null);
+                d3.select(`.data-${d.r_id}`).style("stroke", "#666666").attr("stroke-width", 1.5);
             })
             .merge(pathes);
 
         pathes
             .transition()
             .attr("d", d => line(d.values))
-            .style("stroke", d => {
-                return color(d.r_id)
-            })
+            .style("stroke", "#666666")
             .attr('stroke-width', 1.5);
-
+            pathes.exit().transition().attr('stroke-width', 0).remove();
         animateFauxDOM(800);
 
         if(render) {
@@ -142,11 +144,6 @@ class Spaghetti extends Component {
                 .attr('class', 'x axis')
                 .attr('transform', `translate(0, ${chartHeight})`)
                 .call(xAxis)
-                // .append('text')
-                // .attr('class', 'label')
-                // .attr('x', chartWidth / 2)
-                // .attr('y', 35)
-                // .style('text-anchor', 'middle')
 
             svg.append('g').attr('class', 'y axis').call(yAxis);
         } else if(update) {

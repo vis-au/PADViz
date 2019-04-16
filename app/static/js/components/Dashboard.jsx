@@ -48,6 +48,16 @@ const Grid = styled(GridLayout)`
         fill: none;
         shape-rendering: crispEdges;
     }
+    .axis text {
+        font-family: sans-serif;
+        font-size: 12px;
+        color: gray;
+    }
+    .label {
+        font-family: sans-serif;
+        font-size: 14px;
+        color: blue;
+    }
     .data {
         opacity: ${({hover}) => (hover ? 0.25 : 1)};
         -webkit-transition: opacity .2s ease-in;
@@ -127,7 +137,7 @@ class Dashboard extends Component {
                     </Box>
                     
 
-                    <Box key="HM_PAD">
+                    {/* <Box key="HM_PAD">
                         <SizedS2HeatMap /> 
                     </Box>
                     <Box key="SCA1_PAD">
@@ -138,7 +148,7 @@ class Dashboard extends Component {
                     </Box>
                     <Box key="SPA_PAD">
                         <SizedS2Spaghetti />
-                    </Box>
+                    </Box> */}
                 </Grid>
             </React.Fragment>
         )
