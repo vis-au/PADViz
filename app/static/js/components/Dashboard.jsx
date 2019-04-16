@@ -94,14 +94,14 @@ class Dashboard extends Component {
         const { hover } = this.props;
         const layout = [
             {i: 'HM_ORI', x: 0, y: 0, w: 6, h: 4, minW: 5, static:true},
-            {i: 'SCA1', x: 1, y: 9, w: 2, h: 4, maxW: 4},
-            {i: 'SCA2', x: 3, y: 9, w: 2, h: 4},
-            {i: 'SPA', x: 0, y: 4, w: 6, h: 4},
+            {i: 'SCA1', x: 1, y: 9, w: 2, h: 4, maxW: 4, static:true},
+            {i: 'SCA2', x: 3, y: 9, w: 2, h: 4, static:true},
+            {i: 'SPA', x: 0, y: 4, w: 6, h: 4, static:true},
 
-            {i: 'HM_PAD', x: 7, y: 0, w: 6, h: 4},
-            {i: 'SCA1_PAD', x: 6, y: 4, w: 3, h: 3},
-            {i: 'SCA2_PAD', x: 10, y: 4, w: 3, h: 3},
-            {i: 'SPA_PAD', x: 7, y: 9, w: 6, h: 4},
+            {i: 'HM_PAD', x: 7, y: 0, w: 6, h: 4, static:true},
+            {i: 'SCA1_PAD', x: 7, y: 9, w: 2, h: 3, static:true},
+            {i: 'SCA2_PAD', x: 10, y: 9, w: 3, h: 3, static:true},
+            {i: 'SPA_PAD', x: 7, y: 4, w: 6, h: 4, static:true},
         ];
 
         return (

@@ -22,18 +22,18 @@ class AmpScatter extends Component {
         tooltip: null
     }
 
-    setToolTip = (mean, std, x, y) => {
+    setToolTip = (max, min, x, y) => {
         this.setState(state => ({
-            tooltip: mean ? {mean, std, x, y} : null
+            tooltip: max ? {max, min, x, y} : null
         }))
     }
 
     tooltipProps = () => {
-        const {mean, std, x, y} = this.state.tooltip;
+        const {max, min, x, y} = this.state.tooltip;
         
         if(this.state.tooltip) {
             return {
-                content: `mean: ${Math.round(mean * 100) / 100}, std: ${Math.round(std * 100) / 100}`,
+                content: `max: ${Math.round(max * 100) / 100}, min: ${Math.round(min * 100) / 100}`,
                 style: {top: y - 20, left: x - 20}
             }
         } else {

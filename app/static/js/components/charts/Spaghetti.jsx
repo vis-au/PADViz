@@ -102,6 +102,7 @@ class Spaghetti extends Component {
         
         const xAxis = d3.axisBottom(xScale).tickSize(0);
         const yAxis = d3.axisLeft(yScale).tickSize(0);
+        
         const line = d3.line()
             .x(d => xScale(d.time))
             .y(d => yScale(d.power));
@@ -141,11 +142,11 @@ class Spaghetti extends Component {
                 .attr('class', 'x axis')
                 .attr('transform', `translate(0, ${chartHeight})`)
                 .call(xAxis)
-                .append('text')
-                .attr('class', 'label')
-                .attr('x', chartWidth / 2)
-                .attr('y', 35)
-                .style('text-anchor', 'middle')
+                // .append('text')
+                // .attr('class', 'label')
+                // .attr('x', chartWidth / 2)
+                // .attr('y', 35)
+                // .style('text-anchor', 'middle')
 
             svg.append('g').attr('class', 'y axis').call(yAxis);
         } else if(update) {
