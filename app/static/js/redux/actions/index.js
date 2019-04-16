@@ -1,7 +1,7 @@
 import {
     SET_INDEXES,
     SET_HOVER,
-    SET_AMP_SCATTER
+    SET_TIME
 } from './actionTypes';
 
 
@@ -15,8 +15,7 @@ export const setHover = hover => ({
     hover
 })
 
-export const setAmpScatter = (amp_indexes, t_range) => ({
-    type: SET_AMP_SCATTER,
-    amp_indexes,
-    t_range
+export const setTime = (time) => ({
+    type: SET_TIME,
+    time
 })

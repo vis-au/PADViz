@@ -1,14 +1,13 @@
 import {
     SET_INDEXES,
     SET_HOVER,
-    SET_AMP_SCATTER
+    SET_TIME
 } from '../actions/actionTypes';
 
 export const initialState = {
     hover: null,
     indexes: null,
-    amp_indexes: null,
-    t_range: null
+    time: null
 };
 
 export const rootReducer = (state = initialState, action) => {
@@ -16,18 +15,17 @@ export const rootReducer = (state = initialState, action) => {
         case SET_INDEXES:
             return {
                 ...state, 
-                pos: action.indexes
+                indexes: action.indexes
             };
         case SET_HOVER:
             return {
                 ...state, 
-                pos: action.hover
+                hover: action.hover
             };
-        case SET_AMP_SCATTER:
+        case SET_TIME:
             return {
                 ...state,
-                amp_indexes: action.amp_indexes,
-                t_range: action.t_range
+                time: action.time
             }
         default:
             return state;

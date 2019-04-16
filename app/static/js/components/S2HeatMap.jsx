@@ -1,9 +1,9 @@
 import React, { Component } from 'react';
 import sizeMe from 'react-sizeme';
 
-import StatScatter from './charts/StatScatter';
+import HeatMap from './charts/HeatMap';
 
-class OriStatScatter extends Component {
+class S2HeatMap extends Component {
     constructor(props) {
         super(props)
     }
@@ -15,7 +15,7 @@ class OriStatScatter extends Component {
     componentDidMount() {
         this.setState({isLoading: true});
         
-        fetch("/json/stat")
+        fetch("/json/heatmap?type=s2")
         .then(res => res.json())
         .then(data => this.setState({
             isLoading: false,
@@ -29,7 +29,7 @@ class OriStatScatter extends Component {
         return(
             <div>
                 { initData ?
-                <Scatter initData={initData} width="400" height="400" {...this.props}/> 
+                <HeatMap initData={initData} width={width} height={height ? height : (width/3.5)} {...this.props}/> 
                 : <p>Loading...</p>}
             </div>
         )
@@ -37,4 +37,4 @@ class OriStatScatter extends Component {
     }
 }
 
-export default sizeMe({ monitorHeight: true })(OriStatScatter)
+export default sizeMe({ monitorHeight: true })(S2HeatMap);

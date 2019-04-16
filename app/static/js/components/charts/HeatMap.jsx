@@ -27,7 +27,7 @@ class HeatMap extends Component {
         if(this.state.tooltip) {
             return {
                 content: count,
-                style: {top: y, left: x}
+                style: {top: y, left: x + 80}
             }
         } else {
             return {
@@ -55,7 +55,7 @@ class HeatMap extends Component {
             height,
             initData,
             connectFauxDOM,
-            setPos,
+            setIndexes,
             setHover
         } = this.props;
         
@@ -125,14 +125,13 @@ class HeatMap extends Component {
                 .on('mouseover', (d, i) => {
                     this.setToolTip(d.count, xScale(d.time), yScale(d.amp_interval));
                     setHover(d.instances)
-                    // d3.selectAll(".tick text").classed("active", function(b, j) { return i == j; })
                 })
                 .on('mouseout', d => {
                     this.setToolTip(null);
                     setHover(null);
                 })
                 .on('click', d=>{
-                    setPos(d.instances);
+                    setIndexes(d.instances);
                 })
     }
 

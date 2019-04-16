@@ -49,7 +49,7 @@ def amplitude_into_bins(w_data, no_bins=10, type='ori'):
     if type == 'ori':
         bins = pd.interval_range(start=w_min, end=w_max, periods=10, closed='left')
         pd.DataFrame(bins.to_tuples()).to_pickle("./dataset/ori_bins.pkl")
-    elif type == 'pad':
+    elif type == 's2' or type == 's6':
         df = pd.read_pickle("./dataset/ori_bins.pkl")
         left=[]
         right=[]
@@ -57,7 +57,8 @@ def amplitude_into_bins(w_data, no_bins=10, type='ori'):
             left.append(v[0][0])
             right.append(v[0][1])
         bins = pd.IntervalIndex.from_arrays(left, right, closed="left")
-    
+   
+    print(bins)
     amp_distr = pd.DataFrame(0, index=bins, columns=col_labels)
     data_bins = pd.DataFrame(0, index=w_data.index, columns=col_labels)
     for column in w_data:
@@ -85,9 +86,9 @@ def amplitude_into_bins(w_data, no_bins=10, type='ori'):
     amp_distr_list['amp_interval'] = str_amp_arr
     amp_distr_list['count'] = count_arr
     amp_distr_list['instances'] = ins_arr
-
+    # print(amp_distr_list)
     # write to file
-    # amp_distr_list.to_pickle("./dataset/" + type + "_hm_wIdx_bins_" + str(no_bins) + ".pkl")
+    amp_distr_list.to_pickle("./dataset/" + type + "_hm_wIdx_bins_" + str(no_bins) + ".pkl")
 
     # amp_index = []
     # for i in range(len(bins)):
@@ -104,12 +105,12 @@ if __name__ == "__main__":
 
     ori_hm = './dataset/ori_hm_wIdx_bins_10.pkl'
 
-    df = read_data(ori_file)
+    df = read_data(s6_file)
     w = 5
     s = 3
     w_max, w_min, amplitudes = slide_window_amplitude(df, w, s)
     # print(amplitudes.shape)
-    amplitude_into_bins(amplitudes)
+    amplitude_into_bins(amplitudes, type='s6')
     # write_amplitudes_to_file(w_max, w_min, amplitudes, w, s)
     
     # amplitude_into_bins(amplitudes)

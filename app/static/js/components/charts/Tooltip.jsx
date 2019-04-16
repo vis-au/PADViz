@@ -3,12 +3,13 @@ import PropTypes from 'prop-types';
 import styled from 'styled-components';
 
 const Tip = styled.div`
-    background-color: white;
+    background-color: gray;
     border: solid;
-    border-width: 2px;
+    border-width: 1px;
     padding: 5x;
-    opacity: 1;
+    opacity: 0.8;
     color: black;
+    z-index: 10;
 `;
 
 const Tooltip = ({style = {}, content}) => (

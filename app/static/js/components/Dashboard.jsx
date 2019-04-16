@@ -9,6 +9,7 @@ import { withSize } from 'react-sizeme'
 import OriHeatMap from '../containers/OriHeatMap';
 import OriStatScatter from '../containers/OriStatScatter';
 import OriSpaghetti from '../containers/OriSpaghetti';
+import S2HeatMap from '../containers/S2HeatMap';
 
 const GridLayout = WidthProvider(ReactGridLayout)
 
@@ -17,11 +18,12 @@ const withSizeHOC = withSize();
 const SizedOriHeatMap = withSizeHOC(OriHeatMap);
 const SizedOriStaScatter = withSizeHOC(OriStatScatter);
 const SizedSpaghetti = withSizeHOC(OriSpaghetti);
+const SizedS2HeatMap = withSizeHOC(S2HeatMap);
 
 const Box = styled.div`
-    // box-sizing: border-box;
+    
     width: 100%;
-    border: solid #5B6DCD 4px;
+    
 `;
 
 const generateHoverCss = index => `
@@ -33,7 +35,17 @@ const generateHoverCss = index => `
 
 const Grid = styled(GridLayout)`
     min-width: 2800px;
+    .axis path,
+    .axis line {
+        fill: none;
+        shape-rendering: crispEdges;
+    }
+    .data {
+        opacity: ${({hover}) => (hover ? 0.25 : 1)};
+        -webkit-transition: opacity .2s ease-in;
+    }
     ${({hover}) => hover && hover.map(index => generateHoverCss(index))}
+
     .tooltip {
         position: absolute;
         z-index: 10;
@@ -72,12 +84,11 @@ class Dashboard extends Component {
 
     render() {
         const { hover } = this.props;
-        console.log(hover)
         const layout = [
-            {i: 'HM_ORI', x: 0, y: 0, w: 6, h: 4, minW: 5},
-            {i: 'SCA1', x: 0, y: 4, w: 3, h: 4, maxW: 4},
-            {i: 'SCA2', x: 3, y: 4, w: 3, h: 4},
-            {i: 'SPA', x: 0, y: 9, w: 6, h: 4},
+            {i: 'HM_ORI', x: 0, y: 0, w: 6, h: 4, minW: 5, static:true},
+            {i: 'SCA1', x: 1, y: 9, w: 2, h: 4, maxW: 4},
+            {i: 'SCA2', x: 3, y: 9, w: 2, h: 4},
+            {i: 'SPA', x: 0, y: 4, w: 6, h: 4},
 
             {i: 'HM_PAD', x: 7, y: 0, w: 6, h: 4},
             {i: 'SCA1_PAD', x: 6, y: 4, w: 3, h: 3},
@@ -100,16 +111,17 @@ class Dashboard extends Component {
                         {/* <ConButton />
                         <ConItem /> */}
                     </Box>
+                    <Box key="SPA">
+                        <SizedSpaghetti />
+                    </Box>
                     <Box key="SCA1">
                         <SizedOriStaScatter />
                     </Box>
                     <Box key="SCA2"></Box>
-                    <Box key="SPA">
-                        <SizedSpaghetti />
-                    </Box>
+                    
 
                     <Box key="HM_PAD">
-                    {/* <MeasuredOriStaScatter />  */}
+                    <SizedS2HeatMap /> 
                     </Box>
                     <Box key="SCA1_PAD">SCA_PAD</Box>
                     <Box key="SCA2_PAD">SCA2_PAD</Box>
