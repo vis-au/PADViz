@@ -1,7 +1,7 @@
 import {connect} from 'react-redux';
 
 import { setIndexes, setHover, setTime } from '../redux/actions/index'
-import S2HeatMap from '../components/tmp/HeatMapS2';
+import S2HeatMap from '../components/S2HeatMap';
 
 
 const mapStateToProps = (state, ownProps) => {

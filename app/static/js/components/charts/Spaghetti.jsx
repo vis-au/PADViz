@@ -40,6 +40,7 @@ class Spaghetti extends Component {
             height,
             initData,
             indexes,
+            setHover,
             connectFauxDOM,
             animateFauxDOM
         } = this.props;
@@ -117,11 +118,11 @@ class Spaghetti extends Component {
             })
             .attr('class', d => `line data data-${d.r_id}`)
             .attr("d", d => line(d.values))
-            .on('mouseenter', d => {
-                pathes.style("mix-blend-mode", null).attr("stroke", "#ddd");
+            .on('mouseover', d => {
+                setHover(d.index);
             })
             .on('mouseleave', d => {
-                pathes.style("mix-blend-mode", "multiply").attr("stroke", null);
+                setHover(null);
             })
             .merge(pathes);
 

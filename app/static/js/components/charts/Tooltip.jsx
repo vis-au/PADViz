@@ -10,6 +10,7 @@ const Tip = styled.div`
     opacity: 0.8;
     color: black;
     z-index: 10;
+    pointer-events: none;
 `;
 
 const Tooltip = ({style = {}, content}) => (

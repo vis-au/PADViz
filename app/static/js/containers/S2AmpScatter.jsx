@@ -1,7 +1,7 @@
 import {connect} from 'react-redux';
 
-import OriAmpScatter from '../components/OriAmpScatter';
 import { setHover } from '../redux/actions/index'
+import S2AmpScatter from '../components/S2AmpScatter';
 
 const mapStateToProps = (state, ownProps) => ({
     hover: state.hover,
@@ -13,5 +13,5 @@ const mapDispatchToProps = (dispatch, ownProps) => ({
     setHover: (hover) => dispatch(setHover(hover))
 })
 
-export default connect(mapStateToProps, mapDispatchToProps)(OriAmpScatter);
+export default connect(mapStateToProps, mapDispatchToProps)(S2AmpScatter);
 

@@ -34,7 +34,7 @@ class AmpScatter extends Component {
         if(this.state.tooltip) {
             return {
                 content: `mean: ${Math.round(mean * 100) / 100}, std: ${Math.round(std * 100) / 100}`,
-                style: {top: y + 10, left: x - 10}
+                style: {top: y - 20, left: x - 20}
             }
         } else {
             return {
@@ -70,6 +70,7 @@ class AmpScatter extends Component {
             initData,
             indexes,
             time,
+            setHover,
             connectFauxDOM,
             animateFauxDOM,
         } = this.props;
@@ -130,9 +131,11 @@ class AmpScatter extends Component {
                 .style("fill", d => {return dotColor(d.std)})
                 .on('mouseover', d => {
                     this.setToolTip(d.min, d.max, xScale(d.min), yScale(d.max));
+                    setHover([d.index]);
                 })
                 .on('mouseout', d => {
                     this.setToolTip(null);
+                    setHover(null);
                 })
                 .merge(dots);
         
@@ -151,11 +154,10 @@ class AmpScatter extends Component {
                 .attr('transform', `translate(0, ${chartHeight})`)
                 .call(xAxis)
                 .append('text')
-                .attr('class', 'label')
-                .attr('x', chartWidth / 2)
-                .attr('y', 35)
-                .style('text-anchor', 'middle')
-                .text("mean and std");
+                    .attr('class', 'label')
+                    .attr('transform', `translate(${chartWidth}, ${chartHeight})`)
+                    .style('text-anchor', 'middle')
+                    .text("min");
 
             svg.append('g').attr('class', 'y axis').call(yAxis);
         } else if(update) {

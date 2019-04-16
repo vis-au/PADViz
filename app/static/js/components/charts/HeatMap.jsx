@@ -59,7 +59,7 @@ class HeatMap extends Component {
             setHover,
             setTime
         } = this.props;
-        
+        console.log(initData.length)
         const margin = {top: 20, right: 100, bottom: 20, left: 100};
         const chartWidth = width - margin.left - margin.right;
         const chartHeight = height - margin.top - margin.bottom;
@@ -109,6 +109,10 @@ class HeatMap extends Component {
             .data(initData, function(d) {return d.time+':'+d.amp_interval;})
             .enter()
             .append("rect")
+                // .attr('class', d => {
+                //     let dl = d.instances.map(i => `data-${i}`);
+                //     return "rec data " + dl
+                // })
                 .attr("x", function(d) { return xScale(d.time) })
                 .attr("y", function(d) { return yScale(d.amp_interval) })
                 .attr("width", xScale.bandwidth() )

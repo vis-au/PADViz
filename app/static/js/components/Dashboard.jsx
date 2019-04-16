@@ -11,6 +11,9 @@ import OriStatScatter from '../containers/OriStatScatter';
 import OriAmpScatter from '../containers/OriAmpScatter';
 import OriSpaghetti from '../containers/OriSpaghetti';
 import S2HeatMap from '../containers/S2HeatMap';
+import S2StatScatter from '../containers/S2StatScatter';
+import S2AmpScatter from '../containers/S2AmpScatter';
+import S2Spaghetti from '../containers/S2Spaghetti';
 
 const GridLayout = WidthProvider(ReactGridLayout)
 
@@ -21,6 +24,9 @@ const SizedOriStaScatter = withSizeHOC(OriStatScatter);
 const SizedOriAmpScatter = withSizeHOC(OriAmpScatter);
 const SizedSpaghetti = withSizeHOC(OriSpaghetti);
 const SizedS2HeatMap = withSizeHOC(S2HeatMap);
+const SizedS2StaScatter = withSizeHOC(S2StatScatter);
+const SizedS2AmpScatter = withSizeHOC(S2AmpScatter);
+const SizedS2Spaghetti = withSizeHOC(S2Spaghetti);
 
 const Box = styled.div`
     
@@ -109,15 +115,12 @@ class Dashboard extends Component {
                     {...this.props}>
                     <Box key="HM_ORI"> 
                         <SizedOriHeatMap />
-                        {/* <SizedHM /> */}
-                        {/* <ConButton />
-                        <ConItem /> */}
                     </Box>
                     <Box key="SPA">
-                        {/* <SizedSpaghetti /> */}
+                        <SizedSpaghetti />
                     </Box>
                     <Box key="SCA1">
-                        {/* <SizedOriStaScatter /> */}
+                        <SizedOriStaScatter />
                     </Box>
                     <Box key="SCA2">
                         <SizedOriAmpScatter />
@@ -125,11 +128,17 @@ class Dashboard extends Component {
                     
 
                     <Box key="HM_PAD">
-                    <SizedS2HeatMap /> 
+                        <SizedS2HeatMap /> 
                     </Box>
-                    <Box key="SCA1_PAD">SCA_PAD</Box>
-                    <Box key="SCA2_PAD">SCA2_PAD</Box>
-                    <Box key="SPA_PAD"></Box>
+                    <Box key="SCA1_PAD">
+                        <SizedS2StaScatter />
+                    </Box>
+                    <Box key="SCA2_PAD">
+                        <SizedS2AmpScatter />
+                    </Box>
+                    <Box key="SPA_PAD">
+                        <SizedS2Spaghetti />
+                    </Box>
                 </Grid>
             </React.Fragment>
         )

@@ -34,7 +34,7 @@ class StatScatter extends Component {
         if(this.state.tooltip) {
             return {
                 content: `mean: ${Math.round(mean * 100) / 100}, std: ${Math.round(std * 100) / 100}`,
-                style: {top: y + 10, left: x - 10}
+                style: {top: y-30, left: x - 20}
             }
         } else {
             return {
@@ -69,6 +69,7 @@ class StatScatter extends Component {
             height,
             initData,
             indexes,
+            setHover,
             connectFauxDOM,
             animateFauxDOM,
         } = this.props;
@@ -130,9 +131,11 @@ class StatScatter extends Component {
                 .style("fill", d => {return dotColor(d.std)})
                 .on('mouseover', d => {
                     this.setToolTip(d.mean, d.std, xScale(d.mean), yScale(d.std));
+                    setHover([d.index]);
                 })
                 .on('mouseout', d => {
                     this.setToolTip(null);
+                    setHover(null);
                 })
                 .merge(dots);
         
