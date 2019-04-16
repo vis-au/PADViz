@@ -166,7 +166,7 @@ class StatScatter extends Component {
     
 }
 
-Scatter.defaultProps = {
+StatScatter.defaultProps = {
     chart: 'loading'
 }
 

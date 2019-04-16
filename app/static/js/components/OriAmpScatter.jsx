@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import sizeMe from 'react-sizeme';
 
-import Scatter from './charts/Scatter';
+import AmpScatter from './charts/AmpScatter';
 
 class OriAmpScatter extends Component {
     constructor(props) {
@@ -29,7 +29,7 @@ class OriAmpScatter extends Component {
         return(
             <div>
                 { initData ?
-                <Scatter initData={initData} width="400" height="400" chartType='amp' {...this.props}/> 
+                <AmpScatter initData={initData} width="400" height="400" chartType='amp' {...this.props}/> 
                 : <p>Loading...</p>}
             </div>
         )

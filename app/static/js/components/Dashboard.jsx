@@ -8,6 +8,7 @@ import { withSize } from 'react-sizeme'
 
 import OriHeatMap from '../containers/OriHeatMap';
 import OriStatScatter from '../containers/OriStatScatter';
+import OriAmpScatter from '../containers/OriAmpScatter';
 import OriSpaghetti from '../containers/OriSpaghetti';
 import S2HeatMap from '../containers/S2HeatMap';
 
@@ -17,6 +18,7 @@ const GridLayout = WidthProvider(ReactGridLayout)
 const withSizeHOC = withSize();
 const SizedOriHeatMap = withSizeHOC(OriHeatMap);
 const SizedOriStaScatter = withSizeHOC(OriStatScatter);
+const SizedOriAmpScatter = withSizeHOC(OriAmpScatter);
 const SizedSpaghetti = withSizeHOC(OriSpaghetti);
 const SizedS2HeatMap = withSizeHOC(S2HeatMap);
 
@@ -112,12 +114,14 @@ class Dashboard extends Component {
                         <ConItem /> */}
                     </Box>
                     <Box key="SPA">
-                        <SizedSpaghetti />
+                        {/* <SizedSpaghetti /> */}
                     </Box>
                     <Box key="SCA1">
-                        <SizedOriStaScatter />
+                        {/* <SizedOriStaScatter /> */}
                     </Box>
-                    <Box key="SCA2"></Box>
+                    <Box key="SCA2">
+                        <SizedOriAmpScatter />
+                    </Box>
                     
 
                     <Box key="HM_PAD">

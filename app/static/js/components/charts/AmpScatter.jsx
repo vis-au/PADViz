@@ -77,7 +77,7 @@ class AmpScatter extends Component {
         const render = mode === 'render'
         const update = mode === 'update'
         
-        const margin = {top: 20, right: 20, bottom: 20, left: 20};
+        const margin = {top: 20, right: 20, bottom: 20, left: 35};
         const chartWidth = width - margin.left - margin.right;
         const chartHeight = height - margin.top - margin.bottom;
         
@@ -90,20 +90,20 @@ class AmpScatter extends Component {
                 .attr("height", height)
                 .append("g")
                 .attr("transform", `translate(${margin.left}, ${margin.top})`);
-            data = initData;
+            data = initData.filter(d =>  [0, 10, 20,30, 40].includes(d.index) && d.time === 0);
         } else if(update) {
-            if(indexes) {
-                data = initData.filter(d =>  indexes.includes(d.index) && d.time === time)
+            if(indexes && time) {
+                data = initData.filter(d =>  indexes.includes(d.index) && (d.time === time))
             } 
             svg = d3.select(faux).select('svg').select('g');
         }  
 
         let xScale, yScale;
         xScale = d3.scaleLinear()
-            .domain([0, d3.max(data, d=> {return d.max})])
+            .domain(d3.extent(data, d => {return d.min})).nice()
             .rangeRound([0, chartWidth]);
         yScale = d3.scaleLinear()
-            .domain([0, d3.max(data, d=>{return d.min})])
+            .domain(d3.extent(data, d => {return d.max})).nice()
             .rangeRound([chartHeight, 0])
         
         const xAxis = d3.axisBottom(xScale).tickSize(0)
@@ -111,7 +111,7 @@ class AmpScatter extends Component {
 
         let dotColor;
         if(data.length >= 10) {
-            dotColor = d3.scaleSequential(d3.interpolateYlGnBu).domain([0, d3.max(data, d => {return d.std})]);
+            dotColor = d3.scaleSequential(d3.interpolateYlGnBu).domain([0, d3.max(data, d => {return d.max})]);
         } else {
             dotColor = d3.scaleOrdinal(d3.schemeCategory10);
         }
@@ -125,11 +125,11 @@ class AmpScatter extends Component {
                 .append("circle")
                 .attr('class', d => `dot stroked-negative data data-${d.index}`)
                 .attr("r", 4)
-                .attr("cx", function (d) { return xScale(d.mean); } )
-                .attr("cy", function (d) { return yScale(d.std); } )
+                .attr("cx", function (d) { return xScale(d.min); } )
+                .attr("cy", function (d) { return yScale(d.max); } )
                 .style("fill", d => {return dotColor(d.std)})
                 .on('mouseover', d => {
-                    this.setToolTip(d.mean, d.std, xScale(d.mean), yScale(d.std));
+                    this.setToolTip(d.min, d.max, xScale(d.min), yScale(d.max));
                 })
                 .on('mouseout', d => {
                     this.setToolTip(null);
@@ -139,9 +139,9 @@ class AmpScatter extends Component {
         dots
             .transition()
             .attr('r', 4)
-            .attr("cx", function (d) { return xScale(d.mean); } )
-            .attr("cy", function (d) { return yScale(d.std); } )
-            .style("fill", d => {return dotColor(d.std)});
+            .attr("cx", function (d) { return xScale(d.min); } )
+            .attr("cy", function (d) { return yScale(d.max); } )
+            .style("fill", d => {return dotColor(d.max)});
 
         animateFauxDOM(800);
 
@@ -166,7 +166,7 @@ class AmpScatter extends Component {
     
 }
 
-Scatter.defaultProps = {
+AmpScatter.defaultProps = {
     chart: 'loading'
 }
 

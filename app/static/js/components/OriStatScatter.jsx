@@ -29,7 +29,7 @@ class OriStatScatter extends Component {
         return(
             <div>
                 { initData ?
-                <Scatter initData={initData} width="400" height="400" {...this.props}/> 
+                <StatScatter initData={initData} width="400" height="400" {...this.props}/> 
                 : <p>Loading...</p>}
             </div>
         )

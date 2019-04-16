@@ -1,12 +1,12 @@
 import {connect} from 'react-redux';
 
-import OriStatScatter from '../components/OriStatScatter';
+import OriAmpScatter from '../components/OriAmpScatter';
 
 const mapStateToProps = (state, ownProps) => ({
     hover: state.hover,
-    amp_indexes: state.indexes,
-    t_range: state.t_range
+    indexes: state.indexes,
+    time: state.time,
 })
 
-export default connect(mapStateToProps)(OriStatScatter);
+export default connect(mapStateToProps)(OriAmpScatter);
 

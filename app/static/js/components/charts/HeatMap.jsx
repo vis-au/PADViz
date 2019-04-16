@@ -56,7 +56,8 @@ class HeatMap extends Component {
             initData,
             connectFauxDOM,
             setIndexes,
-            setHover
+            setHover,
+            setTime
         } = this.props;
         
         const margin = {top: 20, right: 100, bottom: 20, left: 100};
@@ -132,6 +133,7 @@ class HeatMap extends Component {
                 })
                 .on('click', d=>{
                     setIndexes(d.instances);
+                    setTime(d.time)
                 })
     }
 
