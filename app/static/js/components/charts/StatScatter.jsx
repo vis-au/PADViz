@@ -22,18 +22,18 @@ class StatScatter extends Component {
         tooltip: null
     }
 
-    setToolTip = (mean, std, x, y) => {
+    setToolTip = (mean, std, x, y, id) => {
         this.setState(state => ({
-            tooltip: mean ? {mean, std, x, y} : null
+            tooltip: mean ? {mean, std, x, y, id} : null
         }))
     }
 
     tooltipProps = () => {
-        const {mean, std, x, y} = this.state.tooltip;
+        const {mean, std, x, y, id} = this.state.tooltip;
         
         if(this.state.tooltip) {
             return {
-                content: `mean: ${Math.round(mean * 100) / 100}, std: ${Math.round(std * 100) / 100}`,
+                content: `mean: ${Math.round(mean * 100) / 100}, std: ${Math.round(std * 100) / 100}, id: ${id}`,
                 style: {top: y-30, left: x - 20}
             }
         } else {
@@ -129,12 +129,12 @@ class StatScatter extends Component {
                 .attr("cx", function (d) { return xScale(d.mean); } )
                 .attr("cy", function (d) { return yScale(d.std); } )
                 .on('mouseover', d => {
-                    d3.select(`.stat.data-${d.index}`).attr('r', 10).attr("fill", "#005073");
-                    this.setToolTip(d.mean, d.std, xScale(d.mean), yScale(d.std));
+                    // d3.select(`.stat.data-${d.index}`).attr('r', 10).attr("fill", "#005073");
+                    this.setToolTip(d.mean, d.std, xScale(d.mean), yScale(d.std), d.index);
                     setHover([d.index]);
                 })
                 .on('mouseout', d => {
-                    d3.select(`.stat.data-${d.index}`).attr('r', 4).attr("fill", "#666666");
+                    // d3.select(`.stat.data-${d.index}`).attr('r', 4).attr("fill", "#666666");
                     this.setToolTip(null);
                     setHover(null);
                 })

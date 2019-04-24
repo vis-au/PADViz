@@ -70,7 +70,6 @@ class HeatMap extends Component {
         } = this.props;
         // let svg = d3.select(faux).select('svg');
         if(hover) {
-            console.log(hover)
             let idxSet = new Set([]);
             hover.forEach(function(idx) {
                 indexMap[idx].forEach(function(v){

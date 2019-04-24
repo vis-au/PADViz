@@ -22,18 +22,18 @@ class AmpScatter extends Component {
         tooltip: null
     }
 
-    setToolTip = (max, min, x, y) => {
+    setToolTip = (max, min, x, y, id) => {
         this.setState(state => ({
-            tooltip: max ? {max, min, x, y} : null
+            tooltip: max ? {max, min, x, y, id} : null
         }))
     }
 
     tooltipProps = () => {
-        const {max, min, x, y} = this.state.tooltip;
+        const {max, min, x, y, id} = this.state.tooltip;
         
         if(this.state.tooltip) {
             return {
-                content: `max: ${Math.round(max * 100) / 100}, min: ${Math.round(min * 100) / 100}`,
+                content: `max: ${Math.round(max * 100) / 100}, min: ${Math.round(min * 100) / 100}, id: ${id}`,
                 style: {top: y - 20, left: x - 20}
             }
         } else {
@@ -136,12 +136,12 @@ class AmpScatter extends Component {
                 .attr("cx", function (d) { return xScale(d.min); } )
                 .attr("cy", function (d) { return yScale(d.max); } )
                 .on('mouseover', d => {
-                    d3.select(`.amp.data-${d.index}`).attr('r', 10).attr("fill", "#005073");
-                    this.setToolTip(d.min, d.max, xScale(d.min), yScale(d.max));
+                    // d3.select(`.amp.data-${d.index}`).attr('r', 10).attr("fill", "#005073");
+                    this.setToolTip(d.min, d.max, xScale(d.min), yScale(d.max), d.index);
                     setHover([d.index]);
                 })
                 .on('mouseout', d => {
-                    d3.select(`.amp.data-${d.index}`).attr('r', 4).attr("fill", "#666666");
+                    // d3.select(`.amp.data-${d.index}`).attr('r', 4).attr("fill", "#666666");
                     this.setToolTip(null);
                     setHover(null);
                 })

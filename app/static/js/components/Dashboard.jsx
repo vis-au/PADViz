@@ -136,12 +136,12 @@ class Dashboard extends Component {
                     cols={12} 
                     rowHeight={100}
                     hover={hover} 
-                    hmIdx={hmIdx}
+                    
                     {...this.props}>
                     <Box key="HM_ORI"> 
                         <SizedOriHeatMap />
                     </Box>
-                    {/* <Box key="SPA">
+                    <Box key="SPA">
                         <SizedSpaghetti />
                     </Box>
                     <Box key="SCA1">
@@ -149,13 +149,13 @@ class Dashboard extends Component {
                     </Box>
                     <Box key="SCA2">
                         <SizedOriAmpScatter />
-                    </Box> */}
+                    </Box>
                     
 
                      <Box key="HM_PAD">
                         <SizedS2HeatMap /> 
                     </Box>
-                    {/*<Box key="SCA1_PAD">
+                    <Box key="SCA1_PAD">
                         <SizedS2StaScatter />
                     </Box>
                     <Box key="SCA2_PAD">
@@ -163,7 +163,7 @@ class Dashboard extends Component {
                     </Box>
                     <Box key="SPA_PAD">
                         <SizedS2Spaghetti />
-                    </Box> */}
+                    </Box>
                 </Grid>
             </React.Fragment>
         )
