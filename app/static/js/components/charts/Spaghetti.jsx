@@ -92,19 +92,19 @@ class Spaghetti extends Component {
         } else {
             data = data.filter(d => ["1", "10", "20"].includes(d.r_id))
         }
-        const time = initData.map(d => {return d.time});
-        // console.log(time)
+        const time = data[0].values.map(v => v.time);
 
-        let xScale = d3.scaleLinear()
-                .domain(d3.extent(data[0].values, d=>d.time)).nice()
-                .range([0, chartWidth]);
+        let xScale = d3.scalePoint()
+                        .domain(time)
+                        .range([0, chartWidth]);
 
         let yScale = d3.scaleLinear()
             .domain([0, 220]).nice()
             .range([chartHeight, 0]);
         
-        const xAxis = d3.axisBottom(xScale).ticks(time.length / 5);
-        const yAxis = d3.axisLeft(yScale).ticks(10);
+        const xAxis = d3.axisBottom(xScale).tickValues(time.filter((d, i) => !(i % 4)));
+        const yAxis = d3.axisLeft(yScale)
+                        .ticks(10);
         
         const line = d3.line()
             .x(d => xScale(d.time))
@@ -112,39 +112,37 @@ class Spaghetti extends Component {
 
         let pathes = svg.selectAll("path").data(data);
 
-        
-
         pathes = pathes
             .join("path")
             .style("mix-blend-mode", "multiply")
             .style("stroke", "#666666")
-            .attr('class', d => `line data data-${d.r_id}`)
+            .attr('class', d => `spagetti line data data-${d.r_id}`)
             .attr("d", d => line(d.values))
             .on('mouseover', d => {
-                // console.log(d.index)
                 setHover([d.r_id]);
-                d3.select(`.data-${d.r_id}`).style("stroke", "#005073").attr("stroke-width", 3);
+                d3.select(`.spagetti.data-${d.r_id}`).attr("stroke", "#005073").attr("stroke-width", 3);
             })
             .on('mouseleave', d => {
                 setHover(null);
-                d3.select(`.data-${d.r_id}`).style("stroke", "#666666").attr("stroke-width", 1.5);
+                d3.select(`.spagetti.data-${d.r_id}`).attr("stroke", "#666666").attr("stroke-width", 1.5);
             })
             .merge(pathes);
 
         pathes
             .transition()
             .attr("d", d => line(d.values))
-            .style("stroke", "#666666")
+            .attr("stroke", "#666666")
             .attr('stroke-width', 1.5);
-            pathes.exit().transition().attr('stroke-width', 0).remove();
+        pathes.exit().transition().attr('stroke-width', 0).remove();
         animateFauxDOM(800);
 
         if(render) {
             svg.append('g')
                 .attr('class', 'x axis')
                 .attr('transform', `translate(0, ${chartHeight})`)
+                .style('fill', 'darkOrange')
                 .call(xAxis)
-
+                
             svg.append('g').attr('class', 'y axis').call(yAxis);
         } else if(update) {
             svg.select('g.x.axis').call(xAxis)

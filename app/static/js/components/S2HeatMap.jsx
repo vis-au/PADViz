@@ -17,19 +17,29 @@ class S2HeatMap extends Component {
         
         fetch("/json/heatmap?type=s2")
         .then(res => res.json())
-        .then(data => this.setState({
-            isLoading: false,
-            initData: data
-        }))
+        .then(data => {
+            let indexMap = {};
+            data.map(function(d, i) {
+                d.instances.forEach(function(idx) {
+                    if(idx in indexMap) indexMap[idx].push(i)
+                    else indexMap[idx] = [i]
+                })
+            })
+            this.setState({
+                isLoading: false,
+                initData: data,
+                indexMap: indexMap
+            })
+        })
     }
 
     render(){
-        const {initData} = this.state;
+        const {initData, indexMap} = this.state;
         let { width, height } = this.props.size
         return(
             <div>
                 { initData ?
-                <HeatMap initData={initData} width={width} height={height ? height : (width/3.5)} {...this.props}/> 
+                <HeatMap initData={initData} indexMap={indexMap} type="s2" width={width} height={height ? height : (width/3.5)} {...this.props}/> 
                 : <p>Loading...</p>}
             </div>
         )

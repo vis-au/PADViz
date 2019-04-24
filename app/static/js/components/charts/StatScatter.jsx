@@ -117,11 +117,6 @@ class StatScatter extends Component {
             dotColor = d3.scaleOrdinal(d3.schemeCategory10);
         }
 
-        let mouseover = function(d, i) {
-            console.log(d)
-            d3.select(this).attr('r', 8)
-        }
-
         let dots = svg.selectAll('.dot')
                     .data(data);
         
@@ -129,17 +124,17 @@ class StatScatter extends Component {
         dots = dots
                 .enter()
                 .append("circle")
-                .attr('class', d => `dot stroked-negative data data-${d.index}`)
+                .attr('class', d => `stat dot stroked-negative data data-${d.index}`)
                 .attr("r", 4)
                 .attr("cx", function (d) { return xScale(d.mean); } )
                 .attr("cy", function (d) { return yScale(d.std); } )
                 .on('mouseover', d => {
-                    d3.select(`.data-${d.index}`).attr('r', 10).style("fill", "#005073");
+                    d3.select(`.stat.data-${d.index}`).attr('r', 10).attr("fill", "#005073");
                     this.setToolTip(d.mean, d.std, xScale(d.mean), yScale(d.std));
                     setHover([d.index]);
                 })
                 .on('mouseout', d => {
-                    d3.select(`.data-${d.index}`).attr('r', 4).style("fill", "#666666");
+                    d3.select(`.stat.data-${d.index}`).attr('r', 4).attr("fill", "#666666");
                     this.setToolTip(null);
                     setHover(null);
                 })
@@ -150,7 +145,7 @@ class StatScatter extends Component {
             .attr('r', 4)
             .attr("cx", function (d) { return xScale(d.mean); } )
             .attr("cy", function (d) { return yScale(d.std); } )
-            .style("fill", "#666666");
+            .attr("fill", "#666666");
             // .style("fill", d => {return dotColor(d.std)});
 
         animateFauxDOM(800);

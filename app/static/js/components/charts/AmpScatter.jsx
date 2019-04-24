@@ -51,6 +51,9 @@ class AmpScatter extends Component {
         if(this.props.indexes !== prevProps.indexes) {
             this.renderD3('update')
         }
+        // if(this.props.hover !== prevProps.hover) {
+        //     this.renderD3('hover')
+        // }
         
     }
 
@@ -73,10 +76,12 @@ class AmpScatter extends Component {
             setHover,
             connectFauxDOM,
             animateFauxDOM,
+            hover
         } = this.props;
         
         const render = mode === 'render'
         const update = mode === 'update'
+        const hoverUpdate = mode === 'hover'
         
         const margin = {top: 20, right: 20, bottom: 40, left: 40};
         const chartWidth = width - margin.left - margin.right;
@@ -97,7 +102,9 @@ class AmpScatter extends Component {
                 data = initData.filter(d =>  indexes.includes(d.index) && (d.time === time))
             } 
             svg = d3.select(faux).select('svg').select('g');
-        }  
+        } else if(hoverUpdate) {
+            svg = d3.select(faux).select('svg').select('g');
+        }
 
         let xScale, yScale;
         xScale = d3.scaleLinear()
@@ -124,17 +131,17 @@ class AmpScatter extends Component {
         dots = dots
                 .enter()
                 .append("circle")
-                .attr('class', d => `dot stroked-negative data data-${d.index}`)
+                .attr('class', d => `amp dot stroked-negative data data-${d.index}`)
                 .attr("r", 4)
                 .attr("cx", function (d) { return xScale(d.min); } )
                 .attr("cy", function (d) { return yScale(d.max); } )
                 .on('mouseover', d => {
-                    d3.select(`.data-${d.index}`).attr('r', 10)
+                    d3.select(`.amp.data-${d.index}`).attr('r', 10).attr("fill", "#005073");
                     this.setToolTip(d.min, d.max, xScale(d.min), yScale(d.max));
                     setHover([d.index]);
                 })
                 .on('mouseout', d => {
-                    // d3.select(`.data-${d.index}`).attr('r', 4).style("fill", "#666666");
+                    d3.select(`.amp.data-${d.index}`).attr('r', 4).attr("fill", "#666666");
                     this.setToolTip(null);
                     setHover(null);
                 })
@@ -145,20 +152,15 @@ class AmpScatter extends Component {
             .attr('r', 4)
             .attr("cx", function (d) { return xScale(d.min); } )
             .attr("cy", function (d) { return yScale(d.max); } )
-            .style("fill", "#666666");
+            .attr("fill", "#666666");
 
         animateFauxDOM(800);
-
+        
         if(render) {
             svg.append('g')
                 .attr('class', 'x axis')
                 .attr('transform', `translate(0, ${chartHeight})`)
                 .call(xAxis)
-                .append('text')
-                    .attr('class', 'label')
-                    .attr('transform', `translate(${chartWidth}, ${chartHeight})`)
-                    .style('text-anchor', 'middle')
-                    .text("min");
 
             svg.append('g').attr('class', 'y axis').call(yAxis);
         } else if(update) {

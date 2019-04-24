@@ -1,7 +1,8 @@
 import {
     SET_INDEXES,
     SET_HOVER,
-    SET_TIME
+    SET_TIME,
+    SET_HM_IDX
 } from './actionTypes';
 
 
@@ -18,4 +19,9 @@ export const setHover = hover => ({
 export const setTime = (time) => ({
     type: SET_TIME,
     time
+})
+
+export const setHMIdx = (idx) => ({
+    type: SET_HM_IDX,
+    idx
 })

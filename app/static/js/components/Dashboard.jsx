@@ -29,15 +29,27 @@ const SizedS2AmpScatter = withSizeHOC(S2AmpScatter);
 const SizedS2Spaghetti = withSizeHOC(S2Spaghetti);
 
 const Box = styled.div`
-    
     width: 100%;
-    
 `;
 
 const generateHoverCss = index => `
-    .data-${index} {
+    .amp.data-${index} {
         opacity: 1;
-        -webkit-transition: opacity .2s ease-in;
+        -webkit-transition: opacity .2s ease-in; 
+        fill: #005073;
+        r: 10;
+    }
+    .stat.data-${index} {
+        opacity: 1;
+        -webkit-transition: opacity .2s ease-in; 
+        fill: #005073;
+        r: 8;
+    }
+    .spagetti.data-${index} {
+        opacity: 1;
+        -webkit-transition: opacity .2s ease-in; 
+        stroke: blue;
+        stroke-width: 3;
     }
 `;
 
@@ -48,7 +60,7 @@ const Grid = styled(GridLayout)`
         fill: none;
         shape-rendering: crispEdges;
     }
-    .axis text {
+    .x .axis {
         font-family: sans-serif;
         font-size: 12px;
         color: gray;
@@ -71,9 +83,7 @@ const Grid = styled(GridLayout)`
         border: solid 1px;
         border-radius: 2px;
         padding: 5px;
-        
         text-align: center;
-        
       }
 `;
 
@@ -101,7 +111,11 @@ class Dashboard extends Component {
     }
 
     render() {
-        const { hover } = this.props;
+        const { 
+            hover,
+            hmIdx
+         } = this.props;
+
         const layout = [
             {i: 'HM_ORI', x: 0, y: 0, w: 6, h: 4, minW: 5, static:true},
             {i: 'SCA1', x: 1, y: 9, w: 2, h: 4, maxW: 4, static:true},
@@ -122,11 +136,12 @@ class Dashboard extends Component {
                     cols={12} 
                     rowHeight={100}
                     hover={hover} 
+                    hmIdx={hmIdx}
                     {...this.props}>
                     <Box key="HM_ORI"> 
                         <SizedOriHeatMap />
                     </Box>
-                    <Box key="SPA">
+                    {/* <Box key="SPA">
                         <SizedSpaghetti />
                     </Box>
                     <Box key="SCA1">
@@ -134,13 +149,13 @@ class Dashboard extends Component {
                     </Box>
                     <Box key="SCA2">
                         <SizedOriAmpScatter />
-                    </Box>
+                    </Box> */}
                     
 
-                    {/* <Box key="HM_PAD">
+                     <Box key="HM_PAD">
                         <SizedS2HeatMap /> 
                     </Box>
-                    <Box key="SCA1_PAD">
+                    {/*<Box key="SCA1_PAD">
                         <SizedS2StaScatter />
                     </Box>
                     <Box key="SCA2_PAD">

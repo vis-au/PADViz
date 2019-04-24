@@ -1,13 +1,15 @@
 import {
     SET_INDEXES,
     SET_HOVER,
-    SET_TIME
+    SET_TIME,
+    SET_HM_IDX
 } from '../actions/actionTypes';
 
 export const initialState = {
     hover: null,
     indexes: null,
-    time: null
+    time: null,
+    hmIdx: null
 };
 
 export const rootReducer = (state = initialState, action) => {
@@ -26,6 +28,11 @@ export const rootReducer = (state = initialState, action) => {
             return {
                 ...state,
                 time: action.time
+            }
+        case SET_HM_IDX:
+            return {
+                ...state,
+                hmIdx: action.idx
             }
         default:
             return state;

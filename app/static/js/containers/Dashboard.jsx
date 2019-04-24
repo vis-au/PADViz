@@ -4,7 +4,8 @@ import Dashboard from '../components/Dashboard';
 
 const mapStatetoProps = (state) => ({
     hover: state.hover,
-    indexes: state.indexes
+    indexes: state.indexes,
+    hmIdx: state.hmIdx
 })
 
 export default connect(mapStatetoProps)(Dashboard);
