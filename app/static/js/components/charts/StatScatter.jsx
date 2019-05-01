@@ -2,6 +2,7 @@ import React, { Component } from 'react';
 import PropTypes from "prop-types";
 import { withFauxDOM } from 'react-faux-dom';
 import * as d3 from 'd3';
+import { select, event } from 'd3-selection';
 import styled from 'styled-components';
 
 import Tooltip from './Tooltip';
@@ -34,7 +35,7 @@ class StatScatter extends Component {
         if(this.state.tooltip) {
             return {
                 content: `mean: ${Math.round(mean * 100) / 100}, std: ${Math.round(std * 100) / 100}, id: ${id}`,
-                style: {top: y-30, left: x - 20}
+                style: {top: y-30, left: x - 10}
             }
         } else {
             return {
@@ -103,53 +104,40 @@ class StatScatter extends Component {
         xScale = d3.scaleLinear()
             .domain([0, d3.max(data, d=> {return d.mean})]).nice()
             .range([0, chartWidth]);
+        
         yScale = d3.scaleLinear()
             .domain([0, d3.max(data, d=>{return d.std})]).nice()
             .range([chartHeight, 0])
-       
-        const xAxis = d3.axisBottom(xScale).tickSize(0)
-        const yAxis = d3.axisLeft(yScale).tickSize(0)
-
-        let dotColor;
-        if(data.length >= 10) {
-            dotColor = d3.scaleSequential(d3.interpolateYlGnBu).domain([0, d3.max(data, d => {return d.std})]);
-        } else {
-            dotColor = d3.scaleOrdinal(d3.schemeCategory10);
-        }
 
         let dots = svg.selectAll('.dot')
                     .data(data);
         
         dots.exit().transition().attr('r', 0).remove();
+
         dots = dots
                 .enter()
                 .append("circle")
-                .attr('class', d => `stat dot stroked-negative data data-${d.index}`)
-                .attr("r", 4)
-                .attr("cx", function (d) { return xScale(d.mean); } )
-                .attr("cy", function (d) { return yScale(d.std); } )
                 .on('mouseover', d => {
-                    // d3.select(`.stat.data-${d.index}`).attr('r', 10).attr("fill", "#005073");
                     this.setToolTip(d.mean, d.std, xScale(d.mean), yScale(d.std), d.index);
                     setHover([d.index]);
                 })
                 .on('mouseout', d => {
-                    // d3.select(`.stat.data-${d.index}`).attr('r', 4).attr("fill", "#666666");
                     this.setToolTip(null);
                     setHover(null);
                 })
                 .merge(dots);
         
         dots
-            .transition()
-            .attr('r', 4)
+            .attr("r", 4)
             .attr("cx", function (d) { return xScale(d.mean); } )
             .attr("cy", function (d) { return yScale(d.std); } )
-            .attr("fill", "#666666");
-            // .style("fill", d => {return dotColor(d.std)});
+            .attr("class", d => `stat dot data data-${d.index}`)
+            .transition();
 
         animateFauxDOM(800);
-
+        
+        const xAxis = d3.axisBottom(xScale).tickSize(0);
+        const yAxis = d3.axisLeft(yScale).tickSize(0);
         if(render) {
             svg.append('g')
                 .attr('class', 'x axis')
@@ -170,14 +158,12 @@ class StatScatter extends Component {
             .attr('class', 'label')
             .style('text-anchor', 'middle')
             .text("mean");
+
         svg.append("text")
             .attr('transform', `translate(${margin.left - 20}, ${margin.top})`)
             .attr('class', 'label')
             .style('text-anchor', 'middle')
             .text("std");
-        
-        
-
     }
     
 }
@@ -191,4 +177,4 @@ StatScatter.defaultProps = {
 //     data: PropTypes.arrayOf(PropTypes.arrayOf(PropTypes.number)).isRequired
 // };
 
-export default withFauxDOM(StatScatter)
+export default withFauxDOM(StatScatter);

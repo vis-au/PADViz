@@ -14,7 +14,11 @@ class Spaghetti extends Component {
         super(props);
         this.renderD3 = this.renderD3.bind(this);
     }
-    
+
+    state = {
+        data: this.initDataTransformer(this.props.initData)
+    }
+
     componentDidMount() {
         this.renderD3('render')
     }
@@ -69,7 +73,7 @@ class Spaghetti extends Component {
         const chartHeight = height - margin.top - margin.bottom;
 
         let faux = connectFauxDOM('div', 'chart')
-        let svg;
+        let svg, data;
         if(render) {
             svg = d3.select(faux).append("svg")
                 .attr("width", width)
@@ -77,21 +81,21 @@ class Spaghetti extends Component {
                 .append("g")
                     .attr("transform", `translate(${margin.left}, ${margin.top})`)
                     .attr("fill", "none")
-                    .attr("stroke", "white")
+                    .attr("stroke", "steerblue")
                     .attr("stroke-linejoin", "round")
                     .attr("stroke-width", 1.5)
                     .attr("stroke-linecap", "round");
+                this.setState({data: this.initDataTransformer(initData)});
+                data = this.state.data.filter(d => ["1", "10", "20"].includes(d.r_id))
         } else if(update) {
+            if(indexes && indexes.length > 0) {
+                data = this.state.data.filter(d => indexes.includes(parseInt(d.r_id)))
+            }
+            
             svg = d3.select(faux).select('svg').select('g');
         }
-
+        console.log(data);
         
-        let data = this.initDataTransformer(initData);
-        if(indexes && indexes.length > 0) {
-            data = data.filter(d => indexes.includes(parseInt(d.r_id)))
-        } else {
-            data = data.filter(d => ["1", "10", "20"].includes(d.r_id))
-        }
         const time = data[0].values.map(v => v.time);
 
         let xScale = d3.scalePoint()
@@ -102,45 +106,41 @@ class Spaghetti extends Component {
             .domain([0, 220]).nice()
             .range([chartHeight, 0]);
         
-        const xAxis = d3.axisBottom(xScale).tickValues(time.filter((d, i) => !(i % 4)));
-        const yAxis = d3.axisLeft(yScale)
-                        .ticks(10);
-        
         const line = d3.line()
             .x(d => xScale(d.time))
             .y(d => yScale(d.power));
+        
+        let pathes = svg.selectAll("path")
+                        .data(data);
 
-        let pathes = svg.selectAll("path").data(data);
-
+        // pathes.exit().transition().attr('stroke-width', 0).remove();
+        
         pathes = pathes
             .join("path")
-            .style("mix-blend-mode", "multiply")
-            .style("stroke", "#666666")
-            .attr('class', d => `spagetti line data data-${d.r_id}`)
-            .attr("d", d => line(d.values))
+            // .style("mix-blend-mode", "multiply")
             .on('mouseover', d => {
                 setHover([d.r_id]);
-                d3.select(`.spagetti.data-${d.r_id}`).attr("stroke", "#005073").attr("stroke-width", 3);
             })
             .on('mouseleave', d => {
                 setHover(null);
-                d3.select(`.spagetti.data-${d.r_id}`).attr("stroke", "#666666").attr("stroke-width", 1.5);
             })
-            .merge(pathes);
+            // .on('click', );
 
         pathes
-            .transition()
+            .attr('class', d => `spagetti line data data-${d.r_id}`)
             .attr("d", d => line(d.values))
             .attr("stroke", "#666666")
-            .attr('stroke-width', 1.5);
-        pathes.exit().transition().attr('stroke-width', 0).remove();
+            .attr('stroke-width', 1.5)
+            .transition();
+        // pathes.exit().transition().attr('stroke-width', 0).remove();
         animateFauxDOM(800);
 
+        const xAxis = d3.axisBottom(xScale).tickValues(time.filter((d, i) => !(i % 4)));
+        const yAxis = d3.axisLeft(yScale)
+                        .ticks(10);
         if(render) {
             svg.append('g')
-                .attr('class', 'x axis')
                 .attr('transform', `translate(0, ${chartHeight})`)
-                .style('fill', 'darkOrange')
                 .call(xAxis)
                 
             svg.append('g').attr('class', 'y axis').call(yAxis);

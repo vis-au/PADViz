@@ -36,39 +36,27 @@ const generateHoverCss = index => `
     .amp.data-${index} {
         opacity: 1;
         -webkit-transition: opacity .2s ease-in; 
-        fill: #005073;
+        fill: #7bd666;
         r: 10;
     }
     .stat.data-${index} {
         opacity: 1;
         -webkit-transition: opacity .2s ease-in; 
-        fill: #005073;
-        r: 8;
+        fill: #7bd666;
+        r: 10;
     }
     .spagetti.data-${index} {
         opacity: 1;
         -webkit-transition: opacity .2s ease-in; 
-        stroke: blue;
-        stroke-width: 3;
+        stroke: #7bd666;
+        stroke-width: 5;
     }
 `;
 
 const Grid = styled(GridLayout)`
     min-width: 2800px;
-    .axis path,
-    .axis line {
-        fill: none;
-        shape-rendering: crispEdges;
-    }
-    .x .axis {
-        font-family: sans-serif;
-        font-size: 12px;
-        color: gray;
-    }
-    .label {
-        font-family: sans-serif;
-        font-size: 14px;
-        color: blue;
+    .line {
+        
     }
     .data {
         opacity: ${({hover}) => (hover ? 0.25 : 1)};
@@ -80,10 +68,6 @@ const Grid = styled(GridLayout)`
         position: absolute;
         z-index: 10;
         display: inline-block;
-        border: solid 1px;
-        border-radius: 2px;
-        padding: 5px;
-        text-align: center;
       }
 `;
 
@@ -138,9 +122,9 @@ class Dashboard extends Component {
                     hover={hover} 
                     
                     {...this.props}>
-                    <Box key="HM_ORI"> 
+                     <Box key="HM_ORI"> 
                         <SizedOriHeatMap />
-                    </Box>
+                    </Box> 
                     <Box key="SPA">
                         <SizedSpaghetti />
                     </Box>
@@ -152,7 +136,7 @@ class Dashboard extends Component {
                     </Box>
                     
 
-                     <Box key="HM_PAD">
+                     {/* <Box key="HM_PAD">
                         <SizedS2HeatMap /> 
                     </Box>
                     <Box key="SCA1_PAD">
@@ -163,7 +147,7 @@ class Dashboard extends Component {
                     </Box>
                     <Box key="SPA_PAD">
                         <SizedS2Spaghetti />
-                    </Box>
+                    </Box> */}
                 </Grid>
             </React.Fragment>
         )

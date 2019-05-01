@@ -3,12 +3,13 @@ import PropTypes from 'prop-types';
 import styled from 'styled-components';
 
 const Tip = styled.div`
-    background-color: gray;
-    border: solid;
-    border-width: 1px;
-    padding: 5x;
+    background-color: #bdbdbd;
+    border: solid 1px;
+    border-radius: 2px;
+    border-color: #626262;
+    padding: 5px;
+    text-align: center;
     opacity: 0.8;
-    color: black;
     z-index: 10;
     pointer-events: none;
 `;
@@ -19,8 +20,8 @@ const Tooltip = ({style = {}, content}) => (
     </Tip>
 )
 
-// Tooltip.propType = {
-//     contet: PropTypes.string.isRequired
-// }
+Tooltip.propType = {
+    content: PropTypes.string.isRequired
+}
 
 export default Tooltip;
