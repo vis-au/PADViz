@@ -58,6 +58,10 @@ const Grid = styled(GridLayout)`
     .line {
         
     }
+    .dot .selected {
+        stroke: red;
+        stroke-width: 2px;
+    }
     .data {
         opacity: ${({hover}) => (hover ? 0.25 : 1)};
         -webkit-transition: opacity .2s ease-in;
@@ -136,7 +140,7 @@ class Dashboard extends Component {
                     </Box>
                     
 
-                     {/* <Box key="HM_PAD">
+                    <Box key="HM_PAD">
                         <SizedS2HeatMap /> 
                     </Box>
                     <Box key="SCA1_PAD">
@@ -147,7 +151,7 @@ class Dashboard extends Component {
                     </Box>
                     <Box key="SPA_PAD">
                         <SizedS2Spaghetti />
-                    </Box> */}
+                    </Box>
                 </Grid>
             </React.Fragment>
         )

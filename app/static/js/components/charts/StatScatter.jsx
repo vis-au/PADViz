@@ -6,6 +6,7 @@ import { select, event } from 'd3-selection';
 import styled from 'styled-components';
 
 import Tooltip from './Tooltip';
+import { setSelected } from '../../redux/actions';
 
 const Wrapper = styled.div`
     position: relative;
@@ -73,6 +74,8 @@ class StatScatter extends Component {
             setHover,
             connectFauxDOM,
             animateFauxDOM,
+            selectedIndexes,
+            hover
         } = this.props;
         
         const render = mode === 'render'
@@ -125,6 +128,15 @@ class StatScatter extends Component {
                     this.setToolTip(null);
                     setHover(null);
                 })
+                // .on("click", d => {
+                //     this.setToolTip(d.mean, d.std, xScale(d.mean), yScale(d.std), d.index);
+                //     if(hover.include(d.index)) {
+                //         setHover(null)
+                //     } else {
+                //         setHover([d.index]);
+                //     }
+                    
+                // })
                 .merge(dots);
         
         dots

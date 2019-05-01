@@ -1,15 +1,17 @@
 import {connect} from 'react-redux';
 
 import OriStatScatter from '../components/OriStatScatter';
-import { setHover } from '../redux/actions/index'
+import { setHover, setSelected } from '../redux/actions/index'
 
 const mapStateToProps = (state, ownProps) => ({
     hover: state.hover,
-    indexes: state.indexes
+    indexes: state.indexes,
+    selectedIndexes: state.selectedIndexes
 })
 
 const mapDispatchToProps = (dispatch, ownProps) => ({
-    setHover: (hover) => dispatch(setHover(hover))
+    setHover: (hover) => dispatch(setHover(hover)),
+    ssetSelected: (indexes) => dispatch(setSelected(indexes))
 })
 
 export default connect(mapStateToProps, mapDispatchToProps)(OriStatScatter);

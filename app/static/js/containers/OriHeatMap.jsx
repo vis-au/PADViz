@@ -7,7 +7,8 @@ import { setIndexes, setHover, setTime, setHMIdx } from '../redux/actions/index'
 const mapStateToProps = (state, ownProps) => {
     return {
         hover: state.hover,
-        indexes: state.indexes
+        indexes: state.indexes,
+        selectedIndexes: state.selectedIndexes
     }
 }
 

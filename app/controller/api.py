@@ -70,14 +70,14 @@ def scatter():
     req_type = request.args.get("type")
 
     if req_type == "s2":
+        df_max = pd.read_pickle("./dataset/s_max_w5_s3.pkl")
+        df_min = pd.read_pickle("./dataset/s_min_w5_s3.pkl")
+    elif req_type == "s6":
+        df_max = pd.read_pickle("./dataset/s6_max_w5_s3.pkl")
+        df_min = pd.read_pickle("./dataset/s6_min_w5_s3.pkl")
+    else:
         df_max = pd.read_pickle("./dataset/max_w5_s3.pkl")
         df_min = pd.read_pickle("./dataset/min_w5_s3.pkl")
-    elif req_type == "s6":
-        df_max = pd.read_pickle("./dataset/s_max_w5_s3.pkl")
-        df_min = pd.read_pickle("./dataset/s_min_w5_s3.pkl")
-    else:
-        df_max = pd.read_pickle("./dataset/s_max_w5_s3.pkl")
-        df_min = pd.read_pickle("./dataset/s_min_w5_s3.pkl")
     
     # print(df_max)
     result = pd.DataFrame(columns=["time", "index", "max", "min"])
@@ -111,9 +111,16 @@ def all_energy():
         df = pd.read_pickle("./dataset/sanitized_profile_best.pkl")
     elif req_type == 's6':
         df = pd.read_pickle("./dataset/sanitized_profile_best6.pkl")
+    elif req_type == 's2mean':
+        df = pd.read_pickle("./results/energy_sample_mean_n2.pickle")
+    elif req_type == 's2median':
+        df = pd.read_pickle("./results/energy_sample_median_n2.pickle")
+    elif req_type == 's4median':
+        df = pd.read_pickle("./results/energy_sample_median_n4.pickle")
     else: # origi
         df = pd.read_pickle(ori_file)
-    
+
+    # print(len(df))    
     df = df.sort_index()
 
     cols = ['time'] + [str(idx) for idx in df.index.values]

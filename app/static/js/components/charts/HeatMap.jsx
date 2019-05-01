@@ -4,6 +4,7 @@ import PropTypes from 'prop-types'
 import { withFauxDOM } from 'react-faux-dom';
 
 import Tooltip from './Tooltip';
+import { select } from 'redux-saga/effects';
 
 class HeatMap extends Component {
     constructor(props) {
@@ -18,7 +19,8 @@ class HeatMap extends Component {
         idxSet: null,
         isSelected: false,
         colorScale: null,
-        grayScale: null
+        grayScale: null,
+        noCells: this.props.initData.length,
     }
 
     setToolTip = (count, x, y) => {
@@ -50,6 +52,9 @@ class HeatMap extends Component {
         if(this.props.hover !== prevProps.hover) {
             this.updateD3();
         }
+        // if(this.props.indexes !== prevProps.index) {
+        //     this.select(this.props.indexes, this.state.noCells);
+        // }
         
     }
 
@@ -68,7 +73,7 @@ class HeatMap extends Component {
             type
         } = this.props;
 
-        if(indexes.length) {
+        if(indexes && indexes.length) {
             let idxSet = new Set([]);
             indexes.forEach(function(idx) {
                 indexMap[idx].forEach(function(v){
@@ -105,38 +110,15 @@ class HeatMap extends Component {
 
     updateD3() {
         const {
-            initData,
-            indexMap,
+            // initData,
+            // indexMap,
             hover,
-            type
+            // type
         } = this.props;
-
-        if(hover) {
-            let idxSet = new Set([]);
-            hover.forEach(function(idx) {
-                indexMap[idx].forEach(function(v){
-                    idxSet.add(v);
-                })
-            })
-            for(let i = 0; i < initData.length; i++) {
-                let node = d3.select(`#${type}-${i}`);
-                let count = node.attr('count');
-                if(count > 0 && !(idxSet.has(i))) {
-                    node.attr('fill', "#aaaaaa");
-                }
-            }
-            this.setState({idxSet: idxSet});
-        } else {
-            if(this.state.idxSet){
-                for(let i = 0; i < initData.length; i++) {
-                    if(!this.state.idxSet.has(i)) {
-                        let node = d3.select(`#${type}-${i}`);
-                        let count = node.attr('count');
-                        if(count > 0) node.attr('fill', this.state.colorScale(count));
-                }}
-            }
-           this.setState({idxSet: null});   
-        }
+        // if(hover) {
+            // console.log(hover)
+            this.select(hover, this.state.noCells)
+        // }
     }
 
     renderD3() {
@@ -261,25 +243,29 @@ class HeatMap extends Component {
                     // console.log(this.state.selectedList)
                     // this.select(new Set(this.state.selectedList), initData.length)
                 } else if(this.state.selectedList.length) {
-                    console.log(this.state.selectedList)
-                } else {
+                    this.select(this.state.selectedList.length, initData.length);
+                } 
+                else {
                     this.select(d.instances, initData.length);
                 }
                 
                 if(d.instances && d.instances.length) {
-                    setIndexes(d.instances)};
+                    setIndexes(d.instances);
                     setTime(d.time);
+                    // setHMIdx(d.instances);
+                }
             });
         
         // X, Y axis
         svg.append("g")
             .style("font-size", 12)
-            .attr("transform", `translate(0, ${chartHeight - 55})`)
+            .attr("transform", `translate(-${rectWidth / 2}, ${chartHeight - 55})`)
             .call(d3.axisBottom(xScale))
                 .select(".domain").remove();
             
         svg.append("g")
             .style("font-size", 12)
+            .attr("transform", `translate(0, -${rectHeight / 2})`)
             .call(d3.axisLeft(yScale).tickFormat(d => ('< ' + d.split('-')[1])))
             .select(".domain").remove();
     }

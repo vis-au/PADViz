@@ -2,7 +2,8 @@ import {
     SET_INDEXES,
     SET_HOVER,
     SET_TIME,
-    SET_HM_IDX
+    SET_HM_IDX,
+    SET_SELECTED
 } from './actionTypes';
 
 
@@ -24,4 +25,9 @@ export const setTime = (time) => ({
 export const setHMIdx = (idx) => ({
     type: SET_HM_IDX,
     idx
+})
+
+export const setSelected = indexes => ({
+    type: SET_SELECTED,
+    indexes
 })

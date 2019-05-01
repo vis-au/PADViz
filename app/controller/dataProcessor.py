@@ -103,14 +103,23 @@ if __name__ == "__main__":
     s2_file = './dataset/sanitized_profile_best.pkl'
     s6_file = './dataset/sanitized_profile_best6.pkl'
 
-    ori_hm = './dataset/ori_hm_wIdx_bins_10.pkl'
+    f1 = './results/energy_sample_mean_n2.pickle'
+    f2 = './results/energy_sample_median_n2.pickle'
+    f3 = './results/energy_sample_median_n4.pickle'
 
-    df = read_data(s6_file)
-    w = 5
-    s = 3
-    w_max, w_min, amplitudes = slide_window_amplitude(df, w, s)
-    # print(amplitudes.shape)
-    amplitude_into_bins(amplitudes, type='s6')
+    ori_hm = './dataset/ori_hm_wIdx_bins_10.pkl'
+    ori_sample = './results/energy_sample.pkl';
+    df_ori = read_data(ori_file)
+    df_ori = df_ori.iloc[:90,0::4]
+    df_ori.to_pickle('./results/energy_sample.pkl')
+    # dfori = read_data(f1)
+
+    # print(df)
+    # w = 5
+    # s = 3
+    # w_max, w_min, amplitudes = slide_window_amplitude(df, w, s)
+    # # print(amplitudes.shape)
+    # amplitude_into_bins(amplitudes, type='s6')
     # write_amplitudes_to_file(w_max, w_min, amplitudes, w, s)
     
     # amplitude_into_bins(amplitudes)

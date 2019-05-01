@@ -15,6 +15,7 @@ class OriSpaghetti extends Component {
     componentDidMount() {
         this.setState({isLoading: true});
         
+        // fetch("/json/line")
         fetch("/json/line")
         .then(res => res.json())
         .then(data => this.setState({

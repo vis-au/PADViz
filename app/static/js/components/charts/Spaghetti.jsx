@@ -94,8 +94,7 @@ class Spaghetti extends Component {
             
             svg = d3.select(faux).select('svg').select('g');
         }
-        console.log(data);
-        
+        // console.log(data)
         const time = data[0].values.map(v => v.time);
 
         let xScale = d3.scalePoint()
@@ -114,17 +113,30 @@ class Spaghetti extends Component {
                         .data(data);
 
         // pathes.exit().transition().attr('stroke-width', 0).remove();
-        
+        // let dots = svg.selectAll("dots")
+        //             .data(data);
+        // dots = dots
+        //         .selectAll("circle")
+        //         .data(d => d.values).enter()
+        //         .append("circle")
+        //         .attr("class", "spaghetti circle")
+        //         .attr("cx", d => xScale(d.time))
+        //         .attr("cy", d => yScale(d.power))
+        //         .attr("r", 4)
+        //         .attr("fill", "black");
+        // dots.transition();
         pathes = pathes
             .join("path")
-            // .style("mix-blend-mode", "multiply")
+            .style("mix-blend-mode", "multiply")
             .on('mouseover', d => {
                 setHover([d.r_id]);
             })
             .on('mouseleave', d => {
                 setHover(null);
             })
-            // .on('click', );
+            // .on('click', d => {
+            //     setHover([d.r_id]);
+            // });
 
         pathes
             .attr('class', d => `spagetti line data data-${d.r_id}`)
@@ -132,10 +144,11 @@ class Spaghetti extends Component {
             .attr("stroke", "#666666")
             .attr('stroke-width', 1.5)
             .transition();
-        // pathes.exit().transition().attr('stroke-width', 0).remove();
+        
         animateFauxDOM(800);
 
-        const xAxis = d3.axisBottom(xScale).tickValues(time.filter((d, i) => !(i % 4)));
+        const xAxis = d3.axisBottom(xScale)
+        .tickValues(time.filter((d, i) => !(i % 4)));
         const yAxis = d3.axisLeft(yScale)
                         .ticks(10);
         if(render) {
