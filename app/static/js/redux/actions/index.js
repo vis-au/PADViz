@@ -7,9 +7,10 @@ import {
 } from './actionTypes';
 
 
-export const setIndexes = indexes => ({
+export const setIndexes = (indexes, sender) => ({
     type: SET_INDEXES,
-    indexes
+    indexes,
+    sender
 })
 
 export const setHover = hover => ({

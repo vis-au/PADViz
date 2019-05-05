@@ -10,14 +10,14 @@ class HeatMap extends Component {
     constructor(props) {
         super(props);
         this.renderD3 = this.renderD3.bind(this);
-        this.updateD3 = this.updateD3.bind(this);
     }
     
     state = {
+        name: this.props.name,
         tooltip: null,
-        selectedList: [],
+        selEle: null,
+        selIns: null,
         idxSet: null,
-        isSelected: false,
         colorScale: null,
         grayScale: null,
         noCells: this.props.initData.length,
@@ -50,12 +50,21 @@ class HeatMap extends Component {
 
     componentDidUpdate(prevProps) {
         if(this.props.hover !== prevProps.hover) {
-            this.updateD3();
+            this.select(this.props.hover, this.state.noCells)
+        }  
+        if(this.props.indexes !== prevProps.indexes) {
+            this.select(this.props.indexes, this.state.noCells)
         }
-        // if(this.props.indexes !== prevProps.index) {
-        //     this.select(this.props.indexes, this.state.noCells);
-        // }
-        
+    }
+
+    isArrayEqual(a, b) {
+        if(a instanceof Array && b instanceof Array) {
+            if(a.length !== b.length) return false;
+            for(let i = 0; i < a.length; i ++) {
+                if(a[i] !== b[i]) return false;
+            }
+            return true;
+        } else return false
     }
 
     render() {
@@ -95,30 +104,17 @@ class HeatMap extends Component {
             }
             this.setState({idxSet: idxSet});
         } else if(this.state.idxSet) {
-            // console.log(indexes)
             for(let i = 0; i < len; i++) {
                 let node = d3.select(`#${type}-${i}`);
                 let count = node.attr('count');
                 if(count > 0) {
                     node.transition()
                         .duration(800)
-                        .attr('fill', this.state.colorScale(count));}
+                        .attr('fill', this.state.colorScale(count))
+                        .attr('stroke', "none");}
             }
             this.setState({idxSet: null});
         }
-    }
-
-    updateD3() {
-        const {
-            // initData,
-            // indexMap,
-            hover,
-            // type
-        } = this.props;
-        // if(hover) {
-            // console.log(hover)
-            this.select(hover, this.state.noCells)
-        // }
     }
 
     renderD3() {
@@ -182,7 +178,7 @@ class HeatMap extends Component {
         let noColors = colorDomain.length;
         let legendEleHeight = rectHeight * amp_range.length / noColors;
         const legendEleWidth = 40;
-        let legend = svg.selectAll()
+        let legend = svg.selectAll(".rect")
                         .data(colorDomain)
                         .enter();
         
@@ -205,7 +201,7 @@ class HeatMap extends Component {
             .style("font-size", "12px");
 
         
-        let rects = svg.selectAll()
+        let rects = svg.selectAll(".rect")
             .data(initData)
             
         rects = rects.enter().append("rect")
@@ -220,7 +216,7 @@ class HeatMap extends Component {
             .on('mouseover', (d, i) => {
                 if(d.count > 0) {
                     d3.select(`#${type}-${i}`)
-                        .attr("stroke", "#ffa845")
+                        .attr("stroke", "#6897bb")
                         .attr("stroke-width", "4px");
 
                     this.setToolTip(d.count, xScale(d.time), yScale(d.amp_interval));
@@ -228,31 +224,27 @@ class HeatMap extends Component {
             })
             .on('mouseout', (d, i) => {
                 if(d.count > 0) {
-                    d3.select(`#${type}-${i}`)
-                    .attr("stroke", "none")
-                    .attr("stroke-width", "0");
-
+                    if(this.state.selEle !== i) {
+                        d3.select(`#${type}-${i}`)
+                            .attr("stroke", "none")
+                    }
                     this.setToolTip(null);
                 }
             })
             .on('click', (d, i) => {
-                
-                if(d3.event.shiftKey) {
-                    if(d.count > 0)  this.setState(prevState => ({
-                        selectedList: [...prevState.selectedList, ...d.instances]}))
-                    // console.log(this.state.selectedList)
-                    // this.select(new Set(this.state.selectedList), initData.length)
-                } else if(this.state.selectedList.length) {
-                    this.select(this.state.selectedList.length, initData.length);
+                if(d.count > 0)  {
+                    if(this.state.selEle) {
+                        d3.select(`#${type}-${this.state.selEle}`)
+                            .attr("stroke", "none");
+                    }
+                    this.setState({ selEle: i});
+                    d3.select(`#${type}-${i}`)
+                        .attr("stroke", "#003366");
                 } 
-                else {
-                    this.select(d.instances, initData.length);
-                }
                 
                 if(d.instances && d.instances.length) {
-                    setIndexes(d.instances);
+                    setIndexes(d.instances, this.state.name);
                     setTime(d.time);
-                    // setHMIdx(d.instances);
                 }
             });
         
@@ -260,14 +252,31 @@ class HeatMap extends Component {
         svg.append("g")
             .style("font-size", 12)
             .attr("transform", `translate(-${rectWidth / 2}, ${chartHeight - 55})`)
+            .attr("class", `heatmap ${type} x axis`)
             .call(d3.axisBottom(xScale))
                 .select(".domain").remove();
             
         svg.append("g")
             .style("font-size", 12)
             .attr("transform", `translate(0, -${rectHeight / 2})`)
+            .attr("class", `heatmap ${type} y axis`)
             .call(d3.axisLeft(yScale).tickFormat(d => ('< ' + d.split('-')[1])))
             .select(".domain").remove();
+
+        svg.append("text")
+            .attr('transform', `translate(${chartWidth}, ${chartHeight - 37})`)
+            .attr('class', 'label')
+            .style('text-anchor', 'middle')
+            .text("time")
+                .style("font-size", 14)
+                .attr('stroke', '#003366');
+        svg.append("text")
+            .attr('class', 'label')
+            .style('text-anchor', 'middle')
+            .text("Bins range")
+                .style("font-size", 14)
+                .attr("transform", `translate(-60, ${chartHeight / 2 -10}), rotate(-90)`)
+                .attr('stroke', '#003366');
     }
 
 }

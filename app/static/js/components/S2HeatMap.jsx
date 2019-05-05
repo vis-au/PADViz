@@ -39,7 +39,7 @@ class S2HeatMap extends Component {
         return(
             <div>
                 { initData ?
-                <HeatMap initData={initData} indexMap={indexMap} type="s2" width={width} height={height ? height : (width/3.5)} {...this.props}/> 
+                <HeatMap initData={initData} indexMap={indexMap} type="col1" width={width} height={height ? height : (width/3.5)} {...this.props}/> 
                 : <p>Loading...</p>}
             </div>
         )

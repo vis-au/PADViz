@@ -5,6 +5,7 @@ import 'react-grid-layout/css/styles.css';
 import 'react-resizable/css/styles.css';
 import styled from 'styled-components';
 import { withSize } from 'react-sizeme'
+import { Row, Col, Form, Nav} from 'react-bootstrap';
 
 import OriHeatMap from '../containers/OriHeatMap';
 import OriStatScatter from '../containers/OriStatScatter';
@@ -29,7 +30,9 @@ const SizedS2AmpScatter = withSizeHOC(S2AmpScatter);
 const SizedS2Spaghetti = withSizeHOC(S2Spaghetti);
 
 const Box = styled.div`
+    box-sizing: content-box;
     width: 100%;
+    border: solid orange 3px;
 `;
 
 const generateHoverCss = index => `
@@ -124,26 +127,44 @@ class Dashboard extends Component {
                     cols={12} 
                     rowHeight={100}
                     hover={hover} 
-                    
+                    class="box"
                     {...this.props}>
                      <Box key="HM_ORI"> 
+                     <Nav className="justify-content-center"  defaultActiveKey="/home" as="ul">
+                            <Nav.Link eventKey="disabled" disabled>
+                                Dataset: energy
+                            </Nav.Link>
+                            <Nav.Item as="li">
+                                <Form>
+                                    <Row>
+                                        <Col>
+                                            <Form.Control placeholder="First name" />
+                                        </Col>
+                                        <Col>
+                                            <Form.Control placeholder="Last name" />
+                                        </Col>
+
+                                    </Row>
+                                </Form>
+                            </Nav.Item>
+                        </Nav>
                         <SizedOriHeatMap />
                     </Box> 
-                    <Box key="SPA">
+                    {/* <Box key="SPA">
                         <SizedSpaghetti />
-                    </Box>
+                    </Box>*/}
                     <Box key="SCA1">
                         <SizedOriStaScatter />
                     </Box>
                     <Box key="SCA2">
                         <SizedOriAmpScatter />
-                    </Box>
+                    </Box> 
                     
 
                     <Box key="HM_PAD">
                         <SizedS2HeatMap /> 
                     </Box>
-                    <Box key="SCA1_PAD">
+                    {/* <Box key="SCA1_PAD">
                         <SizedS2StaScatter />
                     </Box>
                     <Box key="SCA2_PAD">
@@ -151,7 +172,7 @@ class Dashboard extends Component {
                     </Box>
                     <Box key="SPA_PAD">
                         <SizedS2Spaghetti />
-                    </Box>
+                    </Box> */}
                 </Grid>
             </React.Fragment>
         )

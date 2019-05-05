@@ -34,7 +34,7 @@ class AmpScatter extends Component {
         if(this.state.tooltip) {
             return {
                 content: `max: ${Math.round(max * 100) / 100}, min: ${Math.round(min * 100) / 100}, id: ${id}`,
-                style: {top: y - 20, left: x - 20}
+                style: {top: y-10, left: x-10}
             }
         } else {
             return {
@@ -50,6 +50,15 @@ class AmpScatter extends Component {
     componentDidUpdate(prevProps) {
         if(this.props.indexes !== prevProps.indexes) {
             this.renderD3('update')
+        }
+        if(this.props.hover !== prevProps.hover) {
+            if(this.props.hover) {
+                let id = this.props.hover[0];
+                let node = d3.select(`.amp.data-${id}`)
+                this.setToolTip(node.attr('max'), node.attr('min'), node.attr('cx'), node.attr('cy'), id);
+            } else {
+                this.setToolTip(null);
+            }
         }
     }
 
@@ -92,10 +101,9 @@ class AmpScatter extends Component {
                 .attr("height", height)
                 .append("g")
                 .attr("transform", `translate(${margin.left}, ${margin.top})`);
-            data = initData.filter(d =>  [0, 10, 20,30, 40].includes(d.index) && d.time === 0);
+            data = initData;
         } else if(update) {
             if(indexes) {
-                
                 data = initData.filter(d =>  indexes.includes(d.index) && (d.time === time))
             } 
             svg = d3.select(faux).select('svg').select('g');
@@ -111,36 +119,39 @@ class AmpScatter extends Component {
             .range([chartHeight, 0])
         
         
-
-        let dots = svg.selectAll('.dot')
+        if(update) {
+            let dots = svg.selectAll('.dot')
                     .data(data);
         
-        dots.exit().transition().attr('r', 0).remove();
+            dots.exit().transition().attr('r', 0).remove();
 
-        dots = dots
-                .enter()
-                .append("circle")
-                .on('mouseover', d => {
-                    this.setToolTip(d.min, d.max, xScale(d.min), yScale(d.max), d.index);
-                    setHover([d.index]);
-                })
-                .on('mouseout', d => {
-                    this.setToolTip(null);
-                    setHover(null);
-                })
-                .merge(dots);
-        
-        dots
-            .attr('r', 4)
-            .attr("cx", function (d) { return xScale(d.min); } )
-            .attr("cy", function (d) { return yScale(d.max); } )
-            .transition()
-            .attr("class", d => `amp dot data data-${d.index}`);
+            dots = dots
+                    .enter()
+                    .append("circle")
+                    .on('mouseover', d => {
+                        // this.setToolTip(d.min, d.max, xScale(d.min), yScale(d.max), d.index);
+                        setHover([d.index]);
+                    })
+                    .on('mouseout', d => {
+                        // this.setToolTip(null);
+                        setHover(null);
+                    })
+                    .merge(dots);
+            
+            dots
+                .attr('r', 4)
+                .attr("cx", function (d) { return xScale(d.min); } )
+                .attr("cy", function (d) { return yScale(d.max); } )
+                .attr("max", d => d.max)
+                .attr("min", d => d.min)
+                .transition()
+                .attr("class", d => `amp dot data data-${d.index}`);
 
-        animateFauxDOM(800);
+            animateFauxDOM(800);
+        }
         
-        const xAxis = d3.axisBottom(xScale).tickSize(0)
-        const yAxis = d3.axisLeft(yScale).tickSize(0)
+        const xAxis = d3.axisBottom(xScale).ticks(5)
+        const yAxis = d3.axisLeft(yScale).ticks(10)
         if(render) {
             svg.append('g')
                 .attr('class', 'x axis')
@@ -155,12 +166,12 @@ class AmpScatter extends Component {
 
         svg.append("text")
             .attr('transform', `translate(${chartWidth - 10}, ${chartHeight - 5})`)
-            .attr('class', 'label')
+            .attr('class', 'axis label')
             .style('text-anchor', 'middle')
             .text("min");
         svg.append("text")
             .attr('transform', `translate(${margin.left - 20}, ${margin.top})`)
-            .attr('class', 'label')
+            .attr('class', 'axis label')
             .style('text-anchor', 'middle')
             .text("max");
     }

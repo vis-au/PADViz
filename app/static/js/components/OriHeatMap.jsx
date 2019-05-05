@@ -34,6 +34,10 @@ class OriHeatMap extends Component {
         })
     }
 
+    componentDidUpdate() {
+        
+    }
+
     render(){
         const {initData, indexMap} = this.state;
         let { width, height } = this.props.size

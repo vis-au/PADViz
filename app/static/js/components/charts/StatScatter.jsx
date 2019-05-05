@@ -21,7 +21,9 @@ class StatScatter extends Component {
     }
 
     state = {
-        tooltip: null
+        tooltip: null,
+        xScale: null,
+        yScale: null
     }
 
     setToolTip = (mean, std, x, y, id) => {
@@ -52,6 +54,15 @@ class StatScatter extends Component {
     componentDidUpdate(prevProps) {
         if(this.props.indexes !== prevProps.indexes) {
             this.renderD3('update')
+        }
+        if(this.props.hover !== prevProps.hover) {
+            if(this.props.hover) {
+                let id = this.props.hover[0];
+                let node = d3.select(`.stat.data-${id}`)
+                this.setToolTip(node.attr('mean'), node.attr('std'), node.attr('cx'), node.attr('cy'), id);
+            } else {
+                this.setToolTip(null);
+            }
         }
         
     }
@@ -111,45 +122,39 @@ class StatScatter extends Component {
         yScale = d3.scaleLinear()
             .domain([0, d3.max(data, d=>{return d.std})]).nice()
             .range([chartHeight, 0])
-
-        let dots = svg.selectAll('.dot')
+        
+        if(update) {
+            let dots = svg.selectAll('.dot')
                     .data(data);
         
-        dots.exit().transition().attr('r', 0).remove();
+            dots.exit().transition().attr('r', 0).remove();
 
-        dots = dots
-                .enter()
-                .append("circle")
-                .on('mouseover', d => {
-                    this.setToolTip(d.mean, d.std, xScale(d.mean), yScale(d.std), d.index);
-                    setHover([d.index]);
-                })
-                .on('mouseout', d => {
-                    this.setToolTip(null);
-                    setHover(null);
-                })
-                // .on("click", d => {
-                //     this.setToolTip(d.mean, d.std, xScale(d.mean), yScale(d.std), d.index);
-                //     if(hover.include(d.index)) {
-                //         setHover(null)
-                //     } else {
-                //         setHover([d.index]);
-                //     }
-                    
-                // })
-                .merge(dots);
-        
-        dots
-            .attr("r", 4)
-            .attr("cx", function (d) { return xScale(d.mean); } )
-            .attr("cy", function (d) { return yScale(d.std); } )
-            .attr("class", d => `stat dot data data-${d.index}`)
-            .transition();
+            dots = dots
+                    .enter()
+                    .append("circle")
+                    .on('mouseover', d => {
+                        setHover([d.index]);
+                    })
+                    .on('mouseout', d => {
+                        setHover(null);
+                    })
+                    .merge(dots);
+            
+            dots
+                .attr("r", 4)
+                .attr("cx", function (d) { return xScale(d.mean); } )
+                .attr("cy", function (d) { return yScale(d.std); } )
+                .attr("mean", d => d.mean)
+                .attr("std", d => d.std)
+                .attr("class", d => `stat dot data data-${d.index}`)
+                .transition();
 
-        animateFauxDOM(800);
+            animateFauxDOM(800);
+        }
         
-        const xAxis = d3.axisBottom(xScale).tickSize(0);
-        const yAxis = d3.axisLeft(yScale).tickSize(0);
+        
+        const xAxis = d3.axisBottom(xScale).ticks(5);
+        const yAxis = d3.axisLeft(yScale).ticks(10);
         if(render) {
             svg.append('g')
                 .attr('class', 'x axis')
@@ -169,11 +174,13 @@ class StatScatter extends Component {
             .attr('transform', `translate(${chartWidth - 10}, ${chartHeight - 5})`)
             .attr('class', 'label')
             .style('text-anchor', 'middle')
-            .text("mean");
+            .text("mean")
+                .style("font-size", 14)
+                .attr('stroke', '#003366');
 
         svg.append("text")
             .attr('transform', `translate(${margin.left - 20}, ${margin.top})`)
-            .attr('class', 'label')
+            .attr('class', 'axis label')
             .style('text-anchor', 'middle')
             .text("std");
     }
