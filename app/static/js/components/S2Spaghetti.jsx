@@ -29,7 +29,7 @@ class S2Spaghetti extends Component {
         return(
             <div>
                 { initData ?
-                <Spaghetti initData={initData} width={width} height={height ? height : (width/3.5)} {...this.props}/> 
+                <Spaghetti initData={initData} width={width} height={height ? height : (width/3.5)} name="spa-col2" {...this.props}/> 
                 : <p>Loading...</p>}
             </div>
         )

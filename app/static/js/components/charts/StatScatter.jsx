@@ -58,7 +58,7 @@ class StatScatter extends Component {
         if(this.props.hover !== prevProps.hover) {
             if(this.props.hover) {
                 let id = this.props.hover[0];
-                let node = d3.select(`.stat.data-${id}`)
+                let node = d3.select(`.${this.props.name}.data-${id}`)
                 this.setToolTip(node.attr('mean'), node.attr('std'), node.attr('cx'), node.attr('cy'), id);
             } else {
                 this.setToolTip(null);
@@ -85,7 +85,7 @@ class StatScatter extends Component {
             setHover,
             connectFauxDOM,
             animateFauxDOM,
-            selectedIndexes,
+            name,
             hover
         } = this.props;
         
@@ -135,9 +135,12 @@ class StatScatter extends Component {
                     .on('mouseover', d => {
                         setHover([d.index]);
                     })
-                    .on('mouseout', d => {
-                        setHover(null);
-                    })
+                    // .on('mouseout', d => {
+                    //     setHover(null);
+                    // })
+                    // .on('click', d => {
+                    //     if(hover) setHover(null)
+                    // })
                     .merge(dots);
             
             dots
@@ -146,8 +149,10 @@ class StatScatter extends Component {
                 .attr("cy", function (d) { return yScale(d.std); } )
                 .attr("mean", d => d.mean)
                 .attr("std", d => d.std)
-                .attr("class", d => `stat dot data data-${d.index}`)
+                .attr("class", d => `${name} dot data data-${d.index}`)
                 .transition();
+
+            d3.select('.body').on('click', function(){ setHover(null) })
 
             animateFauxDOM(800);
         }
@@ -175,14 +180,14 @@ class StatScatter extends Component {
             .attr('class', 'label')
             .style('text-anchor', 'middle')
             .text("mean")
-                .style("font-size", 14)
-                .attr('stroke', '#003366');
+                .style("font-size", 14);
 
         svg.append("text")
             .attr('transform', `translate(${margin.left - 20}, ${margin.top})`)
             .attr('class', 'axis label')
             .style('text-anchor', 'middle')
-            .text("std");
+            .text("std")
+                .style("font-size", 14);
     }
     
 }

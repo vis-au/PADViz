@@ -54,7 +54,7 @@ class AmpScatter extends Component {
         if(this.props.hover !== prevProps.hover) {
             if(this.props.hover) {
                 let id = this.props.hover[0];
-                let node = d3.select(`.amp.data-${id}`)
+                let node = d3.select(`.${this.props.name}.data-${id}`)
                 this.setToolTip(node.attr('max'), node.attr('min'), node.attr('cx'), node.attr('cy'), id);
             } else {
                 this.setToolTip(null);
@@ -75,18 +75,17 @@ class AmpScatter extends Component {
         const {
             width,
             height,
+            name,
             initData,
             indexes,
             time,
             setHover,
             connectFauxDOM,
             animateFauxDOM,
-            hover
         } = this.props;
         
         const render = mode === 'render'
         const update = mode === 'update'
-        const hoverUpdate = mode === 'hover'
         
         const margin = {top: 20, right: 20, bottom: 40, left: 40};
         const chartWidth = width - margin.left - margin.right;
@@ -129,12 +128,13 @@ class AmpScatter extends Component {
                     .enter()
                     .append("circle")
                     .on('mouseover', d => {
-                        // this.setToolTip(d.min, d.max, xScale(d.min), yScale(d.max), d.index);
                         setHover([d.index]);
                     })
-                    .on('mouseout', d => {
-                        // this.setToolTip(null);
-                        setHover(null);
+                    // .on('mouseout', d => {
+                    //     setHover(null);
+                    // })
+                    .on('click', d => {
+                        setHover([d.index]);
                     })
                     .merge(dots);
             
@@ -145,7 +145,7 @@ class AmpScatter extends Component {
                 .attr("max", d => d.max)
                 .attr("min", d => d.min)
                 .transition()
-                .attr("class", d => `amp dot data data-${d.index}`);
+                .attr("class", d => `${name} dot data data-${d.index}`);
 
             animateFauxDOM(800);
         }
@@ -168,12 +168,14 @@ class AmpScatter extends Component {
             .attr('transform', `translate(${chartWidth - 10}, ${chartHeight - 5})`)
             .attr('class', 'axis label')
             .style('text-anchor', 'middle')
-            .text("min");
+            .text("min")
+                .style("font-size", 14);
         svg.append("text")
             .attr('transform', `translate(${margin.left - 20}, ${margin.top})`)
             .attr('class', 'axis label')
             .style('text-anchor', 'middle')
-            .text("max");
+            .text("max")
+                .style("font-size", 14);
     }
     
 }

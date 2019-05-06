@@ -2,8 +2,8 @@ import React, { Component } from 'react';
 import sizeMe from 'react-sizeme';
 
 
-// import Spaghetti from './charts/Spaghetti';
-import MultiLines from './charts/MultiLines';
+import Spaghetti from './charts/Spaghetti';
+// import MultiLines from './charts/MultiLines';
 
 class OriSpaghetti extends Component {
     constructor(props) {
@@ -32,7 +32,7 @@ class OriSpaghetti extends Component {
         return(
             <div>
                 { initData ?
-                <MultiLines initData={initData} width={width} height={height ? height : (width/3.5)} name="ori" {...this.props}/> 
+                <Spaghetti initData={initData} width={width} height={height ? height : (width/3.5)} name="spa-col1" {...this.props}/> 
                 : <p>Loading...</p>}
                 {/* { initData ?
                 <Spaghetti initData={initData} width={width} height={height ? height : (width/3.5)} {...this.props}/> 

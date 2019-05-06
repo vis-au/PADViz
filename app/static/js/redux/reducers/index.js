@@ -11,7 +11,14 @@ export const initialState = {
     indexes: null,
     time: null,
     hmIdx: null,
-    selectedIndexes: []
+    col1_hm: null,
+    col1_line: null,
+    col1_stat: null,
+    col1_minmax: null,
+    col2_hm: null,
+    col2_line: null,
+    col2_stat: null,
+    col2_minmax: null,
 };
 
 export const rootReducer = (state = initialState, action) => {

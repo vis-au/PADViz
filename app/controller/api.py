@@ -8,8 +8,8 @@ sys.path.append(os.path.abspath("./"))
 
 import pandas as pd
 import numpy as np
-
 import json
+
 
 ori_file ='./dataset/dataframe_all_energy.pkl'
 
@@ -128,3 +128,146 @@ def all_energy():
     json_df.columns = ['time'] + [str(idx) for idx in df.index.values] 
     # return json_df.to_json()
     return json_df.to_json(orient="records")
+
+f_mean = "./datasets/energy_all_mean.pkl"
+f_median = "./datasets/energy_all_mean.pkl"
+
+@json_blueprint.route('/json/hm')
+def loadHeatMap():
+    k = request.args.get("k") if 'k' in request.args else None
+    rep = request.args.get("rep") if 'rep' in request.args else None
+    dist_metric = request.args.get("dist") if 'dist' in request.args else None
+    dfo = pd.read_pickle(ori_file)
+    # print(dfo.shape)
+    if rep.lower() == "mean":
+        df = pd.read_pickle(f_mean)
+    elif rep.lower() == "median":
+        df = pd.read_pickle(f_median)
+    
+    
+    kvmap = {"Self-defined": 0, "Euclidean": 1, "LM": 2, "DM":3 }
+    df = df[0][int(k)][kvmap[dist_metric]].sort_index()
+    # print(df)
+    w_max, w_min, amp = slide_window_amplitude(df, 5, 3)
+    hm_df = amplitude_into_bins(amp, type="s")
+    # print(hm_df)
+
+    #line
+    cols = ['time'] + [str(idx) for idx in df.index.values]
+    line_df = pd.concat([pd.DataFrame(df.columns.values, dtype="int"), (df.T).reset_index(drop=True)], ignore_index=True, axis=1)
+    line_df.columns = ['time'] + [str(idx) for idx in df.index.values] 
+    # return json_df.to_json()
+    
+    #stat
+    df_mean = df.mean(axis=1)    
+    df_std = df.std(1)
+    # print(df_mean)
+    df_scatter = pd.DataFrame(columns=["index","mean", "std"])
+    df_scatter["index"] = df_mean.index.values
+    df_scatter["mean"] = df_mean
+    df_scatter["std"] = df_std
+    # print(df_scatter)
+
+    # max min
+    df_maxmin = pd.DataFrame(columns=["time", "index", "max", "min"])
+    no_idx = w_max.shape[0]
+    time_arr = []
+    index_arr = []
+    max_arr = []
+    min_arr = []
+    for column in w_max:
+        time_arr += [column] * no_idx
+        index_arr += [ _ for _ in w_max.index]
+        max_arr += [ _ for _ in w_max[column]]
+        min_arr += [ _ for _ in w_min[column]]
+    
+    # print(len(time_arr), len(index_arr),len(min_arr),len(max_arr))
+    df_maxmin["time"] = time_arr
+    df_maxmin["index"] = index_arr
+    df_maxmin["max"] = max_arr
+    df_maxmin["min"] = min_arr
+    # print(df_maxmin)
+
+    r = {"hm": hm_df.to_json(orient="records"), "line": line_df.to_json(orient="records"), "stat": df_scatter.to_json(orient="records"), "maxmin": df_maxmin.to_json(orient="records")}
+    # print(r)
+    return json.dumps(r)
+
+
+#### process
+def slide_window_amplitude(t_data, w_size=4, step=1):
+    row_no, col_no = t_data.shape   
+    wcol_no = np.int((col_no - w_size) / step + 1)
+    i = np.arange(1, col_no, step)
+    columns_values = t_data.columns.values[i[:wcol_no] - 1]
+    # print(columns_values, len(columns_values))
+    w_max = pd.DataFrame(np.zeros((row_no, wcol_no)), columns=columns_values)
+    w_min = pd.DataFrame(np.zeros((row_no, wcol_no)), columns=columns_values)
+    amplitudes = pd.DataFrame(np.zeros((row_no, wcol_no)), columns=columns_values)
+    
+    for row in t_data.itertuples():
+        r_no = getattr(row, 'Index')
+        for j in range(wcol_no):
+            c_j = columns_values[j]
+            # print(c_j)
+            w_max.at[r_no, c_j] = max(row[i[j]:i[j]+w_size])
+            w_min.at[r_no, c_j] = min(row[i[j]:i[j]+w_size])
+            amplitudes.at[r_no, c_j] = max(row[i[j]:i[j]+w_size]) - min(row[i[j]:i[j]+w_size])
+    
+    # print(amplitudes)
+    return w_max, w_min, amplitudes
+
+def amplitude_into_bins(w_data, no_bins=10, type='ori'):
+    w_min = (np.floor(w_data.min().min())).astype(int)
+    w_max = (np.ceil(w_data.max().max())).astype(int)
+    col_labels = w_data.columns.values
+    # print(w_min, w_max)
+    if type == 'ori':
+        bins = pd.interval_range(start=w_min, end=w_max, periods=10, closed='left')
+        pd.DataFrame(bins.to_tuples()).to_pickle("./dataset/ori_bins.pkl")
+    else:
+        df = pd.read_pickle("./dataset/ori_bins.pkl")
+        left=[]
+        right=[]
+        for v in df.values:
+            left.append(v[0][0])
+            right.append(v[0][1])
+        bins = pd.IntervalIndex.from_arrays(left, right, closed="left")
+   
+    # print(bins)
+    amp_distr = pd.DataFrame(0, index=bins, columns=col_labels)
+    data_bins = pd.DataFrame(0, index=w_data.index, columns=col_labels)
+    for column in w_data:
+        result = pd.cut(w_data[column], bins=bins, precision=1)
+        amp_distr[column] = result.value_counts()
+        data_bins[column] = result.to_frame()
+    
+    amp_distr_list = pd.DataFrame(columns=["time", "amp_interval",  "count", "instances"])
+    no_bins = no_bins if no_bins else len(bins)
+    time_arr = []
+    amp_arr = []
+    count_arr = []
+    ins_arr = []
+    for column in amp_distr:
+        time_arr += [column] * no_bins
+        amp_arr += amp_distr.index.values
+        count_arr += [c for c in amp_distr[column]]
+        ins_list = [[] for _ in range(no_bins)]
+        for idx, value in enumerate(data_bins[column]):
+            ins_list[bins.get_loc(value)].append(idx)
+        ins_arr += ins_list
+    
+    str_amp_arr = [str(np.round(amp.left, 2)) + "-" + str(np.round(amp.right, 2)) for amp in amp_arr]
+    amp_distr_list['time'] = time_arr
+    amp_distr_list['amp_interval'] = str_amp_arr
+    amp_distr_list['count'] = count_arr
+    amp_distr_list['instances'] = ins_arr
+    return amp_distr_list
+    # print(amp_distr_list)
+    # write to file
+    # amp_distr_list.to_pickle("./dataset/" + type + "_hm_wIdx_bins_" + str(no_bins) + ".pkl")
+
+    # amp_index = []
+    # for i in range(len(bins)):
+    #     amp_index.append(str(np.round(bins[i].left, 2)) + "-" + str(np.round(bins[i].right, 2))) 
+    # amp_distr.index = amp_index
+    # print(amp_distr)

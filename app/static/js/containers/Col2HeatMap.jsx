@@ -1,7 +1,7 @@
 import {connect} from 'react-redux';
 
 import { setIndexes, setHover, setTime, setHMIdx } from '../redux/actions/index'
-import S2HeatMap from '../components/S2HeatMap';
+import Col2HeatMap from '../components/Col2HeatMap';
 
 
 const mapStateToProps = (state, ownProps) => {
@@ -18,4 +18,4 @@ const mapDispatchToProps = (dispatch, ownProps) => ({
     setHMIdx: (idx) => dispatch(setHMIdx(idx))
 })
 
-export default connect( mapStateToProps, mapDispatchToProps )(S2HeatMap);
+export default connect( mapStateToProps, mapDispatchToProps )(Col2HeatMap);

@@ -45,16 +45,22 @@ class HeatMap extends Component {
     }
 
     componentDidMount() {
-        this.renderD3();
+        this.renderD3('render');
     }
 
     componentDidUpdate(prevProps) {
+        if(this.props.initData !== prevProps.initData) {
+            console.log("update")
+            console.log(this.props.indexMap)
+            this.renderD3('update')
+        }
         if(this.props.hover !== prevProps.hover) {
             this.select(this.props.hover, this.state.noCells)
         }  
         if(this.props.indexes !== prevProps.indexes) {
             this.select(this.props.indexes, this.state.noCells)
         }
+
     }
 
     isArrayEqual(a, b) {
@@ -117,8 +123,8 @@ class HeatMap extends Component {
         }
     }
 
-    renderD3() {
-        const {
+    renderD3(mode) {
+        let {
             width,
             height,
             initData,
@@ -132,17 +138,32 @@ class HeatMap extends Component {
             type
         } = this.props;
 
+        const render = mode === 'render'
+        const update = mode === 'update'
+
         const margin = {top: 20, right: 100, bottom: 20, left: 100};
         const chartWidth = width - margin.left - margin.right;
         const chartHeight = height - margin.top - margin.bottom;
 
-        let faux = connectFauxDOM('div', 'chart')
+        let faux = connectFauxDOM('div', 'chart');
+        let data = initData;
+        let svg;
+        if(render) {
+            svg = d3.select(faux).append("svg")
+                .attr("width", width)
+                .attr("height", height)
+                .append("g")
+                .attr("transform", `translate(${margin.left}, ${margin.top})`);
+        } else if(update) {
+            svg = d3.select(faux).select('svg').select('g');
+        }
+
         // Initialize
-        const svg = d3.select(faux).append("svg")
-            .attr("width", width)
-            .attr("height", height)
-            .append("g")
-            .attr("transform", `translate(${margin.left}, ${margin.top})`);
+        // const svg = d3.select(faux).append("svg")
+        //     .attr("width", width)
+        //     .attr("height", height)
+        //     .append("g")
+        //     .attr("transform", `translate(${margin.left}, ${margin.top})`);
 
         const t_interval = d3.map(initData, function(d){return d.time;}).keys();
         const amp_range = d3.map(initData, function(d){return d.amp_interval;}).keys();
@@ -203,16 +224,14 @@ class HeatMap extends Component {
         
         let rects = svg.selectAll(".rect")
             .data(initData)
+
+        rects.exit().transition().attr('width', 0).attr('height', 0).remove();
             
         rects = rects.enter().append("rect")
-                .attr('class', `rect ${type}`)
-                .attr('id', (d, i) => `${type}-${i}`)
-                .attr("x", function(d) { return xScale(d.time) })
-                .attr("y", function(d) { return yScale(d.amp_interval) })
-                .attr("width", rectWidth )
-                .attr("height", rectHeight )
-                .attr("count", d=>d.count)
-                .attr("fill", d => colorScale(d.count))
+                
+                .attr("width", 0 )
+                .attr("height", 0 )
+                
             .on('mouseover', (d, i) => {
                 if(d.count > 0) {
                     d3.select(`#${type}-${i}`)
@@ -246,37 +265,52 @@ class HeatMap extends Component {
                     setIndexes(d.instances, this.state.name);
                     setTime(d.time);
                 }
-            });
+            })
+            .merge(rects);
+            
+        rects.attr('class', `rect ${type}`)
+            .attr('id', (d, i) => `${type}-${i}`)
+            .attr("x", function(d) { return xScale(d.time) })
+            .attr("y", function(d) { return yScale(d.amp_interval) })
+            .attr("count", d=>d.count)
+            .attr("fill", d => colorScale(d.count))
+            .transition()
+            .attr("width", rectWidth )
+            .attr("height", rectHeight );
+        animateFauxDOM(1000);
         
         // X, Y axis
-        svg.append("g")
-            .style("font-size", 12)
-            .attr("transform", `translate(-${rectWidth / 2}, ${chartHeight - 55})`)
-            .attr("class", `heatmap ${type} x axis`)
-            .call(d3.axisBottom(xScale))
+        if(render) {
+            svg.append("g")
+                .style("font-size", 12)
+                .attr("transform", `translate(-${rectWidth / 2}, ${chartHeight - 55})`)
+                .attr("class", `heatmap ${type} x axis`)
+                .call(d3.axisBottom(xScale))
+                    .select(".domain").remove();
+                
+            svg.append("g")
+                .style("font-size", 12)
+                .attr("transform", `translate(0, -${rectHeight / 2})`)
+                .attr("class", `heatmap ${type} y axis`)
+                .call(d3.axisLeft(yScale).tickFormat(d => ('< ' + d.split('-')[1])))
                 .select(".domain").remove();
-            
-        svg.append("g")
-            .style("font-size", 12)
-            .attr("transform", `translate(0, -${rectHeight / 2})`)
-            .attr("class", `heatmap ${type} y axis`)
-            .call(d3.axisLeft(yScale).tickFormat(d => ('< ' + d.split('-')[1])))
-            .select(".domain").remove();
 
-        svg.append("text")
-            .attr('transform', `translate(${chartWidth}, ${chartHeight - 37})`)
-            .attr('class', 'label')
-            .style('text-anchor', 'middle')
-            .text("time")
-                .style("font-size", 14)
-                .attr('stroke', '#003366');
-        svg.append("text")
-            .attr('class', 'label')
-            .style('text-anchor', 'middle')
-            .text("Bins range")
-                .style("font-size", 14)
-                .attr("transform", `translate(-60, ${chartHeight / 2 -10}), rotate(-90)`)
-                .attr('stroke', '#003366');
+            svg.append("text")
+                .attr('transform', `translate(${chartWidth}, ${chartHeight - 37})`)
+                .attr('class', 'label')
+                .style('text-anchor', 'middle')
+                .text("time")
+                    .style("font-size", 14)
+                    .attr('stroke', '#003366');
+            svg.append("text")
+                .attr('class', 'label')
+                .style('text-anchor', 'middle')
+                .text("Bins range")
+                    .style("font-size", 14)
+                    .attr("transform", `translate(-60, ${chartHeight / 2 -10}), rotate(-90)`)
+                    .attr('stroke', '#003366');
+        }
+        
     }
 
 }

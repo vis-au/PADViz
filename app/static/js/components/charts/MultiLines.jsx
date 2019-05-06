@@ -1,15 +1,8 @@
 import React, { Component } from 'react';
 import * as d3 from 'd3';
-import PropTypes from 'prop-types'
 import { withFauxDOM } from 'react-faux-dom';
-import styled from 'styled-components';
 
-const Wrapper = styled.div`
-    position: relative;
-    display: inline-block;
-`
-
-class Spaghetti extends Component {
+class MultiLines extends Component {
     constructor(props) {
         super(props);
         this.renderD3 = this.renderD3.bind(this);
@@ -32,9 +25,9 @@ class Spaghetti extends Component {
 
     render() {
         return (
-            <Wrapper className="spaghetti">
+            <div className="spaghetti">
                 {this.props.chart}
-            </Wrapper>
+            </div>
         )
     }
 
@@ -59,9 +52,9 @@ class Spaghetti extends Component {
             width,
             height,
             initData,
+            name,
             indexes,
             setHover,
-            name,
             connectFauxDOM,
             animateFauxDOM
         } = this.props;
@@ -74,7 +67,7 @@ class Spaghetti extends Component {
         const chartHeight = height - margin.top - margin.bottom;
 
         let faux = connectFauxDOM('div', 'chart')
-        let svg, data, time;
+        let svg, data;
         if(render) {
             svg = d3.select(faux).append("svg")
                 .attr("width", width)
@@ -82,22 +75,23 @@ class Spaghetti extends Component {
                 .append("g")
                     .attr("transform", `translate(${margin.left}, ${margin.top})`)
                     .attr("fill", "none")
+                    .attr("stroke", "steerblue")
                     .attr("stroke-linejoin", "round")
-                    // .attr("stroke-width", 1.5)
+                    .attr("stroke-width", 1.5)
                     .attr("stroke-linecap", "round");
                 this.setState({data: this.initDataTransformer(initData)});
-                data = this.state.data[0];
-                time = data.values.map(v => v.time);
+                data = this.state.data.filter(d => ["1", "10", "20"].includes(d.r_id))
         } else if(update) {
             if(indexes && indexes.length > 0) {
                 data = this.state.data.filter(d => indexes.includes(parseInt(d.r_id)))
             }
-            time = data[0].values.map(v => v.time);
+            
             svg = d3.select(faux).select('svg').select('g');
         }
-        // console.log(data, time)
+        console.log(data)
+        const time = data[0].values.map(v => v.time);
 
-        let xScale = d3.scaleBand()
+        let xScale = d3.scalePoint()
                         .domain(time)
                         .range([0, chartWidth]);
 
@@ -109,80 +103,74 @@ class Spaghetti extends Component {
             .x(d => xScale(d.time))
             .y(d => yScale(d.power));
         
-        let lines = svg.selectAll(".line")
+        let pathes = svg.selectAll(`.${name}`)
                         .data(data);
-        lines.exit().remove();
-        lines = lines.enter()
-                .append("path")
-                    .style("mix-blend-mode", "multiply")
-                    .on('mouseover', d => {
-                        setHover([d.r_id]);
-                    })
-                    // .on('mouseleave', d => {
-                    //     setHover(null);
-                    // })
 
-                    .merge(lines);
-
-        lines
-            .attr("class", d => `${name} line data data-${d.r_id}`)
+        pathes.exit().transition().attr('stroke-width', 0).remove();
+        
+        let dots = pathes.selectAll(".dots")
+                    .data(data);
+        dots = dots
+                .selectAll(".circle")
+                .data(d => d.values).enter()
+                .append("circle")
+        dots.attr("class", "spaghetti circle dots")
+                .attr("cx", d => xScale(d.time))
+                .attr("cy", d => yScale(d.power))
+                .attr("r", 4)
+                .attr("fill", "black");
+        dots.transition();
+        pathes = pathes
+            // .enter()
+            .join("path")
+            .style("mix-blend-mode", "multiply")
+            .attr('stroke-width', 0)
+            .on('mouseover', d => {
+                setHover([d.r_id]);
+            })
+            .on('mouseleave', d => {
+                setHover(null);
+            })
+            .on('click', d => {
+                setHover([d.r_id]);
+            });
+      
+        pathes
+            .attr('class', d => `spagetti line ${name} data data-${d.r_id}`)
             .attr("d", d => line(d.values))
-            .attr("stroke", "#666666")
-            .attr('stroke-width', 0.5)
-            .transition()
-            .attr('stroke-width', 1.5);
-        
-        
-        // let dots = svg.selectAll("dots")
-        //                 .data(data).enter()
-        //                 .selectALL
-        //                 .data(d => d.values).enter();
-        
-        // dots.exit().transition().attr('r', 0).remove();
-        
-        // dots = dots.enter()
-        //         .append("circle")
-        //         .on("mouseout", d => {})
-        //         .merge(dots);
-        
-        // dots
-        //     .attr("class", `${name} circle `)
-        //     .attr("cx", d => {console.log(d); return xScale(d.time)})
-        //     .attr("cy", d => yScale(d.power))
-        //     .transition()
-        //     .attr("r", 4)
-        //     .attr("fill", "#999999");
-    
-        animateFauxDOM(800);
 
-        const xAxis = d3.axisBottom(xScale).tickSize(0).tickValues(time.filter((d, i) => (i === 0 || !(i % 3)) ? i : null));
+            .attr("stroke", "#666666")
+            .transition()
+            .attr('stroke-width', 1.5)
+            // .selectAll("dot")
+                // .data(d => {console.log (d); return d.values});
+        
+        // pathes.selectAll(".dots")
+        //     .data(function(d) {return d.values}).enter()
+        //     .attr("class", "dot")
+            // .append("circle")
+            // .attr("cx", d => xScale(d.time))
+            // .attr("cy", d => yScale(d.power))
+            // .attr("r", 4)
+
+        
+        animateFauxDOM(1200);
+
+        const xAxis = d3.axisBottom(xScale)
+        .tickValues(time.filter((d, i) => !(i % 4)));
         const yAxis = d3.axisLeft(yScale)
                         .ticks(10);
         if(render) {
             svg.append('g')
                 .attr('transform', `translate(0, ${chartHeight})`)
-                .call(xAxis);
-            
-            svg.append("text")
-                .attr('transform', `translate(${chartWidth - 10}, ${chartHeight - 5})`)
-                .attr('class', 'axis label')
-                .style('text-anchor', 'middle')
-                .text("time")
-                    .style("font-size", 14)
-                    .attr("fill", "black");
+                .call(xAxis)
                 
             svg.append('g').attr('class', 'y axis').call(yAxis);
-
-            svg.append("text")
-                .attr('transform', `translate(${margin.left - 70}, ${margin.top})`)
-                .attr('class', 'axis label')
-                .style('text-anchor', 'middle')
-                .text("values")
-                    .style("font-size", 14)
-                    .attr("fill", "black");
+        } else if(update) {
+            svg.select('g.x.axis').call(xAxis)
+            svg.select('g.y.axis').call(yAxis)
         }
     }
-    
 }
 
-export default withFauxDOM(Spaghetti);
+export default withFauxDOM(MultiLines);

@@ -29,7 +29,7 @@ class OriAmpScatter extends Component {
         return(
             <div>
                 { initData ?
-                <AmpScatter initData={initData} width="400" height="400" chartType='amp' {...this.props}/> 
+                <AmpScatter initData={initData} width="400" height="400" name='amp-col1' {...this.props}/> 
                 : <p>Loading...</p>}
             </div>
         )
