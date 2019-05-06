@@ -3,7 +3,7 @@ import sizeMe from 'react-sizeme';
 
 import Spaghetti from './charts/Spaghetti';
 
-class S2Spaghetti extends Component {
+class Col3Spaghetti extends Component {
     constructor(props) {
         super(props)
     }
@@ -15,12 +15,19 @@ class S2Spaghetti extends Component {
     componentDidMount() {
         this.setState({isLoading: true});
         
-        fetch("/json/line?type=s2")
+        fetch("/json/line?type=s6")
         .then(res => res.json())
         .then(data => this.setState({
             isLoading: false,
             initData: data
         }))
+    }
+
+    componentDidUpdate(prevProps) {
+        if(this.props.update && this.props.update != prevProps.update) {
+            let ud = JSON.parse(this.props.update) 
+            this.setState({initData: ud});
+        }
     }
 
     render(){
@@ -37,4 +44,4 @@ class S2Spaghetti extends Component {
     }
 }
 
-export default sizeMe({ monitorHeight: true })(S2Spaghetti);
+export default sizeMe({ monitorHeight: true })(Col3Spaghetti);

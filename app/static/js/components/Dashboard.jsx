@@ -12,10 +12,13 @@ import OriStatScatter from '../containers/OriStatScatter';
 import OriAmpScatter from '../containers/OriAmpScatter';
 import OriSpaghetti from '../containers/OriSpaghetti';
 import Col2HeatMap from '../containers/Col2HeatMap';
-import S2StatScatter from '../containers/S2StatScatter';
-import S2AmpScatter from '../containers/S2AmpScatter';
-import S2Spaghetti from '../containers/S2Spaghetti';
-import { event } from 'd3-selection';
+import Col2StatScatter from '../containers/Col2StatScatter';
+import Col2AmpScatter from '../containers/Col2AmpScatter';
+import Col2Spaghetti from '../containers/Col2Spaghetti';
+import Col3HeatMap from '../containers/Col3HeatMap';
+import Col3StatScatter from '../containers/Col3StatScatter';
+import Col3AmpScatter from '../containers/Col3AmpScatter';
+import Col3Spaghetti from '../containers/Col3Spaghetti';
 
 const GridLayout = WidthProvider(ReactGridLayout)
 
@@ -26,9 +29,13 @@ const SizedOriStaScatter = withSizeHOC(OriStatScatter);
 const SizedOriAmpScatter = withSizeHOC(OriAmpScatter);
 const SizedSpaghetti = withSizeHOC(OriSpaghetti);
 const SizedCol2HeatMap = withSizeHOC(Col2HeatMap);
-const SizedS2StaScatter = withSizeHOC(S2StatScatter);
-const SizedS2AmpScatter = withSizeHOC(S2AmpScatter);
-const SizedS2Spaghetti = withSizeHOC(S2Spaghetti);
+const SizedCol2StaScatter = withSizeHOC(Col2StatScatter);
+const SizedCol2AmpScatter = withSizeHOC(Col2AmpScatter);
+const SizedCol2Spaghetti = withSizeHOC(Col2Spaghetti);
+const SizedCol3HeatMap = withSizeHOC(Col3HeatMap);
+const SizedCol3StaScatter = withSizeHOC(Col3StatScatter);
+const SizedCol3AmpScatter = withSizeHOC(Col3AmpScatter);
+const SizedCol3Spaghetti = withSizeHOC(Col3Spaghetti);
 
 const Box = styled.div`
     box-sizing: content-box;
@@ -52,7 +59,7 @@ const generateHoverCss = index => `
 `;
 
 const Grid = styled(GridLayout)`
-    min-width: 2800px;
+    min-width: 4200px;
     .line {
         
     }
@@ -82,7 +89,8 @@ class Dashboard extends Component {
         this.setRep = this.setRep.bind(this);
         this.setK = this.setK.bind(this);
         this.setDist = this.setDist.bind(this);
-        this.handleSubmit = this.handleSubmit.bind(this);
+        this.handleSubmitCol1 = this.handleSubmitCol1.bind(this);
+        this.handleSubmitCol2 = this.handleSubmitCol2.bind(this);
     }
 
     state = {
@@ -92,15 +100,28 @@ class Dashboard extends Component {
         k: 2,
         dist: "Euclidean",
         rep: "Mean",
-        updateData: null
+        updateCol1: null,
+        updateCol2: null,
+        k2: 6,
+        dist2: "Euclidean",
+        rep2: "Mean",
     }
 
-    handleSubmit(event) {
+    handleSubmitCol1(event) {
         
         fetch('/json/hm?k=' + this.state.k +'&rep=' + this.state.rep + "&dist=" + this.state.dist)
             .then(res => res.json())
             .then(data => {
-                this.setState({updateData: data})
+                this.setState({updateCol1: data})
+            });
+    }
+
+    handleSubmitCol2(event) {
+        
+        fetch('/json/hm?k=' + this.state.k +'&rep=' + this.state.rep + "&dist=" + this.state.dist)
+            .then(res => res.json())
+            .then(data => {
+                this.setState({updateCol2: data})
             });
     }
 
@@ -116,6 +137,18 @@ class Dashboard extends Component {
         this.setState({dist: event.target.value})
     }
 
+    setK2(event) {
+        this.setState({k2: event.target.value})
+    }
+
+    setRep2(event) {
+        this.setState({rep2: event.target.value})
+    }
+
+    setDist2(event) {
+        this.setState({dist2: event.target.value})
+    }
+
     render() {
         const { 
             hover,
@@ -128,10 +161,15 @@ class Dashboard extends Component {
             {i: 'SCA2', x: 3, y: 9, w: 2, h: 4, static:true},
             {i: 'SPA', x: 0, y: 4, w: 6, h: 4, static:true},
 
-            {i: 'HM_PAD', x: 7, y: 0, w: 6, h: 4, static:true},
-            {i: 'SCA1_PAD', x: 7, y: 9, w: 2, h: 4, static:true},
-            {i: 'SCA2_PAD', x: 9, y: 9, w: 2, h: 4, static:true},
-            {i: 'SPA_PAD', x: 7, y: 4, w: 6, h: 4, static:true},
+            {i: 'HM_COL1', x: 6, y: 0, w: 6, h: 4, static:true},
+            {i: 'SCA1_COL1', x: 7, y: 9, w: 2, h: 4, static:true},
+            {i: 'SCA2_COL1', x: 9, y: 9, w: 2, h: 4, static:true},
+            {i: 'SPA_COL1', x: 6, y: 4, w: 6, h: 4, static:true},
+
+            {i: 'HM_COL2', x: 12, y: 0, w: 6, h: 4, minW: 5, static:true},
+            {i: 'SCA1_COL2', x: 13, y: 9, w: 2, h: 4, maxW: 4, static:true},
+            {i: 'SCA2_COL2', x: 15, y: 9, w: 2, h: 4, static:true},
+            {i: 'SPA_COL2', x: 12, y: 4, w: 6, h: 4, static:true},
         ];
 
         return (
@@ -139,29 +177,22 @@ class Dashboard extends Component {
                 <Grid 
                     className="dashboard" 
                     layout={layout} 
-                    cols={12} 
+                    cols={18} 
                     rowHeight={100}
                     hover={hover} 
                     class="box"
                     {...this.props}>
-                     {/* <Box key="HM_ORI"> 
+                     <Box key="HM_ORI"> 
                      <Nav className="justify-content-center"  defaultActiveKey="/home" as="ul">
                             <Nav.Link eventKey="disabled" disabled>
                                 Dataset: energy
                             </Nav.Link>
-                            <Nav.Item as="li">
-                                <Form>
-                                    <Row>
-                                        <Col>
-                                            <Form.Control placeholder="First name" />
-                                        </Col>
-                                        <Col>
-                                            <Form.Control placeholder="Last name" />
-                                        </Col>
-
-                                    </Row>
-                                </Form>
-                            </Nav.Item>
+                            <Nav.Link eventKey="disabled" disabled>
+                                window size: 5
+                            </Nav.Link>
+                            <Nav.Link eventKey="disabled" disabled>
+                                step size: 3
+                            </Nav.Link>
                         </Nav>
                         <SizedOriHeatMap />
                     </Box> 
@@ -173,12 +204,12 @@ class Dashboard extends Component {
                     </Box>
                     <Box key="SCA2">
                         <SizedOriAmpScatter />
-                    </Box>  */}
+                    </Box> 
                     
 
-                    <Box key="HM_PAD">
+                    <Box key="HM_COL1">
                     <Navbar className="bg-light justify-content-between">
-                        <Form inline onSubmit={this.handleSubmit}>
+                        <Form inline onSubmit={this.handleSubmitCol1}>
                         <label>
                             Replace by: 
                             <select value={this.state.rep} onChange={ this.setRep}>
@@ -202,19 +233,77 @@ class Dashboard extends Component {
 
                             <Button type="submit">Load</Button>
                         </Form>
+                        <Nav.Link eventKey="disabled" disabled>
+                                k: {this.state.k}
+                        </Nav.Link>
+                        <Nav.Link eventKey="disabled" disabled>
+                                replace by: {this.state.rep}
+                        </Nav.Link>
+                        <Nav.Link eventKey="disabled" disabled>
+                                distance metric: {this.state.dist}
+                        </Nav.Link>
                     </Navbar>
-                        {/* {this.state.updateData ? console.log(this.state.updateData['hm']): null} */}
-                        <SizedCol2HeatMap update={this.state.updateData ? this.state.updateData["hm"]: null} /> 
+                        <SizedCol2HeatMap update={this.state.updateCol1 ? this.state.updateCol1["hm"]: null} /> 
                     </Box>
-                    <Box key="SCA1_PAD">
-                        <SizedS2StaScatter />
+                    <Box key="SPA_COL1">
+                        <SizedCol2Spaghetti update={this.state.updateCol1 ? this.state.updateCol1["line"]: null}/>
                     </Box>
-                    <Box key="SCA2_PAD">
-                        <SizedS2AmpScatter />
+                    <Box key="SCA1_COL1">
+                        <SizedCol2StaScatter update={this.state.updateCol1 ? this.state.updateCol1["stat"]: null}/>
                     </Box>
-                    <Box key="SPA_PAD">
-                        <SizedS2Spaghetti />
+                    <Box key="SCA2_COL1">
+                        <SizedCol2AmpScatter update={this.state.updateCol1 ? this.state.updateCol1["maxmin"]: null}/>
                     </Box>
+
+
+                    <Box key="HM_COL2">
+                    <Navbar className="bg-light justify-content-between">
+                        <Form inline onSubmit={this.handleSubmitCol2}>
+                        <label>
+                            Replace by: 
+                            <select value={this.state.rep2} onChange={ this.setRep2}>
+                                {this.state.reps.map((v, i) => <option key={i} value={v}>{v}</option>)}
+                            </select>
+                        </label>
+
+                        <label>
+                            k: 
+                            <select value={this.state.k2} onChange={ this.setK2}>
+                                {this.state.kvals.map((v, i) => <option key={i} value={v}>{v}</option>)}
+                            </select>
+                        </label>
+
+                        <label>
+                            distance metric:
+                            <select value={this.state.dist2} onChange={ this.setDist2}>
+                                {this.state.dists.map((v, i) => <option key={i} value={v}>{v}</option>)}
+                            </select>
+                        </label>
+
+                            <Button type="submit">Load</Button>
+                        </Form>
+                        <Nav.Link eventKey="disabled" disabled>
+                                k: {this.state.k2}
+                        </Nav.Link>
+                        <Nav.Link eventKey="disabled" disabled>
+                                replace by: {this.state.rep2}
+                        </Nav.Link>
+                        <Nav.Link eventKey="disabled" disabled>
+                                distance metric: {this.state.dist2}
+                        </Nav.Link>
+                    </Navbar>
+                        <SizedCol3HeatMap update={this.state.updateCol2 ? this.state.updateCol2["hm"]: null} /> 
+                    </Box>
+                    <Box key="SPA_COL2">
+                        <SizedCol3Spaghetti update={this.state.updateCol2 ? this.state.updateCol2["line"]: null}/>
+                    </Box>
+                    <Box key="SCA1_COL2">
+                        <SizedCol3StaScatter update={this.state.updateCol2 ? this.state.updateCol2["stat"]: null}/>
+                    </Box>
+                    <Box key="SCA2_COL2">
+                        <SizedCol3AmpScatter update={this.state.updateCol2 ? this.state.updateCol2["maxmin"]: null}/>
+                    </Box>
+                    
                 </Grid>
             </React.Fragment>
         )

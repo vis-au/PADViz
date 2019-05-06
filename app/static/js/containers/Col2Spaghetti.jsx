@@ -1,7 +1,7 @@
 import {connect} from 'react-redux';
 
 import { setHover } from '../redux/actions/index'
-import S2StatScatter from '../components/S2StatScatter';
+import Col2Spaghetti from '../components/Col2Spaghetti';
 
 const mapStateToProps = (state, ownProps) => ({
     hover: state.hover,
@@ -12,5 +12,4 @@ const mapDispatchToProps = (dispatch, ownProps) => ({
     setHover: (hover) => dispatch(setHover(hover))
 })
 
-export default connect(mapStateToProps, mapDispatchToProps)(S2StatScatter);
-
+export default connect(mapStateToProps, mapDispatchToProps)(Col2Spaghetti);

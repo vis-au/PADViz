@@ -1,9 +1,9 @@
 import React, { Component } from 'react';
 import sizeMe from 'react-sizeme';
 
-import AmpScatter from './charts/AmpScatter';
+import StatScatter from './charts/StatScatter';
 
-class S2AmpScatter extends Component {
+class Col2StatScatter extends Component {
     constructor(props) {
         super(props)
     }
@@ -15,12 +15,18 @@ class S2AmpScatter extends Component {
     componentDidMount() {
         this.setState({isLoading: true});
         
-        fetch("/json/amp?type=s2")
+        fetch("/json/stat?type=s2")
         .then(res => res.json())
         .then(data => this.setState({
             isLoading: false,
             initData: data
         }))
+    }
+
+    componentDidUpdate(prevProps) {
+        if(this.props.update && this.props.update != prevProps.update) {
+            this.setState({initData: JSON.parse(this.props.update) });
+        }
     }
 
     render(){
@@ -29,7 +35,7 @@ class S2AmpScatter extends Component {
         return(
             <div>
                 { initData ?
-                <AmpScatter initData={initData} width="400" height="400" name='amp-col2' {...this.props}/> 
+                <StatScatter initData={initData} width="400" height="400" name="stat-col1" {...this.props}/> 
                 : <p>Loading...</p>}
             </div>
         )
@@ -37,4 +43,4 @@ class S2AmpScatter extends Component {
     }
 }
 
-export default sizeMe({ monitorHeight: true })(S2AmpScatter)
+export default sizeMe({ monitorHeight: true })(Col2StatScatter)

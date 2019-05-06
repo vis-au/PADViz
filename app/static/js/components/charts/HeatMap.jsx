@@ -50,8 +50,6 @@ class HeatMap extends Component {
 
     componentDidUpdate(prevProps) {
         if(this.props.initData !== prevProps.initData) {
-            console.log("update")
-            console.log(this.props.indexMap)
             this.renderD3('update')
         }
         if(this.props.hover !== prevProps.hover) {
@@ -90,10 +88,14 @@ class HeatMap extends Component {
 
         if(indexes && indexes.length) {
             let idxSet = new Set([]);
+            
             indexes.forEach(function(idx) {
-                indexMap[idx].forEach(function(v){
-                    idxSet.add(v);
-                })
+                if(idx in indexMap) {
+                    indexMap[idx].forEach(function(v){
+                        idxSet.add(v);
+                    })
+                }
+                
             });
             for(let i = 0; i < len; i++) {
                 let node = d3.select(`#${type}-${i}`);

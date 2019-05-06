@@ -38,7 +38,7 @@ class StatScatter extends Component {
         if(this.state.tooltip) {
             return {
                 content: `mean: ${Math.round(mean * 100) / 100}, std: ${Math.round(std * 100) / 100}, id: ${id}`,
-                style: {top: y-30, left: x - 10}
+                style: {top: y-40, left: x - 40}
             }
         } else {
             return {
@@ -52,6 +52,9 @@ class StatScatter extends Component {
     }
 
     componentDidUpdate(prevProps) {
+        if(this.props.initData !== prevProps.initData) {
+           this.renderD3('load')
+        }
         if(this.props.indexes !== prevProps.indexes) {
             this.renderD3('update')
         }
@@ -91,6 +94,7 @@ class StatScatter extends Component {
         
         const render = mode === 'render'
         const update = mode === 'update'
+        const load = mode === 'load'
         
         const margin = {top: 20, right: 20, bottom: 40, left: 40};
         const chartWidth = width - margin.left - margin.right;
@@ -111,7 +115,10 @@ class StatScatter extends Component {
                 data = initData.filter(d =>  indexes.includes(d.index))
             } 
             svg = d3.select(faux).select('svg').select('g');
-        }  
+        } else if(load) {
+            data = initData;
+            svg = d3.select(faux).select('svg').select('g');
+        }
 
         let xScale, yScale;
         
@@ -154,13 +161,15 @@ class StatScatter extends Component {
 
             d3.select('.body').on('click', function(){ setHover(null) })
 
-            animateFauxDOM(800);
+            
         }
         
         
-        const xAxis = d3.axisBottom(xScale).ticks(5);
-        const yAxis = d3.axisLeft(yScale).ticks(10);
+        let xAxis = d3.axisBottom(xScale).ticks(5);
+        let yAxis = d3.axisLeft(yScale).ticks(10);
         if(render) {
+        // let axis_x = svg.select('g.x.axis');
+        // let axis_y = svg.select('g.y.axis');
             svg.append('g')
                 .attr('class', 'x axis')
                 .attr('transform', `translate(0, ${chartHeight})`)
@@ -188,6 +197,7 @@ class StatScatter extends Component {
             .style('text-anchor', 'middle')
             .text("std")
                 .style("font-size", 14);
+        animateFauxDOM(800);
     }
     
 }

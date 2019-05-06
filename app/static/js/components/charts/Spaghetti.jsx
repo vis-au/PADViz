@@ -24,6 +24,9 @@ class Spaghetti extends Component {
     }
 
     componentDidUpdate(prevProps) {
+        if(this.props.initData !== prevProps.initData) {
+            this.renderD3('load')
+        }
         if(this.props.indexes !== prevProps.indexes) {
             this.renderD3('update')
         }
@@ -68,6 +71,7 @@ class Spaghetti extends Component {
 
         const render = mode === 'render'
         const update = mode === 'update'
+        const load = mode === 'load'
         
         const margin = {top: 20, right: 100, bottom: 20, left: 100};
         const chartWidth = width - margin.left - margin.right;
@@ -93,7 +97,13 @@ class Spaghetti extends Component {
                 data = this.state.data.filter(d => indexes.includes(parseInt(d.r_id)))
             }
             time = data[0].values.map(v => v.time);
+            // time = data.values.map(v => v.time);
             svg = d3.select(faux).select('svg').select('g');
+        } else if(load) {
+            this.setState({data: this.initDataTransformer(initData)});
+            svg = d3.select(faux).select('svg').select('g');
+            data = this.state.data[0];
+            time = data.values.map(v => v.time);
         }
         // console.log(data, time)
 
@@ -108,29 +118,32 @@ class Spaghetti extends Component {
         const line = d3.line()
             .x(d => xScale(d.time))
             .y(d => yScale(d.power));
+        if(update) {
+            let lines = svg.selectAll(".line")
+                            .data(data);
+            lines.exit().remove();
+            lines = lines.enter()
+                    .append("path")
+                        .style("mix-blend-mode", "multiply")
+                        .on('mouseover', d => {
+                            setHover([d.r_id]);
+                        })
+                        // .on('mouseleave', d => {
+                        //     setHover(null);
+                        // })
+
+                        .merge(lines);
+
+            lines
+                .attr("class", d => `${name} line data data-${d.r_id}`)
+                .attr("d", d => line(d.values))
+                .attr("stroke", "#666666")
+                .attr('stroke-width', 0.5)
+                .transition()
+                .attr('stroke-width', 1.5);
+                animateFauxDOM(800);
+        }
         
-        let lines = svg.selectAll(".line")
-                        .data(data);
-        lines.exit().remove();
-        lines = lines.enter()
-                .append("path")
-                    .style("mix-blend-mode", "multiply")
-                    .on('mouseover', d => {
-                        setHover([d.r_id]);
-                    })
-                    // .on('mouseleave', d => {
-                    //     setHover(null);
-                    // })
-
-                    .merge(lines);
-
-        lines
-            .attr("class", d => `${name} line data data-${d.r_id}`)
-            .attr("d", d => line(d.values))
-            .attr("stroke", "#666666")
-            .attr('stroke-width', 0.5)
-            .transition()
-            .attr('stroke-width', 1.5);
         
         
         // let dots = svg.selectAll("dots")
@@ -153,7 +166,7 @@ class Spaghetti extends Component {
         //     .attr("r", 4)
         //     .attr("fill", "#999999");
     
-        animateFauxDOM(800);
+        
 
         const xAxis = d3.axisBottom(xScale).tickSize(0).tickValues(time.filter((d, i) => (i === 0 || !(i % 3)) ? i : null));
         const yAxis = d3.axisLeft(yScale)
@@ -163,15 +176,15 @@ class Spaghetti extends Component {
                 .attr('transform', `translate(0, ${chartHeight})`)
                 .call(xAxis);
             
-            svg.append("text")
-                .attr('transform', `translate(${chartWidth - 10}, ${chartHeight - 5})`)
-                .attr('class', 'axis label')
-                .style('text-anchor', 'middle')
-                .text("time")
-                    .style("font-size", 14)
-                    .attr("fill", "black");
-                
             svg.append('g').attr('class', 'y axis').call(yAxis);
+
+            svg.append("text")
+            .attr('transform', `translate(${chartWidth - 10}, ${chartHeight - 5})`)
+            .attr('class', 'axis label')
+            .style('text-anchor', 'middle')
+            .text("time")
+                .style("font-size", 14)
+                .attr("fill", "black");
 
             svg.append("text")
                 .attr('transform', `translate(${margin.left - 70}, ${margin.top})`)
@@ -181,7 +194,13 @@ class Spaghetti extends Component {
                     .style("font-size", 14)
                     .attr("fill", "black");
         }
-    }
+           
+        }// else if(update) {
+        //     svg.select('g.x.axis').call(xAxis)
+        //     svg.select('g.y.axis').call(yAxis)
+        // }
+
+        
     
 }
 

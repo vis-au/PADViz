@@ -111,12 +111,6 @@ def all_energy():
         df = pd.read_pickle("./dataset/sanitized_profile_best.pkl")
     elif req_type == 's6':
         df = pd.read_pickle("./dataset/sanitized_profile_best6.pkl")
-    elif req_type == 's2mean':
-        df = pd.read_pickle("./results/energy_sample_mean_n2.pickle")
-    elif req_type == 's2median':
-        df = pd.read_pickle("./results/energy_sample_median_n2.pickle")
-    elif req_type == 's4median':
-        df = pd.read_pickle("./results/energy_sample_median_n4.pickle")
     else: # origi
         df = pd.read_pickle(ori_file)
 

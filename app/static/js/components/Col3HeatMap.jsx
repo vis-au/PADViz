@@ -3,7 +3,7 @@ import sizeMe from 'react-sizeme';
 
 import HeatMap from './charts/HeatMap';
 
-class Col2HeatMap extends Component {
+class Col3HeatMap extends Component {
     constructor(props) {
         super(props);
     }
@@ -17,7 +17,7 @@ class Col2HeatMap extends Component {
     componentDidMount() {
         this.setState({isLoading: true});
         
-        fetch("/json/heatmap?type=s2")
+        fetch("/json/heatmap?type=s6")
         .then(res => res.json())
         .then(data => {
             this.getIndexMap(data);
@@ -62,4 +62,4 @@ class Col2HeatMap extends Component {
     }
 }
 
-export default sizeMe({ monitorHeight: true })(Col2HeatMap);
+export default sizeMe({ monitorHeight: true })(Col3HeatMap);

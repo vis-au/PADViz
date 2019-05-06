@@ -7,9 +7,9 @@
 }
 
 .box {
-	box-sizing: border-box;
+	/* box-sizing: border-box; */
 	width: 100%;
-	border: solid orange 3px;
+	/* border: solid orange 3px; */
 	display: inline-block;
 	/* padding: 5px; */
 	/* margin: 5px; */

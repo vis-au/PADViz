@@ -34,7 +34,7 @@ class AmpScatter extends Component {
         if(this.state.tooltip) {
             return {
                 content: `max: ${Math.round(max * 100) / 100}, min: ${Math.round(min * 100) / 100}, id: ${id}`,
-                style: {top: y-10, left: x-10}
+                style: {top: y-40, left: x-40}
             }
         } else {
             return {
@@ -48,6 +48,9 @@ class AmpScatter extends Component {
     }
 
     componentDidUpdate(prevProps) {
+        if(this.props.initData !== prevProps.initData) {
+            this.renderD3('load')
+        }
         if(this.props.indexes !== prevProps.indexes) {
             this.renderD3('update')
         }
@@ -86,7 +89,8 @@ class AmpScatter extends Component {
         
         const render = mode === 'render'
         const update = mode === 'update'
-        
+        const load = mode === 'load'
+
         const margin = {top: 20, right: 20, bottom: 40, left: 40};
         const chartWidth = width - margin.left - margin.right;
         const chartHeight = height - margin.top - margin.bottom;
@@ -105,6 +109,9 @@ class AmpScatter extends Component {
             if(indexes) {
                 data = initData.filter(d =>  indexes.includes(d.index) && (d.time === time))
             } 
+            svg = d3.select(faux).select('svg').select('g');
+        } else if(load) {
+            data = initData;
             svg = d3.select(faux).select('svg').select('g');
         }
         
