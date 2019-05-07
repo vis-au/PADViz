@@ -89,6 +89,9 @@ class Dashboard extends Component {
         this.setRep = this.setRep.bind(this);
         this.setK = this.setK.bind(this);
         this.setDist = this.setDist.bind(this);
+        this.setRep2 = this.setRep2.bind(this);
+        this.setK2 = this.setK2.bind(this);
+        this.setDist2 = this.setDist2.bind(this);
         this.handleSubmitCol1 = this.handleSubmitCol1.bind(this);
         this.handleSubmitCol2 = this.handleSubmitCol2.bind(this);
     }
@@ -108,7 +111,7 @@ class Dashboard extends Component {
     }
 
     handleSubmitCol1(event) {
-        
+        event.preventDefault();
         fetch('/json/hm?k=' + this.state.k +'&rep=' + this.state.rep + "&dist=" + this.state.dist)
             .then(res => res.json())
             .then(data => {
@@ -117,7 +120,7 @@ class Dashboard extends Component {
     }
 
     handleSubmitCol2(event) {
-        
+        event.preventDefault();
         fetch('/json/hm?k=' + this.state.k +'&rep=' + this.state.rep + "&dist=" + this.state.dist)
             .then(res => res.json())
             .then(data => {
