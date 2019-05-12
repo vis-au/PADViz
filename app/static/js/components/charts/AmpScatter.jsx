@@ -58,7 +58,9 @@ class AmpScatter extends Component {
             if(this.props.hover) {
                 let id = this.props.hover[0];
                 let node = d3.select(`.${this.props.name}.data-${id}`)
-                this.setToolTip(node.attr('max'), node.attr('min'), node.attr('cx'), node.attr('cy'), id);
+                if(!node.empty()) {
+                    this.setToolTip(node.attr('max'), node.attr('min'), node.attr('cx'), node.attr('cy'), id);
+                }
             } else {
                 this.setToolTip(null);
             }

@@ -62,7 +62,9 @@ class StatScatter extends Component {
             if(this.props.hover) {
                 let id = this.props.hover[0];
                 let node = d3.select(`.${this.props.name}.data-${id}`)
-                this.setToolTip(node.attr('mean'), node.attr('std'), node.attr('cx'), node.attr('cy'), id);
+                if(!node.empty()) {
+                    this.setToolTip(node.attr('mean'), node.attr('std'), node.attr('cx'), node.attr('cy'), id);
+                }
             } else {
                 this.setToolTip(null);
             }
@@ -161,8 +163,10 @@ class StatScatter extends Component {
 
             d3.select('.body').on('click', function(){ setHover(null) })
         } else if(load) {
-            data = initData;
-            svg = d3.select(faux).select('svg').select('g');
+            let dots = svg.selectAll('.dot')
+                    .data([]);
+        
+            dots.exit().transition().attr('r', 0).remove();
         }
         
         

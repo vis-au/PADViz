@@ -3,24 +3,22 @@ import sizeMe from 'react-sizeme';
 
 import Spaghetti from './charts/Spaghetti';
 
-class Col3Spaghetti extends Component {
+class MultiLines extends Component {
+
     constructor(props) {
         super(props)
     }
     state = {
-        isLoading: false,
         initData: null
     }
 
     componentDidMount() {
-        this.setState({isLoading: true});
-        
-        fetch("/json/line?type=s6")
-        .then(res => res.json())
-        .then(data => this.setState({
-            isLoading: false,
-            initData: data
-        }))
+        fetch(this.props.initUrl)
+            .then(res => res.json())
+            .then(data => this.setState({
+                isLoading: false,
+                initData: data
+            }))
     }
 
     componentDidUpdate(prevProps) {
@@ -32,11 +30,13 @@ class Col3Spaghetti extends Component {
 
     render(){
         const {initData} = this.state;
-        let { width, height } = this.props.size
+        let { width, height } = this.props.size;
+        let { name } = this.props;
+
         return(
             <div>
                 { initData ?
-                <Spaghetti initData={initData} width={width} height={height ? height : (width/3.5)} name="spa-col3" {...this.props}/> 
+                <Spaghetti initData={initData} width={width} height={height ? height : (width/3.5)} name={name} {...this.props}/> 
                 : <p>Loading...</p>}
             </div>
         )
@@ -44,4 +44,4 @@ class Col3Spaghetti extends Component {
     }
 }
 
-export default sizeMe({ monitorHeight: true })(Col3Spaghetti);
+export default sizeMe({ monitorHeight: true })(MultiLines);

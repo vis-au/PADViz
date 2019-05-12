@@ -96,8 +96,11 @@ class Spaghetti extends Component {
             if(indexes && indexes.length > 0) {
                 data = this.state.data.filter(d => indexes.includes(parseInt(d.r_id)))
             }
-            time = data[0].values.map(v => v.time);
-            // time = data.values.map(v => v.time);
+            if(data && data.length > 0) {
+                time = data[0].values.map(v => v.time);
+            } else {
+                time = null;
+            }
             svg = d3.select(faux).select('svg').select('g');
         } else if(load) {
             this.setState({data: this.initDataTransformer(initData)});
@@ -106,20 +109,27 @@ class Spaghetti extends Component {
             time = data.values.map(v => v.time);
         }
         // console.log(data, time)
-
-        let xScale = d3.scaleBand()
+        let xScale, yScale, line, xAxis, yAxis;
+        if(time) {
+            xScale = d3.scaleBand()
                         .domain(time)
                         .range([0, chartWidth]);
 
-        let yScale = d3.scaleLinear()
-            .domain([0, 220]).nice()
-            .range([chartHeight, 0]);
+            yScale = d3.scaleLinear()
+                .domain([0, 220]).nice()
+                .range([chartHeight, 0]);
+            
+            line = d3.line()
+                .x(d => xScale(d.time))
+                .y(d => yScale(d.power));
+            
+            xAxis = d3.axisBottom(xScale).tickSize(0).tickValues(time.filter((d, i) => (i === 0 || !(i % 3)) ? i : null));
+            yAxis = d3.axisLeft(yScale)
+                            .ticks(10);
+        }
         
-        const line = d3.line()
-            .x(d => xScale(d.time))
-            .y(d => yScale(d.power));
         
-        if(update) {
+        if(update && time) {
             let lines = svg.selectAll(".line")
                             .data(data);
             lines.exit().remove();
@@ -142,12 +152,25 @@ class Spaghetti extends Component {
                 .attr('stroke-width', 0.5)
                 .transition()
                 .attr('stroke-width', 1.5);
-                animateFauxDOM(800);
-        }
-        if(load) {
-            let lines = svg.selectAll(".line");
-            lines.exit().remove();
-        }
+                
+        }  else if(load || (update && !time)) {
+            console.log("here")
+            let lines = svg.selectAll(".line")
+                            .data([]);
+            
+                            lines.exit().transition().attr('stroke-width', 0).remove();
+            // let dots = svg.selectAll('.dot')
+            //         .data([]);
+        
+            // dots.exit().transition().attr('r', 0).remove();
+        } 
+        animateFauxDOM(800);
+        // console.log(update + " " +time)
+        // console.log(update && time)
+        // if(load) {
+        //     let lines = svg.selectAll(".line");
+        //     lines.exit().remove();
+        // }
         
         
         // let dots = svg.selectAll("dots")
@@ -171,10 +194,6 @@ class Spaghetti extends Component {
         //     .attr("fill", "#999999");
     
         
-
-        const xAxis = d3.axisBottom(xScale).tickSize(0).tickValues(time.filter((d, i) => (i === 0 || !(i % 3)) ? i : null));
-        const yAxis = d3.axisLeft(yScale)
-                        .ticks(10);
         if(render) {
             svg.append('g')
                 .attr('transform', `translate(0, ${chartHeight})`)

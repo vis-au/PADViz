@@ -10,10 +10,8 @@ import { Row, Col, Form, Navbar, Nav, InputGroup, FormControl, Button, NavDropdo
 import AmpHeatMap from '../containers/AmpHeatMap';
 import MinMaxScatter from '../containers/MinMaxScatter';
 import MeanStdScatter from '../containers/MeanStdScatter';
+import MultiLines from '../containers/MultiLines';
 
-import OriSpaghetti from '../containers/OriSpaghetti';
-import Col2Spaghetti from '../containers/Col2Spaghetti';
-import Col3Spaghetti from '../containers/Col3Spaghetti';
 
 
 const GridLayout = WidthProvider(ReactGridLayout)
@@ -23,6 +21,7 @@ const withSizeHOC = withSize();
 const SizedAmpHeatMap = withSizeHOC(AmpHeatMap);
 const SizedMinMaxScatter = withSizeHOC(MinMaxScatter);
 const SizedMeanStdScatter = withSizeHOC(MeanStdScatter);
+const SizedMultiLines = withSizeHOC(MultiLines);
 
 const Box = styled.div`
     box-sizing: content-box;
@@ -147,7 +146,7 @@ class Dashboard extends Component {
 
     clickHandler() {
         this.props.setFreeze(!this.props.isFreeze);
-        console.log(this.props.isFreeze)
+        // console.log(this.props.isFreeze)
     }
 
     render() {
@@ -197,7 +196,7 @@ class Dashboard extends Component {
                         <SizedAmpHeatMap name="hm-col1" initUrl="/json/heatmap"/>
                     </Box> 
                     <Box key="SPA">
-                        {/* <SizedSpaghetti /> */}
+                        <SizedMultiLines name="spa-col1" initUrl="/json/line"/>
                     </Box>
                     <Box key="SCA1">
                         <SizedMeanStdScatter name="stascatter-col1" initUrl="/json/stat"/>
@@ -246,7 +245,7 @@ class Dashboard extends Component {
                         <SizedAmpHeatMap name="hm-col2" initUrl="/json/heatmap?type=s2" update={this.state.updateCol1 ? this.state.updateCol1["hm"]: null}/>
                     </Box>
                     <Box key="SPA_COL1">
-                        {/* <SizedCol2Spaghetti update={this.state.updateCol1 ? this.state.updateCol1["line"]: null}/> */}
+                        <SizedMultiLines name="spa-col2" initUrl="/json/line?type=s2" update={this.state.updateCol1 ? this.state.updateCol1["line"]: null}/>
                     </Box>
                     <Box key="SCA1_COL1">
                         <SizedMeanStdScatter name="stascatter-col2" initUrl="/json/stat?type=s2" update={this.state.updateCol1 ? this.state.updateCol1["stat"]: null}/>
@@ -292,11 +291,10 @@ class Dashboard extends Component {
                                 distance metric: {this.state.dist2}
                         </Nav.Link>
                     </Navbar>
-                        {/* <SizedCol3HeatMap update={this.state.updateCol2 ? this.state.updateCol2["hm"]: null} />  */}
                         <SizedAmpHeatMap name="hm-col3" initUrl="/json/heatmap?type=s6" update={this.state.updateCol2 ? this.state.updateCol2["hm"]: null}/>
                     </Box>
                     <Box key="SPA_COL2">
-                        {/* <SizedCol3Spaghetti update={this.state.updateCol2 ? this.state.updateCol2["line"]: null}/> */}
+                        <SizedMultiLines name="spa-col3" initUrl="/json/line?type=s6" update={this.state.updateCol2 ? this.state.updateCol2["line"]: null}/>
                     </Box>
                     <Box key="SCA1_COL2">
                         <SizedMeanStdScatter name="stascatter-col3" initUrl="/json/stat?type=s6" update={this.state.updateCol2 ? this.state.updateCol2["stat"]: null}/>
