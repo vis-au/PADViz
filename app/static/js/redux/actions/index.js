@@ -3,6 +3,8 @@ import {
     SET_CLICK_HM,
     SET_HOVER,
     SET_TIME,
+    SET_FREEZE,
+
     SET_HM_IDX,
     SET_SELECTED
 } from './actionTypes';
@@ -27,6 +29,13 @@ export const setTime = (time) => ({
     type: SET_TIME,
     time
 })
+
+export const setFreeze = (isFreeze) => ({
+    type: SET_FREEZE,
+    isFreeze
+})
+
+
 
 export const setHMIdx = (idx) => ({
     type: SET_HM_IDX,

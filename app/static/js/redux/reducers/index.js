@@ -3,6 +3,8 @@ import {
     SET_CLICK_HM,
     SET_HOVER,
     SET_TIME,
+    SET_FREEZE,
+
     SET_HM_IDX,
     SET_SELECTED
 } from '../actions/actionTypes';
@@ -12,7 +14,8 @@ export const initialState = {
     indexes: null,
     time: null,
     hmIdx: null,
-    clickHm: null
+    clickHm: null,
+    isFreeze: false
 };
 
 export const rootReducer = (state = initialState, action) => {
@@ -41,6 +44,11 @@ export const rootReducer = (state = initialState, action) => {
             return {
                 ...state,
                 hmIdx: action.idx
+            }
+        case SET_FREEZE:
+            return {
+                ...state,
+                isFreeze: action.isFreeze
             }
         case SET_SELECTED:
             return {

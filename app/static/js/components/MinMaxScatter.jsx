@@ -3,33 +3,39 @@ import sizeMe from 'react-sizeme';
 
 import AmpScatter from './charts/AmpScatter';
 
-class OriAmpScatter extends Component {
+class MinMaxScatter extends Component {
     constructor(props) {
         super(props)
     }
+
     state = {
-        isLoading: false,
         initData: null
     }
 
     componentDidMount() {
         this.setState({isLoading: true});
         
-        fetch("/json/amp")
+        fetch(this.props.initUrl)
         .then(res => res.json())
         .then(data => this.setState({
-            isLoading: false,
             initData: data
         }))
     }
 
+    componentDidUpdate(prevProps) {
+        if(this.props.update && this.props.update != prevProps.update) {
+            this.setState({initData: JSON.parse(this.props.update) });
+        }
+    }
+
     render(){
-        const {initData} = this.state;
-        let { width, height } = this.props.size
+        const { initData } = this.state;
+        const { name } = this.props;
+
         return(
             <div>
                 { initData ?
-                <AmpScatter initData={initData} width="400" height="400" name='amp-col1' {...this.props}/> 
+                <AmpScatter initData={initData} width="400" height="400" name={name} {...this.props}/> 
                 : <p>Loading...</p>}
             </div>
         )
@@ -37,4 +43,4 @@ class OriAmpScatter extends Component {
     }
 }
 
-export default sizeMe({ monitorHeight: true })(OriAmpScatter)
+export default sizeMe({ monitorHeight: true })(MinMaxScatter)

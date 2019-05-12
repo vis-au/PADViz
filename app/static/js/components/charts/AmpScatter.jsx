@@ -83,6 +83,7 @@ class AmpScatter extends Component {
             indexes,
             time,
             setHover,
+            isFreeze,
             connectFauxDOM,
             animateFauxDOM,
         } = this.props;
@@ -114,7 +115,7 @@ class AmpScatter extends Component {
             data = initData;
             svg = d3.select(faux).select('svg').select('g');
         }
-        
+
         let xScale, yScale;
         xScale = d3.scaleLinear()
             .domain(d3.extent(data, d => {return d.min})).nice()
@@ -138,7 +139,8 @@ class AmpScatter extends Component {
                         setHover([d.index]);
                     })
                     // .on('mouseout', d => {
-                    //     setHover(null);
+                    //     console.log(isFreeze)
+                    //     if(!isFreeze) setHover(null);
                     // })
                     .on('click', d => {
                         setHover([d.index]);
@@ -146,7 +148,7 @@ class AmpScatter extends Component {
                     .merge(dots);
             
             dots
-                .attr('r', 4)
+                .attr('r', 7.5)
                 .attr("cx", function (d) { return xScale(d.min); } )
                 .attr("cy", function (d) { return yScale(d.max); } )
                 .attr("max", d => d.max)
@@ -154,8 +156,14 @@ class AmpScatter extends Component {
                 .transition()
                 .attr("class", d => `${name} dot data data-${d.index}`);
 
-            animateFauxDOM(800);
+            
+        } else if(load) {
+            let dots = svg.selectAll('.dot')
+                    .data([]);
+        
+            dots.exit().transition().attr('r', 0).remove();
         }
+        animateFauxDOM(1000);
         
         const xAxis = d3.axisBottom(xScale).ticks(5)
         const yAxis = d3.axisLeft(yScale).ticks(10)
@@ -166,23 +174,25 @@ class AmpScatter extends Component {
                 .call(xAxis)
 
             svg.append('g').attr('class', 'y axis').call(yAxis);
+
+            svg.append("text")
+                .attr('transform', `translate(${chartWidth - 10}, ${chartHeight - 5})`)
+                .attr('class', 'axis label')
+                .style('text-anchor', 'middle')
+                .text("min")
+                    .style("font-size", 14);
+            svg.append("text")
+                .attr('transform', `translate(${margin.left - 20}, ${margin.top})`)
+                .attr('class', 'axis label')
+                .style('text-anchor', 'middle')
+                .text("max")
+                    .style("font-size", 14);
         } else if(update) {
             svg.select('g.x.axis').call(xAxis)
             svg.select('g.y.axis').call(yAxis)
         }
 
-        svg.append("text")
-            .attr('transform', `translate(${chartWidth - 10}, ${chartHeight - 5})`)
-            .attr('class', 'axis label')
-            .style('text-anchor', 'middle')
-            .text("min")
-                .style("font-size", 14);
-        svg.append("text")
-            .attr('transform', `translate(${margin.left - 20}, ${margin.top})`)
-            .attr('class', 'axis label')
-            .style('text-anchor', 'middle')
-            .text("max")
-                .style("font-size", 14);
+        
     }
     
 }

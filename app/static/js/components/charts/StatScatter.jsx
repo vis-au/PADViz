@@ -151,7 +151,7 @@ class StatScatter extends Component {
                     .merge(dots);
             
             dots
-                .attr("r", 4)
+                .attr("r", 7.5)
                 .attr("cx", function (d) { return xScale(d.mean); } )
                 .attr("cy", function (d) { return yScale(d.std); } )
                 .attr("mean", d => d.mean)
@@ -160,8 +160,9 @@ class StatScatter extends Component {
                 .transition();
 
             d3.select('.body').on('click', function(){ setHover(null) })
-
-            
+        } else if(load) {
+            data = initData;
+            svg = d3.select(faux).select('svg').select('g');
         }
         
         
@@ -179,24 +180,25 @@ class StatScatter extends Component {
                 .attr('class', 'y axis')
                 .call(yAxis);
 
+            svg.append("text")
+                .attr('transform', `translate(${chartWidth - 10}, ${chartHeight - 5})`)
+                .attr('class', 'label')
+                .style('text-anchor', 'middle')
+                .text("mean")
+                    .style("font-size", 14);
+    
+            svg.append("text")
+                .attr('transform', `translate(${margin.left - 20}, ${margin.top})`)
+                .attr('class', 'axis label')
+                .style('text-anchor', 'middle')
+                .text("std")
+                    .style("font-size", 14);
         } else if(update) {
             svg.select('g.x.axis').call(xAxis)
             svg.select('g.y.axis').call(yAxis)
         }
 
-        svg.append("text")
-            .attr('transform', `translate(${chartWidth - 10}, ${chartHeight - 5})`)
-            .attr('class', 'label')
-            .style('text-anchor', 'middle')
-            .text("mean")
-                .style("font-size", 14);
-
-        svg.append("text")
-            .attr('transform', `translate(${margin.left - 20}, ${margin.top})`)
-            .attr('class', 'axis label')
-            .style('text-anchor', 'middle')
-            .text("std")
-                .style("font-size", 14);
+        
         animateFauxDOM(800);
     }
     

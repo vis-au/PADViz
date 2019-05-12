@@ -277,8 +277,8 @@ class HeatMap extends Component {
             .attr("count", d=>d.count)
             .attr("fill", d => colorScale(d.count))
             .transition()
-            .attr("width", rectWidth )
-            .attr("height", rectHeight );
+                .attr("width", rectWidth )
+                .attr("height", rectHeight );
         
             animateFauxDOM(1000);
         

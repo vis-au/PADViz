@@ -8,36 +8,21 @@ import { withSize } from 'react-sizeme'
 import { Row, Col, Form, Navbar, Nav, InputGroup, FormControl, Button, NavDropdown, NavItem} from 'react-bootstrap';
 
 import AmpHeatMap from '../containers/AmpHeatMap';
-import OriHeatMap from '../containers/OriHeatMap';
-import OriStatScatter from '../containers/OriStatScatter';
-import OriAmpScatter from '../containers/OriAmpScatter';
+import MinMaxScatter from '../containers/MinMaxScatter';
+import MeanStdScatter from '../containers/MeanStdScatter';
+
 import OriSpaghetti from '../containers/OriSpaghetti';
-import Col2HeatMap from '../containers/Col2HeatMap';
-import Col2StatScatter from '../containers/Col2StatScatter';
-import Col2AmpScatter from '../containers/Col2AmpScatter';
 import Col2Spaghetti from '../containers/Col2Spaghetti';
-import Col3HeatMap from '../containers/Col3HeatMap';
-import Col3StatScatter from '../containers/Col3StatScatter';
-import Col3AmpScatter from '../containers/Col3AmpScatter';
 import Col3Spaghetti from '../containers/Col3Spaghetti';
+
 
 const GridLayout = WidthProvider(ReactGridLayout)
 
 
 const withSizeHOC = withSize();
 const SizedAmpHeatMap = withSizeHOC(AmpHeatMap);
-const SizedOriHeatMap = withSizeHOC(OriHeatMap);
-const SizedOriStaScatter = withSizeHOC(OriStatScatter);
-const SizedOriAmpScatter = withSizeHOC(OriAmpScatter);
-const SizedSpaghetti = withSizeHOC(OriSpaghetti);
-const SizedCol2HeatMap = withSizeHOC(Col2HeatMap);
-const SizedCol2StaScatter = withSizeHOC(Col2StatScatter);
-const SizedCol2AmpScatter = withSizeHOC(Col2AmpScatter);
-const SizedCol2Spaghetti = withSizeHOC(Col2Spaghetti);
-const SizedCol3HeatMap = withSizeHOC(Col3HeatMap);
-const SizedCol3StaScatter = withSizeHOC(Col3StatScatter);
-const SizedCol3AmpScatter = withSizeHOC(Col3AmpScatter);
-const SizedCol3Spaghetti = withSizeHOC(Col3Spaghetti);
+const SizedMinMaxScatter = withSizeHOC(MinMaxScatter);
+const SizedMeanStdScatter = withSizeHOC(MeanStdScatter);
 
 const Box = styled.div`
     box-sizing: content-box;
@@ -96,6 +81,7 @@ class Dashboard extends Component {
         this.setDist2 = this.setDist2.bind(this);
         this.handleSubmitCol1 = this.handleSubmitCol1.bind(this);
         this.handleSubmitCol2 = this.handleSubmitCol2.bind(this);
+        this.clickHandler = this.clickHandler.bind(this);
     }
 
     state = {
@@ -155,10 +141,18 @@ class Dashboard extends Component {
         this.setState({dist2: event.target.value})
     }
 
+    componentDidMount() {
+        document.body.addEventListener('click', this.clickHandler);
+    }
+
+    clickHandler() {
+        this.props.setFreeze(!this.props.isFreeze);
+        console.log(this.props.isFreeze)
+    }
+
     render() {
         const { 
-            hover,
-            hmIdx
+            hover
          } = this.props;
 
         const layout = [
@@ -200,17 +194,16 @@ class Dashboard extends Component {
                                     step size: 3
                                 </Nav.Link>
                         </Nav>
-                        {/* <SizedOriHeatMap /> */}
                         <SizedAmpHeatMap name="hm-col1" initUrl="/json/heatmap"/>
                     </Box> 
                     <Box key="SPA">
                         {/* <SizedSpaghetti /> */}
                     </Box>
                     <Box key="SCA1">
-                        <SizedOriStaScatter />
+                        <SizedMeanStdScatter name="stascatter-col1" initUrl="/json/stat"/>
                     </Box>
                     <Box key="SCA2">
-                        <SizedOriAmpScatter />
+                        <SizedMinMaxScatter name="ampscatter-col1" initUrl="/json/amp"/>
                     </Box> 
                     
 
@@ -250,17 +243,16 @@ class Dashboard extends Component {
                                 distance metric: {this.state.dist}
                         </Nav.Link>
                     </Navbar>
-                        {/* <SizedCol2HeatMap update={this.state.updateCol1 ? this.state.updateCol1["hm"]: null} />  */}
                         <SizedAmpHeatMap name="hm-col2" initUrl="/json/heatmap?type=s2" update={this.state.updateCol1 ? this.state.updateCol1["hm"]: null}/>
                     </Box>
                     <Box key="SPA_COL1">
                         {/* <SizedCol2Spaghetti update={this.state.updateCol1 ? this.state.updateCol1["line"]: null}/> */}
                     </Box>
                     <Box key="SCA1_COL1">
-                        <SizedCol2StaScatter update={this.state.updateCol1 ? this.state.updateCol1["stat"]: null}/>
+                        <SizedMeanStdScatter name="stascatter-col2" initUrl="/json/stat?type=s2" update={this.state.updateCol1 ? this.state.updateCol1["stat"]: null}/>
                     </Box>
                     <Box key="SCA2_COL1">
-                        <SizedCol2AmpScatter update={this.state.updateCol1 ? this.state.updateCol1["maxmin"]: null}/>
+                        <SizedMinMaxScatter name="ampscatter-col2" initUrl="/json/amp?type=s2" update={this.state.updateCol1 ? this.state.updateCol1["maxmin"]: null}/>
                     </Box>
 
 
@@ -307,10 +299,10 @@ class Dashboard extends Component {
                         {/* <SizedCol3Spaghetti update={this.state.updateCol2 ? this.state.updateCol2["line"]: null}/> */}
                     </Box>
                     <Box key="SCA1_COL2">
-                        <SizedCol3StaScatter update={this.state.updateCol2 ? this.state.updateCol2["stat"]: null}/>
+                        <SizedMeanStdScatter name="stascatter-col3" initUrl="/json/stat?type=s6" update={this.state.updateCol2 ? this.state.updateCol2["stat"]: null}/>
                     </Box>
                     <Box key="SCA2_COL2">
-                        <SizedCol3AmpScatter update={this.state.updateCol2 ? this.state.updateCol2["maxmin"]: null}/>
+                        <MinMaxScatter name="ampscatter-col3" initUrl="/json/amp?type=s6" update={this.state.updateCol2 ? this.state.updateCol2["maxmin"]: null}/>
                     </Box>
                     
                 </Grid>
