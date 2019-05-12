@@ -1,5 +1,6 @@
 import {
     SET_INDEXES,
+    SET_CLICK_HM,
     SET_HOVER,
     SET_TIME,
     SET_HM_IDX,
@@ -7,10 +8,14 @@ import {
 } from './actionTypes';
 
 
-export const setIndexes = (indexes, sender) => ({
+export const setIndexes = (indexes) => ({
     type: SET_INDEXES,
-    indexes,
-    sender
+    indexes
+})
+
+export const setClickHm = (name) => ({
+    type: SET_CLICK_HM,
+    name
 })
 
 export const setHover = hover => ({

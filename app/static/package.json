@@ -31,6 +31,7 @@
     "d3-brush": "^1.0.6",
     "deep-equal": "1.0.1",
     "jquery": "^3.4.1",
+    "loadsh": "0.0.4",
     "prop-types": "15.7.2",
     "react": "16.8.6",
     "react-bootstrap": "^1.0.0-beta.8",

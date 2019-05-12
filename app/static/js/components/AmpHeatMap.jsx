@@ -3,21 +3,18 @@ import sizeMe from 'react-sizeme';
 
 import HeatMap from './charts/HeatMap';
 
-class Col3HeatMap extends Component {
+class AmpHeatMap extends Component {
     constructor(props) {
-        super(props);
+        super(props)
     }
 
     state = {
         initData: null,
-        // data: null,
-        indexMap: null
+        indexMap: null,
     }
 
     componentDidMount() {
-        this.setState({isLoading: true});
-        
-        fetch("/json/heatmap?type=s6")
+        fetch(this.props.initUrl)
         .then(res => res.json())
         .then(data => {
             this.getIndexMap(data);
@@ -43,23 +40,24 @@ class Col3HeatMap extends Component {
             let ud = JSON.parse(this.props.update) 
             this.getIndexMap(ud);
             this.setState({initData: ud});
-            // console.log(this.state.initData)
         }
     }
 
     render(){
         let {initData, indexMap} = this.state;
-        let { width, height} = this.props.size
+        let { width, height} = this.props.size;
+        let { name } = this.props;
 
         return(
             <div>
                 { initData ? 
-                <HeatMap initData={initData} indexMap={indexMap} type="col3" width={width} height={height ? height : (width/3.5)} {...this.props}/> 
+                <HeatMap initData={initData} indexMap={indexMap} name={name} width={width} height={height ? height : 400} {...this.props}/> 
                 : <p>Loading...</p>}
             </div>
         )
         
     }
+
 }
 
-export default sizeMe({ monitorHeight: true })(Col3HeatMap);
+export default sizeMe({ monitorHeight: true })(AmpHeatMap);

@@ -124,7 +124,7 @@ def all_energy():
     return json_df.to_json(orient="records")
 
 f_mean = "./datasets/energy_all_mean.pkl"
-f_median = "./datasets/energy_all_mean.pkl"
+f_median = "./datasets/energy_all_median.pkl"
 
 @json_blueprint.route('/json/hm')
 def loadHeatMap():

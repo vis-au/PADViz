@@ -118,6 +118,7 @@ class Spaghetti extends Component {
         const line = d3.line()
             .x(d => xScale(d.time))
             .y(d => yScale(d.power));
+        
         if(update) {
             let lines = svg.selectAll(".line")
                             .data(data);
@@ -143,7 +144,10 @@ class Spaghetti extends Component {
                 .attr('stroke-width', 1.5);
                 animateFauxDOM(800);
         }
-        
+        if(load) {
+            let lines = svg.selectAll(".line");
+            lines.exit().remove();
+        }
         
         
         // let dots = svg.selectAll("dots")

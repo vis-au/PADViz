@@ -35,7 +35,7 @@ class Col3StatScatter extends Component {
         return(
             <div>
                 { initData ?
-                <StatScatter initData={initData} width="400" height="400" name="stat-col1" {...this.props}/> 
+                <StatScatter initData={initData} width="400" height="400" name="stat-col3" {...this.props}/> 
                 : <p>Loading...</p>}
             </div>
         )

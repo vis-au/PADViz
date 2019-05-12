@@ -35,7 +35,7 @@ class Col3AmpScatter extends Component {
         return(
             <div>
                 { initData ?
-                <AmpScatter initData={initData} width="400" height="400" name='amp-col2' {...this.props}/> 
+                <AmpScatter initData={initData} width="400" height="400" name='amp-col3' {...this.props}/> 
                 : <p>Loading...</p>}
             </div>
         )

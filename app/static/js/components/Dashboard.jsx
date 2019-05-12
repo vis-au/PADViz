@@ -7,6 +7,7 @@ import styled from 'styled-components';
 import { withSize } from 'react-sizeme'
 import { Row, Col, Form, Navbar, Nav, InputGroup, FormControl, Button, NavDropdown, NavItem} from 'react-bootstrap';
 
+import AmpHeatMap from '../containers/AmpHeatMap';
 import OriHeatMap from '../containers/OriHeatMap';
 import OriStatScatter from '../containers/OriStatScatter';
 import OriAmpScatter from '../containers/OriAmpScatter';
@@ -24,6 +25,7 @@ const GridLayout = WidthProvider(ReactGridLayout)
 
 
 const withSizeHOC = withSize();
+const SizedAmpHeatMap = withSizeHOC(AmpHeatMap);
 const SizedOriHeatMap = withSizeHOC(OriHeatMap);
 const SizedOriStaScatter = withSizeHOC(OriStatScatter);
 const SizedOriAmpScatter = withSizeHOC(OriAmpScatter);
@@ -121,7 +123,7 @@ class Dashboard extends Component {
 
     handleSubmitCol2(event) {
         event.preventDefault();
-        fetch('/json/hm?k=' + this.state.k +'&rep=' + this.state.rep + "&dist=" + this.state.dist)
+        fetch('/json/hm?k=' + this.state.k2 +'&rep=' + this.state.rep2 + "&dist=" + this.state.dist2)
             .then(res => res.json())
             .then(data => {
                 this.setState({updateCol2: data})
@@ -146,6 +148,7 @@ class Dashboard extends Component {
 
     setRep2(event) {
         this.setState({rep2: event.target.value})
+        console.log(this.state.rep2)
     }
 
     setDist2(event) {
@@ -160,18 +163,18 @@ class Dashboard extends Component {
 
         const layout = [
             {i: 'HM_ORI', x: 0, y: 0, w: 6, h: 4, minW: 5, static:true},
-            {i: 'SCA1', x: 1, y: 9, w: 2, h: 4, maxW: 4, static:true},
-            {i: 'SCA2', x: 3, y: 9, w: 2, h: 4, static:true},
+            {i: 'SCA1', x: 1, y: 8, w: 2, h: 4, maxW: 4, static:true},
+            {i: 'SCA2', x: 3, y: 8, w: 2, h: 4, static:true},
             {i: 'SPA', x: 0, y: 4, w: 6, h: 4, static:true},
 
             {i: 'HM_COL1', x: 6, y: 0, w: 6, h: 4, static:true},
-            {i: 'SCA1_COL1', x: 7, y: 9, w: 2, h: 4, static:true},
-            {i: 'SCA2_COL1', x: 9, y: 9, w: 2, h: 4, static:true},
+            {i: 'SCA1_COL1', x: 7, y: 8, w: 2, h: 4, static:true},
+            {i: 'SCA2_COL1', x: 9, y: 8, w: 2, h: 4, static:true},
             {i: 'SPA_COL1', x: 6, y: 4, w: 6, h: 4, static:true},
 
             {i: 'HM_COL2', x: 12, y: 0, w: 6, h: 4, minW: 5, static:true},
-            {i: 'SCA1_COL2', x: 13, y: 9, w: 2, h: 4, maxW: 4, static:true},
-            {i: 'SCA2_COL2', x: 15, y: 9, w: 2, h: 4, static:true},
+            {i: 'SCA1_COL2', x: 13, y: 8, w: 2, h: 4, maxW: 4, static:true},
+            {i: 'SCA2_COL2', x: 15, y: 8, w: 2, h: 4, static:true},
             {i: 'SPA_COL2', x: 12, y: 4, w: 6, h: 4, static:true},
         ];
 
@@ -186,21 +189,22 @@ class Dashboard extends Component {
                     class="box"
                     {...this.props}>
                      <Box key="HM_ORI"> 
-                     <Nav className="justify-content-center"  defaultActiveKey="/home" as="ul">
-                            <Nav.Link eventKey="disabled" disabled>
-                                Dataset: energy
-                            </Nav.Link>
-                            <Nav.Link eventKey="disabled" disabled>
-                                window size: 5
-                            </Nav.Link>
-                            <Nav.Link eventKey="disabled" disabled>
-                                step size: 3
-                            </Nav.Link>
+                        <Nav className="justify-content-center"  defaultActiveKey="/home" as="ul">
+                                <Nav.Link eventKey="disabled" disabled>
+                                    Dataset: energy
+                                </Nav.Link>
+                                <Nav.Link eventKey="disabled" disabled>
+                                    window size: 5
+                                </Nav.Link>
+                                <Nav.Link eventKey="disabled" disabled>
+                                    step size: 3
+                                </Nav.Link>
                         </Nav>
-                        <SizedOriHeatMap />
+                        {/* <SizedOriHeatMap /> */}
+                        <SizedAmpHeatMap name="hm-col1" initUrl="/json/heatmap"/>
                     </Box> 
                     <Box key="SPA">
-                        <SizedSpaghetti />
+                        {/* <SizedSpaghetti /> */}
                     </Box>
                     <Box key="SCA1">
                         <SizedOriStaScatter />
@@ -246,10 +250,11 @@ class Dashboard extends Component {
                                 distance metric: {this.state.dist}
                         </Nav.Link>
                     </Navbar>
-                        <SizedCol2HeatMap update={this.state.updateCol1 ? this.state.updateCol1["hm"]: null} /> 
+                        {/* <SizedCol2HeatMap update={this.state.updateCol1 ? this.state.updateCol1["hm"]: null} />  */}
+                        <SizedAmpHeatMap name="hm-col2" initUrl="/json/heatmap?type=s2" update={this.state.updateCol1 ? this.state.updateCol1["hm"]: null}/>
                     </Box>
                     <Box key="SPA_COL1">
-                        <SizedCol2Spaghetti update={this.state.updateCol1 ? this.state.updateCol1["line"]: null}/>
+                        {/* <SizedCol2Spaghetti update={this.state.updateCol1 ? this.state.updateCol1["line"]: null}/> */}
                     </Box>
                     <Box key="SCA1_COL1">
                         <SizedCol2StaScatter update={this.state.updateCol1 ? this.state.updateCol1["stat"]: null}/>
@@ -295,10 +300,11 @@ class Dashboard extends Component {
                                 distance metric: {this.state.dist2}
                         </Nav.Link>
                     </Navbar>
-                        <SizedCol3HeatMap update={this.state.updateCol2 ? this.state.updateCol2["hm"]: null} /> 
+                        {/* <SizedCol3HeatMap update={this.state.updateCol2 ? this.state.updateCol2["hm"]: null} />  */}
+                        <SizedAmpHeatMap name="hm-col3" initUrl="/json/heatmap?type=s6" update={this.state.updateCol2 ? this.state.updateCol2["hm"]: null}/>
                     </Box>
                     <Box key="SPA_COL2">
-                        <SizedCol3Spaghetti update={this.state.updateCol2 ? this.state.updateCol2["line"]: null}/>
+                        {/* <SizedCol3Spaghetti update={this.state.updateCol2 ? this.state.updateCol2["line"]: null}/> */}
                     </Box>
                     <Box key="SCA1_COL2">
                         <SizedCol3StaScatter update={this.state.updateCol2 ? this.state.updateCol2["stat"]: null}/>

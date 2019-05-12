@@ -1,5 +1,6 @@
 import {
     SET_INDEXES,
+    SET_CLICK_HM,
     SET_HOVER,
     SET_TIME,
     SET_HM_IDX,
@@ -11,14 +12,7 @@ export const initialState = {
     indexes: null,
     time: null,
     hmIdx: null,
-    col1_hm: null,
-    col1_line: null,
-    col1_stat: null,
-    col1_minmax: null,
-    col2_hm: null,
-    col2_line: null,
-    col2_stat: null,
-    col2_minmax: null,
+    clickHm: null
 };
 
 export const rootReducer = (state = initialState, action) => {
@@ -28,6 +22,11 @@ export const rootReducer = (state = initialState, action) => {
                 ...state, 
                 indexes: action.indexes
             };
+        case SET_CLICK_HM:
+            return {
+                ...state,
+                clickHm: action.name
+            }
         case SET_HOVER:
             return {
                 ...state, 
