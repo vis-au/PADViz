@@ -137,6 +137,8 @@ class Spaghetti extends Component {
                     .append("path")
                         .style("mix-blend-mode", "multiply")
                         .on('mouseover', d => {
+                            // if(hover)
+                            console.log(d.r_id);
                             setHover([d.r_id]);
                         })
                         // .on('mouseleave', d => {
@@ -154,11 +156,10 @@ class Spaghetti extends Component {
                 .attr('stroke-width', 1.5);
                 
         }  else if(load || (update && !time)) {
-            console.log("here")
             let lines = svg.selectAll(".line")
                             .data([]);
             
-                            lines.exit().transition().attr('stroke-width', 0).remove();
+            lines.exit().transition().attr('stroke-width', 0).remove();
             // let dots = svg.selectAll('.dot')
             //         .data([]);
         

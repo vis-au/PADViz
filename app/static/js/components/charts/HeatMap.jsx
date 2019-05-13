@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import * as d3 from 'd3';
 import PropTypes from 'prop-types'
 import { withFauxDOM } from 'react-faux-dom';
-import _ from "loadsh";
+// import _ from "loadsh";
 import Tooltip from './Tooltip';
 
 class HeatMap extends Component {
@@ -51,10 +51,13 @@ class HeatMap extends Component {
             this.renderD3('update')
         }
         if(this.props.hover !== prevProps.hover) {
-            this.changeSelectEle(null);
+            // this.changeSelectEle(null);
             this.select(this.props.hover, this.state.noCells)
         }  
         if(this.props.indexes !== prevProps.indexes) {
+            if(this.props.indexes.length === 0 && this.state.selEle) {
+                this.changeSelectEle(null);
+            } 
             this.select(this.props.indexes, this.state.noCells)
         }
         if(this.props.clickHm !== prevProps.clickHm) {
@@ -114,7 +117,7 @@ class HeatMap extends Component {
                     node.transition()
                         .duration(800)
                         .attr('fill', this.state.grayScale(count))
-                        .attr("stroke", "none");
+                        // .attr("stroke", "none");
                 } else if(count > 0) {
                     node.transition()
                         .duration(800)
@@ -130,7 +133,8 @@ class HeatMap extends Component {
                     node.transition()
                         .duration(800)
                         .attr('fill', this.state.colorScale(count))
-                        .attr('stroke', "none");}
+                        // .attr('stroke', "none");
+                    }
             }
             this.setState({idxSet: null});
         }
@@ -170,6 +174,8 @@ class HeatMap extends Component {
                 .attr("transform", `translate(${margin.left}, ${margin.top})`);
         } else if(update) {
             svg = d3.select(faux).select('svg').select('g');
+            setIndexes([]);
+            if(this.state.selEle) this.changeSelectEle(null);
         }
 
         const t_interval = d3.map(initData, function(d){return d.time;}).keys();

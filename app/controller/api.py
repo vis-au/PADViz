@@ -124,7 +124,16 @@ def all_energy():
     return json_df.to_json(orient="records")
 
 f_mean = "./datasets/energy_all_mean.pkl"
+f_mean2 = "./datasets/energy_all_mean_n2.pkl"
 f_median = "./datasets/energy_all_median.pkl"
+
+def simpleComp(lst):
+    d = lst.duplicated()
+    idx = []
+    # for i, v in d.iteritems():
+    #     print(i, v)
+    # for i in range(len(lst)):
+    #     print(lst(i))
 
 @json_blueprint.route('/json/hm')
 def loadHeatMap():
@@ -133,14 +142,24 @@ def loadHeatMap():
     dist_metric = request.args.get("dist") if 'dist' in request.args else None
     dfo = pd.read_pickle(ori_file)
     # print(dfo.shape)
+    kvmap = {"Self-defined": 0, "Euclidean": 1, "LM": 2, "DM":3 }
     if rep.lower() == "mean":
-        df = pd.read_pickle(f_mean)
+        if int(k) == 2:
+            df = pd.read_pickle(f_mean2)
+            # print(df)
+            
+            df = df[0][kvmap[dist_metric]]
+            simpleComp(df)
+            df = df.sort_index()
+        else:
+            df = pd.read_pickle(f_mean)
+            
+            df = df[0][int(k)][kvmap[dist_metric]].sort_index()
     elif rep.lower() == "median":
         df = pd.read_pickle(f_median)
+        df = df[0][int(k)][kvmap[dist_metric]].sort_index()
     
-    
-    kvmap = {"Self-defined": 0, "Euclidean": 1, "LM": 2, "DM":3 }
-    df = df[0][int(k)][kvmap[dist_metric]].sort_index()
+
     # print(df)
     w_max, w_min, amp = slide_window_amplitude(df, 5, 3)
     hm_df = amplitude_into_bins(amp, type="s")

@@ -26,7 +26,7 @@ const SizedMultiLines = withSizeHOC(MultiLines);
 const Box = styled.div`
     box-sizing: content-box;
     width: 100%;
-    border: solid orange 3px;
+    // border: solid orange 3px;
 `;
 
 const generateHoverCss = index => `
@@ -80,7 +80,7 @@ class Dashboard extends Component {
         this.setDist2 = this.setDist2.bind(this);
         this.handleSubmitCol1 = this.handleSubmitCol1.bind(this);
         this.handleSubmitCol2 = this.handleSubmitCol2.bind(this);
-        this.clickHandler = this.clickHandler.bind(this);
+        // this.clickHandler = this.clickHandler.bind(this);
     }
 
     state = {
@@ -140,14 +140,16 @@ class Dashboard extends Component {
         this.setState({dist2: event.target.value})
     }
 
-    componentDidMount() {
-        document.body.addEventListener('click', this.clickHandler);
-    }
+    // componentDidMount() {
+    //     document.body.addEventListener('onDoubleClick', this.clickHandler);
+    //     // document.body.addEventListener('click', this.clickHandler);
+    // }
 
-    clickHandler() {
-        this.props.setFreeze(!this.props.isFreeze);
-        // console.log(this.props.isFreeze)
-    }
+    // clickHandler() {
+    //     alert("double click")
+    //     this.props.setFreeze(!this.props.isFreeze);
+    //     // console.log(this.props.isFreeze)
+    // }
 
     render() {
         const { 
