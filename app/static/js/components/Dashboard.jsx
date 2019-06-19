@@ -90,11 +90,14 @@ class Dashboard extends Component {
         k: 2,
         dist: "Euclidean",
         rep: "Mean",
+        
+        k2: 2,
+        dist2: "Self-defined",
+        rep2: "Median",
+
+        updateCol0: null,
         updateCol1: null,
         updateCol2: null,
-        k2: 6,
-        dist2: "Euclidean",
-        rep2: "Mean",
     }
 
     handleSubmitCol1(event) {
@@ -140,39 +143,30 @@ class Dashboard extends Component {
         this.setState({dist2: event.target.value})
     }
 
-    // componentDidMount() {
-    //     document.body.addEventListener('onDoubleClick', this.clickHandler);
-    //     // document.body.addEventListener('click', this.clickHandler);
-    // }
-
-    // clickHandler() {
-    //     alert("double click")
-    //     this.props.setFreeze(!this.props.isFreeze);
-    //     // console.log(this.props.isFreeze)
-    // }
-
     render() {
         const { 
             hover
          } = this.props;
 
         const layout = [
-            {i: 'HM_ORI', x: 0, y: 0, w: 6, h: 4, minW: 5, static:true},
+            {i: 'SPA', x: 0, y: 0, w: 6, h: 4, static:true},
+            {i: 'HM_ORI', x: 0, y: 4, w: 6, h: 4, minW: 5, static:true},
             {i: 'SCA1', x: 1, y: 8, w: 2, h: 4, maxW: 4, static:true},
             {i: 'SCA2', x: 3, y: 8, w: 2, h: 4, static:true},
-            {i: 'SPA', x: 0, y: 4, w: 6, h: 4, static:true},
-
-            {i: 'HM_COL1', x: 6, y: 0, w: 6, h: 4, static:true},
+            
+            {i: 'SPA_COL1', x: 6, y: 0, w: 6, h: 4, static:true},
+            {i: 'HM_COL1', x: 6, y: 4, w: 6, h: 4, static:true},
             {i: 'SCA1_COL1', x: 7, y: 8, w: 2, h: 4, static:true},
             {i: 'SCA2_COL1', x: 9, y: 8, w: 2, h: 4, static:true},
-            {i: 'SPA_COL1', x: 6, y: 4, w: 6, h: 4, static:true},
-
-            {i: 'HM_COL2', x: 12, y: 0, w: 6, h: 4, minW: 5, static:true},
+            
+            {i: 'SPA_COL2', x: 12, y: 0, w: 6, h: 4, static:true},
+            {i: 'HM_COL2', x: 12, y: 4, w: 6, h: 4, minW: 5, static:true},
             {i: 'SCA1_COL2', x: 13, y: 8, w: 2, h: 4, maxW: 4, static:true},
             {i: 'SCA2_COL2', x: 15, y: 8, w: 2, h: 4, static:true},
-            {i: 'SPA_COL2', x: 12, y: 4, w: 6, h: 4, static:true},
+            
         ];
 
+        let { updateCol0 } = this.state;
         return (
             <React.Fragment>
                 <Grid 
@@ -184,7 +178,7 @@ class Dashboard extends Component {
                     class="box"
                     {...this.props}>
                      <Box key="HM_ORI"> 
-                        <Nav className="justify-content-center"  defaultActiveKey="/home" as="ul">
+                        <Navbar className="bg-light justify-content-between">
                                 <Nav.Link eventKey="disabled" disabled>
                                     Dataset: energy
                                 </Nav.Link>
@@ -194,8 +188,8 @@ class Dashboard extends Component {
                                 <Nav.Link eventKey="disabled" disabled>
                                     step size: 3
                                 </Nav.Link>
-                        </Nav>
-                        <SizedAmpHeatMap name="hm-col1" initUrl="/json/heatmap"/>
+                        </Navbar>
+                        <SizedAmpHeatMap name="hm-col1" initUrl="/json/hm"/>
                     </Box> 
                     <Box key="SPA">
                         <SizedMultiLines name="spa-col1" initUrl="/json/line"/>
@@ -244,7 +238,7 @@ class Dashboard extends Component {
                                 distance metric: {this.state.dist}
                         </Nav.Link>
                     </Navbar>
-                        <SizedAmpHeatMap name="hm-col2" initUrl="/json/heatmap?type=s2" update={this.state.updateCol1 ? this.state.updateCol1["hm"]: null}/>
+                        <SizedAmpHeatMap name="hm-col2" initUrl="/json/hm?k=2&rep=Mean&dist=Euclidean" update={this.state.updateCol1 ? this.state.updateCol1["hm"]: null}/>
                     </Box>
                     <Box key="SPA_COL1">
                         <SizedMultiLines name="spa-col2" initUrl="/json/line?type=s2" update={this.state.updateCol1 ? this.state.updateCol1["line"]: null}/>
@@ -293,7 +287,7 @@ class Dashboard extends Component {
                                 distance metric: {this.state.dist2}
                         </Nav.Link>
                     </Navbar>
-                        <SizedAmpHeatMap name="hm-col3" initUrl="/json/heatmap?type=s6" update={this.state.updateCol2 ? this.state.updateCol2["hm"]: null}/>
+                        <SizedAmpHeatMap name="hm-col3" initUrl="/json/hm?k=2&rep=Median&dist=Self-defined" update={this.state.updateCol2 ? this.state.updateCol2["hm"]: null}/>
                     </Box>
                     <Box key="SPA_COL2">
                         <SizedMultiLines name="spa-col3" initUrl="/json/line?type=s6" update={this.state.updateCol2 ? this.state.updateCol2["line"]: null}/>

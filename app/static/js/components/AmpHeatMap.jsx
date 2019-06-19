@@ -17,6 +17,7 @@ class AmpHeatMap extends Component {
         fetch(this.props.initUrl)
         .then(res => res.json())
         .then(data => {
+            data = JSON.parse(data["hm"]);
             this.getIndexMap(data);
             this.setState({
                 initData: data,

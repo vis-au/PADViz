@@ -6,7 +6,10 @@ import {
     SET_FREEZE,
 
     SET_HM_IDX,
-    SET_SELECTED
+    SET_SELECTED,
+
+    SET_HOVER_LINES,
+    SET_LINE_MAX,
 } from '../actions/actionTypes';
 
 export const initialState = {
@@ -15,11 +18,24 @@ export const initialState = {
     time: null,
     hmIdx: null,
     clickHm: null,
-    isFreeze: false
+    isFreeze: false,
+
+    lineIndexes: null,
+    lineMax: 0,
 };
 
 export const rootReducer = (state = initialState, action) => {
     switch(action.type) {
+        case SET_HOVER_LINES:
+            return {
+                ...state,
+                lineIndexes: action.indexes
+            }
+        case SET_LINE_MAX: 
+            return {
+                ...state,
+                lineMax: action.max
+            }
         case SET_INDEXES:
             return {
                 ...state, 

@@ -6,9 +6,21 @@ import {
     SET_FREEZE,
 
     SET_HM_IDX,
-    SET_SELECTED
+    SET_SELECTED,
+
+    SET_HOVER_LINES,
+    SET_LINE_MAX
 } from './actionTypes';
 
+export const setHoverLines = (indexes) => ({
+    type: SET_HOVER_LINES,
+    indexes
+})
+
+export const setLineMax = (max) => ({
+    type: SET_LINE_MAX,
+    max
+})
 
 export const setIndexes = (indexes) => ({
     type: SET_INDEXES,

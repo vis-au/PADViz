@@ -14,3 +14,9 @@
 	/* padding: 5px; */
 	/* margin: 5px; */
 }
+
+.y.axis line {
+	stroke: 	#6e7f80;
+	stroke-dasharray: 3;
+	opacity: 0.5;
+}

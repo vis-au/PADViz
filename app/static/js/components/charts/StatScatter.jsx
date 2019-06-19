@@ -105,22 +105,22 @@ class StatScatter extends Component {
 
         let faux = connectFauxDOM('div', 'chart')
         let svg, data;
-        if(render) {
+        // if(render) {
             svg = d3.select(faux).append("svg")
                 .attr("width", width)
                 .attr("height", height)
                 .append("g")
                 .attr("transform", `translate(${margin.left}, ${margin.top})`);
             data = initData;
-        } else if(update) {
-            if(indexes) {
-                data = initData.filter(d =>  indexes.includes(d.index))
-            } 
-            svg = d3.select(faux).select('svg').select('g');
-        } else if(load) {
-            data = initData;
-            svg = d3.select(faux).select('svg').select('g');
-        }
+        // } else if(update) {
+        //     if(indexes) {
+        //         data = initData.filter(d =>  indexes.includes(d.index))
+        //     } 
+        //     svg = d3.select(faux).select('svg').select('g');
+        // } else if(load) {
+        //     data = initData;
+        //     svg = d3.select(faux).select('svg').select('g');
+        // }
 
         let xScale, yScale;
         

@@ -13,31 +13,49 @@ import json
 
 ori_file ='./dataset/dataframe_all_energy.pkl'
 
+f_mean = "./datasets/energy_all_mean.pkl"
+f_mean2 = "./datasets/energy_all_mean_n2.pkl"
+f_median2 = "./datasets/energy_all_median_n2.pkl"
+f_median = "./datasets/energy_all_median.pkl"
+
 ori_hm = './dataset/ori_hm_wIdx_bins_10.pkl'
 s2_hm = './dataset/s2_hm_wIdx_bins_10.pkl'
 s6_hm = './dataset/s6_hm_wIdx_bins_10.pkl'
-
-idx = [264, 265, 254]
-idx = [256, 263, 266, 268, 269, 253, 254, 255]
 ##
 ## HEATMAP
 ##
+@json_blueprint.route('/json/data')
+def load_data():
+    k = request.args.get("k") if 'k' in request.args else None
 
-@json_blueprint.route('/json/heatmap')
-def read_heatmap():
-    req_type = request.args.get("type")
-    req_wsize = request.args.get("wsize")
-    req_step = request.args.get("step")
-    req_k = request.args.get("k")
-    # print(req_type)
-    if req_type == "s2":
-        df = pd.read_pickle(s2_hm)
-    elif req_type == 's6':
-        df = pd.read_pickle(s6_hm)
-    else: # origi
-        df = pd.read_pickle(ori_hm)
+    rep = request.args.get("rep") if 'rep' in request.args else None
+    dist_metric = request.args.get("dist") if 'dist' in request.args else None
+
+    req_wsize = request.args.get("wsize") if 'wsize' in request.args else 5
+    req_step = request.args.get("step") if 'step' in request.args else 3
+    req_bins = request.args.get('bins') if 'bins' in request.args else 10
+
+    kvmap = {"Self-defined": 0, "Euclidean": 1, "LM": 2, "DM":3 }
+
+    # get original dataset
+    if not k:
+        df = pd.read_pickle(ori_file)
+    else:
+        if rep.lower() == "mean":
+            df = pd.read_pickle(f_mean2)
+        else:
+            df = pd.read_pickle(f_median2)
     
-    return df.to_json(orient="records")
+        df = df[0][kvmap[dist_metric]]
+    
+    w_max, w_min, amp = slide_window_amplitude(df, w_size=req_wsize, step=req_step)
+
+    if not k:
+        hm_df = amplitude_into_bins(amp, no_bins=req_bins)
+    else:
+        hm_df = amplitude_into_bins(amp, type="s")
+    
+    return hm_df.to_json(orient="records")
 
 ##
 ## scatter
@@ -125,51 +143,59 @@ def all_energy():
 
 f_mean = "./datasets/energy_all_mean.pkl"
 f_mean2 = "./datasets/energy_all_mean_n2.pkl"
+f_median2 = "./datasets/energy_all_median_n2.pkl"
 f_median = "./datasets/energy_all_median.pkl"
 
-def simpleComp(lst):
-    d = lst.duplicated()
-    idx = []
-    # for i, v in d.iteritems():
-    #     print(i, v)
-    # for i in range(len(lst)):
-    #     print(lst(i))
+def count_duplicate(dp):
+    d = dp.duplicated()
+    idx_list = {}
+    for i, v in d.iteritems():
+        if not v:
+            idx_list[i] = []
+            key = i
+        else:
+            idx_list[key].append(i)
+
+    return dp.drop_duplicates(), idx_list
 
 @json_blueprint.route('/json/hm')
 def loadHeatMap():
     k = request.args.get("k") if 'k' in request.args else None
+
     rep = request.args.get("rep") if 'rep' in request.args else None
     dist_metric = request.args.get("dist") if 'dist' in request.args else None
-    dfo = pd.read_pickle(ori_file)
+
+    req_wsize = request.args.get("wsize") if 'wsize' in request.args else 5
+    req_step = request.args.get("step") if 'step' in request.args else 3
+    req_bins = request.args.get('bins') if 'bins' in request.args else 10
+    
     # print(dfo.shape)
     kvmap = {"Self-defined": 0, "Euclidean": 1, "LM": 2, "DM":3 }
-    if rep.lower() == "mean":
-        if int(k) == 2:
-            df = pd.read_pickle(f_mean2)
-            # print(df)
-            
-            df = df[0][kvmap[dist_metric]]
-            simpleComp(df)
-            df = df.sort_index()
-        else:
-            df = pd.read_pickle(f_mean)
-            
-            df = df[0][int(k)][kvmap[dist_metric]].sort_index()
-    elif rep.lower() == "median":
-        df = pd.read_pickle(f_median)
-        df = df[0][int(k)][kvmap[dist_metric]].sort_index()
-    
 
-    # print(df)
-    w_max, w_min, amp = slide_window_amplitude(df, 5, 3)
-    hm_df = amplitude_into_bins(amp, type="s")
-    # print(hm_df)
+    # get original dataset
+    if not k:
+        df = pd.read_pickle(ori_file)
+    else:
+        if rep.lower() == "mean":
+            df = pd.read_pickle(f_mean2)
+        else:
+            df = pd.read_pickle(f_median2)
+    
+        df = df[0][kvmap[dist_metric]]
+
+    w_max, w_min, amp = slide_window_amplitude(df, w_size=req_wsize, step=req_step)
+    if not k:
+        hm_df = amplitude_into_bins(amp, no_bins=req_bins)
+    else:
+        hm_df = amplitude_into_bins(amp, type="s")
+    
+    df_drop, idx_list = count_duplicate(df)
+    df = df.sort_index()
 
     #line
     cols = ['time'] + [str(idx) for idx in df.index.values]
     line_df = pd.concat([pd.DataFrame(df.columns.values, dtype="int"), (df.T).reset_index(drop=True)], ignore_index=True, axis=1)
     line_df.columns = ['time'] + [str(idx) for idx in df.index.values] 
-    # return json_df.to_json()
     
     #stat
     df_mean = df.mean(axis=1)    
@@ -201,7 +227,7 @@ def loadHeatMap():
     df_maxmin["min"] = min_arr
     # print(df_maxmin)
 
-    r = {"hm": hm_df.to_json(orient="records"), "line": line_df.to_json(orient="records"), "stat": df_scatter.to_json(orient="records"), "maxmin": df_maxmin.to_json(orient="records")}
+    r = {"hm": hm_df.to_json(orient="records"), "line": line_df.to_json(orient="records"), "stat": df_scatter.to_json(orient="records"), "maxmin": df_maxmin.to_json(orient="records"), "duplicate": idx_list}
     # print(r)
     return json.dumps(r)
 

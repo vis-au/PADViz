@@ -3,10 +3,10 @@ import PropTypes from 'prop-types';
 import styled from 'styled-components';
 
 const Tip = styled.div`
-    background-color: #bdbdbd;
+    background-color: #e0e0e0;
     border: solid 1px;
     border-radius: 2px;
-    border-color: #626262;
+    border-color: #d0d0d0;
     padding: 5px;
     text-align: center;
     opacity: 0.8;

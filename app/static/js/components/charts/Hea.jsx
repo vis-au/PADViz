@@ -1,38 +1,32 @@
 import React, { Component } from 'react';
 import * as d3 from 'd3';
-import PropTypes from 'prop-types'
 import { withFauxDOM } from 'react-faux-dom';
-// import _ from "loadsh";
+
 import Tooltip from './Tooltip';
 
-class HeatMap extends Component {
+
+class Hea extends Component {
     constructor(props) {
         super(props);
         this.renderD3 = this.renderD3.bind(this);
     }
-    
+
     state = {
-        tooltip: null,
-        selEle: null,
-        selIns: null,
-        idxSet: null,
-        colorScale: null,
-        grayScale: null,
-        noCells: this.props.initData.length,
+        tooltip: null
     }
 
-    setToolTip = (count, x, y) => {
+    setToolTip = (count, records, x, y) => {
         this.setState(state => ({
-            tooltip: (count > 0) ? {count, x, y} : null
+            tooltip: (count > 0) ? {count, records, x, y} : null
         }))
     }
 
     tooltipProps = () => {
-        const { count, x, y } = this.state.tooltip;
+        const { count, records, x, y } = this.state.tooltip;
         
         if(this.state.tooltip) {
             return {
-                content: `No. of records: ${count}`,
+                content: `No. of records: ${count}, records IDs: ${records}`,
                 style: {top: y - 10, left: x - 30}
             }
         } else {
@@ -42,58 +36,7 @@ class HeatMap extends Component {
         }
     }
 
-    componentDidMount() {
-        this.renderD3('render');
-    }
-
-    componentDidUpdate(prevProps) {
-        if(this.props.initData !== prevProps.initData) {
-            this.renderD3('update')
-        }
-        if(this.props.hover !== prevProps.hover) {
-            // this.changeSelectEle(null);
-            this.select(this.props.hover, this.state.noCells)
-        }  
-        if(this.props.indexes !== prevProps.indexes) {
-            if(this.props.indexes.length === 0 && this.state.selEle) {
-                this.changeSelectEle(null);
-            } 
-            this.select(this.props.indexes, this.state.noCells)
-        }
-        if(this.props.clickHm !== prevProps.clickHm) {
-            if(this.props.clickHm !== this.props.name) this.changeSelectEle(null);
-        }
-
-    }
-
-    changeSelectEle(i) {
-        const { name, clickHm } = this.props;
-        if(i ) {
-            
-            if(this.state.selEle) {
-                d3.select(`#${name}-${this.state.selEle}`)
-                    .attr("stroke", "none");
-            }
-            d3.select(`#${name}-${i}`)
-                .attr("stroke", "#003366");
-            this.setState({ selEle: i});
-        } else {
-            d3.select(`#${name}-${this.state.selEle}`)
-                .attr("stroke", "none");
-            this.setState({selEle: null});
-        }
-    }
-
-    render() {
-        return (
-            <div className="heatmap">
-                {this.props.chart}
-                {this.state.tooltip && <Tooltip {...this.tooltipProps() } />}
-            </div>
-        )
-    }
-
-    select(indexes, len) {
+    changeSelectEle(indexes, len) {
         const {
             indexMap,
             name
@@ -111,7 +54,7 @@ class HeatMap extends Component {
                 
             });
             for(let i = 0; i < len; i++) {
-                let node = d3.select(`#${name}-${i}`);
+                let node = d3.select(`.rect-${i}`);
                 let count = node.attr('count');
                 if(count > 0 && !(idxSet.has(i))) {
                     node.transition()
@@ -140,47 +83,42 @@ class HeatMap extends Component {
         }
     }
 
-    renderD3(mode) {
-        let {
+    render() {
+        return (
+            <div className="heatmap">
+                {this.props.chart}
+                {this.state.tooltip && <Tooltip {...this.tooltipProps() } />}
+            </div>
+        )
+    }
+
+    componentDidMount() {
+        this.renderD3();
+    }
+
+    renderD3() {
+        const {
             width,
             height,
-            initData,
+            data,
             connectFauxDOM,
-            animateFauxDOM,
-            setIndexes,
-            setClickHm,
-            setHover,
-            setTime,
-            setHMIdx,
-            hover,
-            name
+            animateFauxDOM
         } = this.props;
 
-        const render = mode === 'render'
-        const update = mode === 'update'
-
-        const margin = {top: 20, right: 100, bottom: 20, left: 100};
+        const margin = {top: 20, right: 100, bottom: 50, left: 100};
         const chartWidth = width - margin.left - margin.right;
         const chartHeight = height - margin.top - margin.bottom;
 
         let faux = connectFauxDOM('div', 'chart');
-        let data = initData;
-        let svg;
-        if(render) {
-            svg = d3.select(faux).append("svg")
+        let svg = d3.select(faux).append("svg")
                 .attr("width", width)
                 .attr("height", height)
                 .append("g")
                 .attr("transform", `translate(${margin.left}, ${margin.top})`);
-        } else if(update) {
-            svg = d3.select(faux).select('svg').select('g');
-            setIndexes([]);
-            if(this.state.selEle) this.changeSelectEle(null);
-        }
 
-        const t_interval = d3.map(initData, function(d){return d.time;}).keys();
-        const amp_range = d3.map(initData, function(d){return d.amp_interval;}).keys();
-        // Build X Y scales
+        const t_interval = d3.map(data, function(d){return d.time;}).keys();
+        const amp_range = d3.map(data, function(d){return d.amp_interval;}).keys();
+
         const xScale = d3.scaleBand()
             .range([ 0, chartWidth])
             .domain(t_interval)
@@ -191,6 +129,36 @@ class HeatMap extends Component {
             .domain(amp_range)
             .padding(0.01);
 
+        let rectWidth = xScale.bandwidth();
+        let rectHeight = yScale.bandwidth();
+
+        svg.append("g")
+            .style("font-size", 12)
+            .attr("transform", `translate(-${rectWidth / 2}, ${chartHeight - 55})`)
+            .attr("class", `heatmap x axis`)
+            .call(d3.axisBottom(xScale))
+                .select(".domain").remove();
+            
+        svg.append("g")
+            .style("font-size", 12)
+            .attr("transform", `translate(0, -${rectHeight / 2})`)
+            .attr("class", `heatmap y axis`)
+            .call(d3.axisLeft(yScale).tickFormat(d => ('< ' + d.split('-')[1])))
+            .select(".domain").remove();
+        
+        svg.append('text')
+            .attr("x", chartWidth / 2 )
+            .attr("y", chartHeight - 10)
+            .attr("text-anchor", "middle")
+            .text("time period");
+
+        svg.append("text")
+            .attr("x", -(chartHeight / 2))
+            .attr("y", -50)
+            .attr("transform", 'rotate(-90)')
+            .attr("text-anchor", "middle")
+            .text("bins")
+        
         // COLORSCALE
         const colorHold = ['#F8F7F7', '#8b0000','#aa0e27','#c52940','#db4551','#ed645c','#fa8266','#ffa474','#ffc58a','#ffe3af','#ffffe0'];
         const grayHold = ['#F8F7F7', '#878787','#929292','#9c9c9c','#a9a9a9','#b3b3b3','#bfbfbf','#cbcbcb','#d6d6d6','#e3e3e3','#eeeeee'];
@@ -205,9 +173,6 @@ class HeatMap extends Component {
             .domain(colorDomain);
         this.setState({colorScale: colorScale, grayScale: grayScale});
 
-        let rectWidth = xScale.bandwidth();
-        let rectHeight = yScale.bandwidth();
-        
         // LEGEND
         let noColors = colorDomain.length;
         let legendEleHeight = rectHeight * amp_range.length / noColors;
@@ -236,49 +201,56 @@ class HeatMap extends Component {
 
         
         let rects = svg.selectAll(".rect")
-            .data(initData);
+            .data(data);
+        
+        rects.exit()
+            .transition()
+                .attr("stroke", "none")
+                .attr('width', 0)
+                .attr('height', 0).remove();
 
-        rects.exit().transition().attr("stroke", "none").attr('width', 0).attr('height', 0).remove();
-            
         rects = rects.enter().append("rect")
                 .attr("width", 0 )
                 .attr("height", 0 )
                 .attr("stroke", "none")
             .on('mouseover', (d, i) => {
                 if(d.count > 0) {
-                    d3.select(`#${name}-${i}`)
-                        .attr("stroke", "#6897bb")
+                    d3.select(`.rect-${i}`)
+                        .attr("stroke", "	#5e9aff")
                         .attr("stroke-width", "4px");
-                    this.setToolTip(d.count, xScale(d.time), yScale(d.amp_interval));
+                    this.setToolTip(d.count, d.instances, xScale(d.time), yScale(d.amp_interval));
                 }
             })
             .on('mouseout', (d, i) => {
                 if(d.count > 0) {
-                    if(this.state.selEle !== i) {
-                        d3.select(`#${name}-${i}`)
-                            .attr("stroke", "none")
-                    }
+                    // if(this.state.selEle !== i) {
+                    d3.select(`.rect-${i}`)
+                        .attr("stroke", "none")
+                    // }
                     this.setToolTip(null);
                 }
             })
             .on('click', (d, i) => {
                 if(d.count > 0)  {
-                    setClickHm(this.props.name);
-                    this.changeSelectEle(i);
+                    // setClickHm(this.props.name);
+                    this.changeSelectEle(d.instances, data.length);
+                    d3.select(`.rect-${i}`)
+                        .attr("stroke", "#0098d8")
+                        .attr("stroke-width", "4px");
                 } 
                 
-                if(d.instances && d.instances.length) {
-                    console.log(d.instances)
-                    setIndexes(d.instances);
-                    setTime(d.time);
-                } else {
-                    setIndexes([]);
-                }
+                // if(d.instances && d.instances.length) {
+                //     console.log(d.instances)
+                //     setIndexes(d.instances);
+                //     setTime(d.time);
+                // } else {
+                //     setIndexes([]);
+                // }
             })
             .merge(rects);
             
-        rects.attr('class', `rect ${name}`)
-            .attr('id', (d, i) => `${name}-${i}`)
+        rects.attr('class', (d, i) => `rect rect-${i}`)
+            // .attr('id', (d, i) => `${name}-${i}`)
             .attr("x", function(d) { return xScale(d.time) })
             .attr("y", function(d) { return yScale(d.amp_interval) })
             .attr("count", d=>d.count)
@@ -288,50 +260,12 @@ class HeatMap extends Component {
                 .attr("height", rectHeight );
         
             animateFauxDOM(1000);
-        
-        // X, Y axis
-        if(render) {
-            svg.append("g")
-                .style("font-size", 12)
-                .attr("transform", `translate(-${rectWidth / 2}, ${chartHeight - 55})`)
-                .attr("class", `heatmap ${name} x axis`)
-                .call(d3.axisBottom(xScale))
-                    .select(".domain").remove();
-                
-            svg.append("g")
-                .style("font-size", 12)
-                .attr("transform", `translate(0, -${rectHeight / 2})`)
-                .attr("class", `heatmap ${name} y axis`)
-                .call(d3.axisLeft(yScale).tickFormat(d => ('< ' + d.split('-')[1])))
-                .select(".domain").remove();
 
-            svg.append("text")
-                .attr('transform', `translate(${chartWidth}, ${chartHeight - 37})`)
-                .attr('class', 'label')
-                .style('text-anchor', 'middle')
-                .text("time")
-                    .style("font-size", 14)
-                    .attr('stroke', '#003366');
-            svg.append("text")
-                .attr('class', 'label')
-                .style('text-anchor', 'middle')
-                .text("Bins range")
-                    .style("font-size", 14)
-                    .attr("transform", `translate(-60, ${chartHeight / 2 -10}), rotate(-90)`)
-                    .attr('stroke', '#003366');
-        }
-        
     }
-
 }
 
-HeatMap.propTypes = {
-    width: PropTypes.number.isRequired,
-    height: PropTypes.number.isRequired
-}
-
-HeatMap.defaultProps = {
+Hea.defaultProps = {
     chart: 'loading'
 };
 
-export default withFauxDOM(HeatMap);
+export default withFauxDOM(Hea);

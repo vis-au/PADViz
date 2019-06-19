@@ -6,3 +6,6 @@ export const SET_FREEZE = "SET_FREEZE";
 
 export const SET_HM_IDX = "SET_HM_IDX";
 export const SET_SELECTED = "SET_SELECTED";
+
+export const SET_HOVER_LINES = "SET_HOVER_LINES";
+export const SET_LINE_MAX= "SET_LINE_MAX";
