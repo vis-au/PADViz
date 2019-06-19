@@ -126,11 +126,6 @@ def lines():
     
     cols = [str(idx) for idx in df.index.values]
     line_df = df
-    # cols = ['time'] + [str(idx) for idx in df.index.values]
-    # # df = df.sort_index()
-    # line_df = pd.concat([pd.DataFrame(df.columns.values, dtype="int"), (df.T)], ignore_index=True, axis=1)
-    # line_df.columns = ['time'] + [str(idx) for idx in df.index.values] 
-    # print(line_df)
 
     r = {
         "lines": line_df.to_json(orient="split"),
@@ -151,7 +146,7 @@ def heatmap():
     req_bins = int(request.args.get('bins')) if 'bins' in request.args else 10
 
     df = read_file(k, dist_metric, rep)
-    df = df.iloc[:90]
+    # df = df.iloc[:90]
     w_max, w_min, amp = slide_window_amplitude(df, w_size=req_wsize, step=req_step)
     if not k:
         hm_df = amplitude_into_bins(amp, no_bins=req_bins)
@@ -170,18 +165,22 @@ def stat():
     dist_metric = request.args.get("dist") if 'dist' in request.args else None
 
     df = read_file(k, dist_metric, rep)
-    print(df.shape)
-    # df = df.loc[265:268]
-    # print(df)
-    df_mean = df.mean(axis=1)    
-    df_std = df.std(1)
-    # print(df_mean)
+    if k:
+        groups = get_groups(df)
+        df = df.drop_duplicates().sort_index()
+    else:
+        groups = []
+
     df_scatter = pd.DataFrame(columns=["index","mean", "std"])
-    df_scatter["index"] = df_mean.index.values
-    df_scatter["mean"] = df_mean
-    df_scatter["std"] = df_std
+    df_scatter["index"] = df.index.values
+    df_scatter["mean"] = df.mean(axis=1).reset_index(drop=True)
+    df_scatter["std"] = df.std(axis=1).reset_index(drop=True)
     
-    return df_scatter.to_json(orient="records")
+    r = {
+        "dots": df_scatter.to_json(orient="records"),
+        "groups": groups
+    }
+    return json.dumps(r)
 
 @data_blueprint.route('/data/diff')
 def diff():
@@ -191,14 +190,22 @@ def diff():
     dist_metric = request.args.get("dist") if 'dist' in request.args else None
 
     df = read_file(k, dist_metric, rep)
+    if k:
+        groups = get_groups(df)
+        df = df.drop_duplicates().sort_index()
+    else:
+        groups = []
 
     df_maxmin = pd.DataFrame(columns=["index", "max", "min"])
-    
     df_maxmin["index"] = df.index.values
-    df_maxmin["max"] = df.max(axis=1)
-    df_maxmin["min"] = df.min(axis=1)
-    
-    return df_maxmin.to_json(orient="records")
+    df_maxmin["max"] = df.max(axis=1).reset_index(drop=True)
+    df_maxmin["min"] = df.min(axis=1).reset_index(drop=True)
+
+    r = {
+        "dots": df_maxmin.to_json(orient="records"),
+        "groups": groups
+    }
+    return json.dumps(r)
     
 def sort_global_amplitude(data, percentage=[0.01, 0.05, 0.1, 0.25, 0.5, 1], opacity=[1, 0.1, 0.1,0.1, 0.1, 0.1]):
     row_no, col_no = data.shape  

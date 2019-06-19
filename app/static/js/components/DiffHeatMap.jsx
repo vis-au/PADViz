@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 
-import Hea from './charts/Hea';
+import HeatMap from './charts/HeatMap';
 
 class DiffHeatMap extends Component {
     constructor(props) {
@@ -13,11 +13,7 @@ class DiffHeatMap extends Component {
     }
 
     componentDidMount() {
-        // fetch("/data/hm?wsize=8&step=5&bins=10")
-        // fetch("/data/hm?k=2&dist=LM&rep=median")
-        // fetch("/data/hm?k=3&dist=LM&rep=mean")
-        fetch("/data/hm?k=3&dist=Euclidean&rep=mean")
-        fetch("/data/hm")
+        fetch(this.props.initurl)
             .then(res => res.json())
             .then(data => this.setState({
                 data: data,
@@ -34,15 +30,15 @@ class DiffHeatMap extends Component {
             })
         })
         return indexMap;
-        // this.setState({indexMap: indexMap})
     }
 
     render() {
         let { data, indexMap } = this.state;
         const { width, height } = this.props;
+        
         return (
             <div>
-                {data ? <Hea data={data} indexMap={indexMap}  width={width} height={height}/> : <p>Loading...</p>}
+                {data ? <HeatMap data={data} indexMap={indexMap} {...this.props}/> : <p>Loading...</p>}
             </div>
         )
     }

@@ -9,7 +9,12 @@ import {
     SET_SELECTED,
 
     SET_HOVER_LINES,
-    SET_LINE_MAX
+    SET_LINE_MAX,
+    SET_GLOBAL_FITLER,
+    SET_GLOBAL_HOVER,
+    SET_DIFF_XY,
+    SET_STAT_XY,
+    
 } from './actionTypes';
 
 export const setHoverLines = (indexes) => ({
@@ -20,6 +25,26 @@ export const setHoverLines = (indexes) => ({
 export const setLineMax = (max) => ({
     type: SET_LINE_MAX,
     max
+})
+
+export const setGlobalFilter = (indexes) => ({
+    type: SET_GLOBAL_FITLER,
+    indexes
+})
+
+export const setGlobalHover = (indexes) => ({
+    type: SET_GLOBAL_HOVER,
+    indexes
+})
+
+export const setDiffXY = (arr) => ({
+    type: SET_DIFF_XY,
+    arr
+})
+
+export const setStatXY = (arr) => ({
+    type: SET_STAT_XY,
+    arr
 })
 
 export const setIndexes = (indexes) => ({

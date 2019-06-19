@@ -3,8 +3,6 @@ import * as d3 from 'd3';
 import { withFauxDOM } from 'react-faux-dom';
 
 import Tooltip from './Tooltip';
-import { type } from 'os';
-import { setHoverLines } from '../../redux/actions';
 
 class Lines extends Component {
     constructor(props) {
@@ -17,13 +15,20 @@ class Lines extends Component {
     }
 
     componentDidMount() { 
-        this.renderD3();
+        this.renderD3("render");
     }
 
     componentDidUpdate(prevProps) {
-        if(this.props.lineIndexes !== prevProps.lineIndexes) {
-            this.updateLines(this.props.lineIndexes, prevProps.lineIndexes);
-            this.setToolTip(this.props.lineIndexes, this.state.pos_x, this.state.pos_y);
+        // if(this.props.lineIndexes !== prevProps.lineIndexes) {
+        //     this.updateLines(this.props.lineIndexes, prevProps.lineIndexes);
+        //     this.setToolTip(this.props.lineIndexes, this.state.pos_x, this.state.pos_y);
+        // }
+        if(this.props.global_hover !== prevProps.global_hover) {
+            this.updateLines(this.props.global_hover, prevProps.global_hover);
+            this.setToolTip(this.props.global_hover, this.state.pos_x, this.state.pos_y);
+        }
+        if(this.props.global_indexes !== prevProps.global_indexes) {
+            this.renderD3("update")
         }
     }
 
@@ -123,7 +128,7 @@ class Lines extends Component {
     }
 
 
-    renderD3() {
+    renderD3(mode) {
         let {
             width,
             height,
@@ -136,11 +141,15 @@ class Lines extends Component {
             
             setHoverLines,
             lineMax,
+            global_indexes,
+            setGlobalHover,
 
             connectFauxDOM,
             animateFauxDOM
         } = this.props;
 
+        const render = mode === 'render';
+        const update = mode === 'update';
         
         const margin = {top: 20, right: 100, bottom: 50, left: 100};
         const chartWidth = width - margin.left - margin.right;
@@ -149,86 +158,80 @@ class Lines extends Component {
         
         let faux = connectFauxDOM('div', 'chart')
         let svg;
-        svg = d3.select(faux).append("svg")
+        if(render) {
+            svg = d3.select(faux).append("svg")
                 .attr("width", width)
                 .attr("height", height)
                 .append("g")
-                    .attr("transform", `translate(${margin.left}, ${margin.top})`);
-        
-
+                    .attr("transform", `translate(${margin.left}, ${margin.top})`)
+                    .attr("fill", "none")
+                    .attr("stroke-linejoin", "round")
+                    .attr("stroke-linecap", "round");
+        } else if(update) {
+            svg = d3.select(faux).select('svg').select('g');
+            if(global_indexes) {
+                data = data.filter((d, i) => global_indexes.includes(index[i]))
+                index = index.filter((d, i) => global_indexes.includes(d))
+            }
+        }
         let xScale = d3.scaleBand()
-                        .domain(time)
-                        .range([0, chartWidth]).padding(-1);
+                .domain(time)
+                .range([0, chartWidth]).padding(-1);
         let yScale = d3.scaleLinear()
                         .domain([0, lineMax]).nice()
                         .range([chartHeight, 0]);
-
-        let xAxis =  d3.axisBottom(xScale)
-                        .tickValues(xScale.domain().filter(d => (d === 0 || !(d%10))))
-                        .tickSizeOuter(0);
         
+        let xAxis =  d3.axisBottom(xScale)
+            .tickValues(xScale.domain().filter(d => (d === 0 || !(d%10))))
+            .tickSizeOuter(0);
+            
         let yAxis = d3.axisLeft(yScale)
                         .tickSizeInner(-chartWidth)
                         .tickSizeOuter(1)
-                        
-        svg.append('g')
-            .attr('class', 'x axis')
-            .attr('transform', `translate(-14, ${chartHeight})`)
-            .call(xAxis)
+        // if(render) {
+            svg.append('g')
+                .attr('class', 'x axis')
+                .attr('transform', `translate(-14, ${chartHeight})`)
+                .call(xAxis)
 
-        svg.append('g')
-            .attr('class', 'y axis')
-            .attr('transform', `translate(-14, 0)`)
-            .call(yAxis);
-        
-        svg.append('text')
-            .attr("x", chartWidth / 2 )
-            .attr("y", chartHeight + 35)
-            .attr("text-anchor", "middle")
-            .text("time");
+            svg.append('g')
+                .attr('class', 'y axis')
+                .attr('transform', `translate(-14, 0)`)
+                .call(yAxis);
+            
+            svg.append('text')
+                .attr("x", chartWidth / 2 )
+                .attr("y", chartHeight + 35)
+                .attr("text-anchor", "middle")
+                .text("time");
 
-        svg.append("text")
-            .attr("x", -(chartHeight / 2))
-            .attr("y", -40)
-            .attr("transform", 'rotate(-90)')
-            .attr("text-anchor", "middle")
-            .text("power")
+            svg.append("text")
+                .attr("x", -(chartHeight / 2))
+                .attr("y", -40)
+                .attr("transform", 'rotate(-90)')
+                .attr("text-anchor", "middle")
+                .text("power");
+        // }
 
         let line = d3.line()
                 .defined(d => !isNaN(d))
                 .x((d, i) => xScale(time[i]))
                 .y(d => yScale(d))
         
-        let path = svg.append('g')
-                    .attr("fill", "none")
-                    .attr("stroke-linejoin", "round")
-                    .attr("stroke-linecap", "round")
-                    .selectAll("path")
+        let path = svg.selectAll("path")
                     .data(data);
-                    
+
         path = path
                 .join("path")
                 .on("mouseover", (d, i) => {
-                    // d3.select(`.${name}.data-${index[i]}`)
-                    //     .attr("stroke", "#18da3b")
-                    //     .attr("stroke-width", 5)
-                    //     .attr("opacity", "1")
-                    //     .raise()
                     let info = groups[index[i]] ? groups[index[i]] : index[i];
-                    // this.setToolTip(info, chartWidth - 40, margin.top)
-                    setHoverLines(info);
+                    // setHoverLines(info);
+                    setGlobalHover(info);
                 })
                 .on("mouseout", (d, i) => {
-                    // let node = d3.select(`.${name}.data-${index[i]}`);
-                    // let opacity = node.attr("opavalue")
-                    // console.log(opacity)
-                    // node.transition()
-                    //     .attr("stroke", "#000000")
-                    //     .attr("stroke-width", 2)
-                    //     .attr("opacity", opacity);
-                        
-                    this.setToolTip(null);
-                    setHoverLines(null);
+                    // this.setToolTip(null);
+                    // setHoverLines(null);
+                    setGlobalHover([]);
                 });
         path
             .attr('class', (d, i) =>{ 
@@ -245,8 +248,13 @@ class Lines extends Component {
             })
             .transition()
             .attr("stroke-width", 2);
+        
+        path.exit()
+            .transition()
+                .attr("stroke-width", 0) 
+                .remove();
 
-        animateFauxDOM(1000);
+        animateFauxDOM(1300);
     }
 }
 

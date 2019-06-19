@@ -1,8 +1,9 @@
 import React, { Component } from 'react';
 
-import Diff from './charts/Diff';
+import Stat from "./charts/Stat";
+import { setSTATXY } from '../redux/actions';
 
-class DiffScatterPlot extends Component {
+class StatScatterPlot extends Component {
     
     constructor(props) {
         super(props)
@@ -12,7 +13,7 @@ class DiffScatterPlot extends Component {
     }
 
     componentDidMount() {
-        let { name, setDiffXY } = this.props;
+        let { name, setStatXY } = this.props;
 
         fetch(this.props.initurl)
         .then(res => res.json())
@@ -22,26 +23,25 @@ class DiffScatterPlot extends Component {
                 data: dots,
                 groups: data["groups"]
             })
-            if(name === "col1-diff") {
+            if(name === "col1-stat") {
                 let min = Number.MIN_VALUE;
                 let max = Number.MIN_VALUE;
                 dots.forEach(d => Object.keys(d).forEach(function(k) {
-                    if(k === 'min') min = Math.max(min, d[k]);
-                    if(k === "max") max = Math.max(max, d[k]);
+                    if(k === 'mean') min = Math.max(min, d[k]);
+                    if(k === "std") max = Math.max(max, d[k]);
                 }));
-                setDiffXY([min, max])
+                setStatXY([min, max])
             }
         })
     }
 
     render(){
         const { data, groups } = this.state;
-        const { diffxy } = this.props;
-
+        const { statxy } = this.props;
         return(
             <div>
-                { data && diffxy.length > 0 ? 
-                <Diff data={data} groups={groups} {...this.props}/> 
+                { data && statxy.length > 0 ? 
+                <Stat data={data} groups={groups} {...this.props}/> 
                 : <p>Loading...</p>}
             </div>
         )
@@ -49,4 +49,4 @@ class DiffScatterPlot extends Component {
     }
 }
 
-export default DiffScatterPlot;
+export default StatScatterPlot;

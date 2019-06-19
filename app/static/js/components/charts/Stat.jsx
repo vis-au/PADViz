@@ -15,19 +15,23 @@ class Stat extends Component {
         tooltip: null,
     }
 
-    setToolTip = (mean, std, x, y, id) => {
-        this.setState(state => ({
-            tooltip: mean ? {mean, std, x, y, id} : null
-        }))
+    setToolTip = (x, y, ids) => {
+        this.setState({
+            tooltip: ids ? {x, y, ids} : null
+        })
     }
 
     tooltipProps = () => {
-        const {mean, std, x, y, id} = this.state.tooltip;
-        
+        let {x, y, ids} = this.state.tooltip;
+        let {groups} = this.props;     
+
         if(this.state.tooltip) {
+            if(!Array.isArray(groups) && ids.length === 1) {
+                ids = groups[ids].length === 1 ? groups[groups[ids][0]] : groups[ids]
+            } 
             return {
-                content: `mean: ${Math.round(mean * 100) / 100}, std: ${Math.round(std * 100) / 100}, id: ${id}`,
-                style: {top: y-40, left: x}
+                content: `id: ${ids.join(" ")}`,
+                style: {top: y, left: x}
             }
         } else {
             return {
@@ -36,107 +40,182 @@ class Stat extends Component {
         }
     }
 
-    componentDidMount() {
-        this.renderD3()
+    round(n) {
+        return Math.round(min * 100) / 100;
     }
+
+    componentDidMount() {
+        this.renderD3("render")
+    }
+
+    componentDidUpdate(prevProps) {
+        if(this.props.global_indexes != prevProps.global_indexes) {
+            this.renderD3("update")
+        }
+        if(this.props.global_hover != prevProps.global_hover) {
+            this.updateDots(this.props.global_hover, prevProps.global_hover);
+            if(this.props.global_hover.length > 0) this.setToolTip(this.state.pos_x, this.state.pos_y, this.props.global_hover);
+            else this.setToolTip(null);
+        }
+    }
+
+    updateDots(ids, prevIds) {
+        let { groups } = this.props;
+
+        // de-highlight previous dots
+        if(prevIds.length === 1) {
+            if(groups.length === 0) this.deHighlight(prevIds);
+            else groups[prevIds].map(id => this.deHighlight(id));
+        } else if(prevIds.length > 1) {
+            prevIds.map(id => this.deHighlight(id));
+        }
+        // highlight select lines
+        if(ids.length  === 1) {
+            if(groups.length === 0) this.highlight(ids);
+            else groups[ids].map(id => this.highlight(id));
+        } else if(ids.length > 1) {
+            ids.map(id => this.highlight(id));
+        }
+    }
+
+    highlight(id) {
+        d3.select(`.${this.props.name}.data-${id}`)
+            .attr("r", 15)
+            .attr("opacity", 1)
+            .attr("fill","#18da3b")
+            .raise();
+    }
+
+    deHighlight(id) {
+        d3.select(`.${this.props.name}.data-${id}`)
+            .attr("r", 7.5)
+            .attr("opacity", 0.7)
+            .attr("fill","#000000")
+            .order();
+    }
+
+    
 
     render() {
         return (
-            <div className="scatterplot">
+            <div className="stat-scatter">
                 {this.props.chart}
                 {this.state.tooltip && <Tooltip {...this.tooltipProps() } />}
             </div>
         )
     }
 
-    renderD3() {
-        const {
+    renderD3(mode) {
+        let {
             width,
             height,
+            name,
             data,
+            groups,
+            statxy,
+            global_indexes,
+            setGlobalHover,
             connectFauxDOM,
             animateFauxDOM,
         } = this.props;
 
+        const render = mode === 'render';
+        const update = mode === 'update';
+
         const margin = {top: 20, right: 20, bottom: 40, left: 80};
         const chartWidth = width - margin.left - margin.right;
         const chartHeight = height - margin.top - margin.bottom;
-        
+        this.setState({pos_x: chartWidth, pos_y: margin.top});
 
         let faux = connectFauxDOM('div', 'chart');
-        let svg = d3.select(faux).append("svg")
-            .attr("width", width)
-            .attr("height", height)
-            .append("g")
-            .attr("transform", `translate(${margin.left}, ${margin.top})`);
-        
+        let svg;
+        if(render) {
+            svg = d3.select(faux).append("svg")
+                .attr("width", width)
+                .attr("height", height)
+                .append("g")
+                    .attr("transform", `translate(${margin.left}, ${margin.top})`);
+        } else if (update) {
+            if(global_indexes) {
+                let index_list;
+                if(!Array.isArray(groups)) {
+                    index_list = global_indexes.map(v => {
+                        if(groups[v].length === 1) return groups[v][0];
+                    })
+                } else index_list = global_indexes;
 
+                data = data.filter(d => index_list.includes(d.index))
+            } 
+            
+            svg = d3.select(faux).select('svg').select('g');
+        }
         let xScale, yScale;
     
         xScale = d3.scaleLinear()
-            .domain([0, d3.max(data, d=> {return d.mean})]).nice()
+            .domain([0, statxy[0]]).nice()
             .range([0, chartWidth]);
         
         yScale = d3.scaleLinear()
-            .domain([0, d3.max(data, d=>{return d.std})]).nice()
-            .range([chartHeight, 0])
+            .domain([0, statxy[1]]).nice()
+            .range([chartHeight, 0]);
 
-            let dots = svg.selectAll('.dot')
-            .data(data);
+        let dots = svg.selectAll('.dot')
+                    .data(data);
 
         dots.exit().transition().attr('r', 0).remove();
-
+       
         dots = dots
-            .enter()
-            .append("circle")
-            .on('mouseover', (d, i) => {
-                this.setToolTip(d.mean, d.std, chartWidth, 50, i)
-                d3.select(`.data-264`)
-                // d3.select(`.data-${i}`)
-                    .attr("r", 15)
-                    .attr("opacity", 1)
-                    .attr("fill","#18da3b")
-            })
-            .on('mouseout', (d, i) => {
-                this.setToolTip(null)
-                d3.select(`.data-${i}`)
-                    .attr("r", 7.5)
-                    .attr("opacity", 0.7)
-                    .attr("fill","#000000")
-                });
+                .enter()
+                .append("circle")
+                .on('mouseover', (d, i) => {
+                    let info = groups.length === 0 ? [d.index] : groups[d.index];
+                    setGlobalHover(info);
+                })
+                .on('mouseout', (d, i) => {
+                    setGlobalHover([])
+                })
+                .merge(dots);
+    
         dots
-            .attr("r", 7.5)
+            .attr("r", 0)
             .attr("cx", function (d) { return xScale(d.mean); } )
             .attr("cy", function (d) { return yScale(d.std); } )
             .attr("mean", d => d.mean)
             .attr("std", d => d.std)
+            .attr("opacity", 0)
             .attr("class", d => `${name} dot data data-${d.index}`)
-            .attr("opacity", 0.7)
-            .transition();
-        
-        let xAxis = d3.axisBottom(xScale).ticks(5);
+            .transition()
+                .attr("r", 7.5)
+                .attr("opacity", 0.7);
+
+        animateFauxDOM(1000);
+
+        let xAxis = d3.axisBottom(xScale).ticks(10);
         let yAxis = d3.axisLeft(yScale).ticks(10);
         
-        svg.append('g')
+        if(render) {
+            svg.append('g')
                 .attr('class', 'x axis')
                 .attr('transform', `translate(0, ${chartHeight})`)
                 .call(xAxis);
-        svg.append('text')
-            .attr("x", chartWidth / 2 )
-            .attr("y", chartHeight + 30)
-            .attr("text-anchor", "middle")
-            .text("mean");
-    
+            svg.append('text')
+                .attr("x", chartWidth / 2 )
+                .attr("y", chartHeight + 30)
+                .attr("text-anchor", "middle")
+                .text("mean");
+        
 
-        svg.append('g')
-            .attr('class', 'y axis')
-            .call(yAxis);
-        svg.append("text")
-            .attr("x", -(chartHeight / 2))
-            .attr("y", -30)
-            .attr("transform", 'rotate(-90)')
-            .attr("text-anchor", "middle")
-            .text("Std")
+            svg.append('g')
+                .attr('class', 'y axis')
+                .call(yAxis);
+            svg.append("text")
+                .attr("x", -(chartHeight / 2))
+                .attr("y", -30)
+                .attr("transform", 'rotate(-90)')
+                .attr("text-anchor", "middle")
+                .text("std")
+        }
+        
 
     }
 

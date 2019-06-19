@@ -1,16 +1,19 @@
 import {connect} from 'react-redux';
 
-import { setHoverLines, setLineMax } from '../redux/actions/index';
+import { setHoverLines, setLineMax, setGlobalHover } from '../redux/actions/index';
 import MultipleLines from '../components/MultipleLines';
 
 const mapStateToProps = (state, ownProps) => ({
     lineIndexes: state.lineIndexes,
-    lineMax: state.lineMax
+    lineMax: state.lineMax,
+    global_indexes: state.global_indexes,
+    global_hover: state.global_hover,
 })
 
 const mapDispatchToProps = (dispatch, ownProps) => ({
     setHoverLines: (indexes) => dispatch(setHoverLines(indexes)),
-    setLineMax: (max) => dispatch(setLineMax(max))
+    setLineMax: (max) => dispatch(setLineMax(max)),
+    setGlobalHover: (indexes) => dispatch(setGlobalHover(indexes)),
 })
 
 export default connect(mapStateToProps, mapDispatchToProps)(MultipleLines);

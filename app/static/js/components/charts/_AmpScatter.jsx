@@ -106,7 +106,7 @@ class AmpScatter extends Component {
                 .attr("width", width)
                 .attr("height", height)
                 .append("g")
-                .attr("transform", `translate(${margin.left}, ${margin.top})`);
+                    .attr("transform", `translate(${margin.left}, ${margin.top})`);
             data = initData;
         } else if(update) {
             if(indexes) {

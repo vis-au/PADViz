@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import sizeMe from 'react-sizeme';
 
-import HeatMap from './charts/HeatMap';
+import HeatMap from './charts/__HeatMap';
 
 class AmpHeatMap extends Component {
     constructor(props) {

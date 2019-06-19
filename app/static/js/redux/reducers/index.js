@@ -10,6 +10,10 @@ import {
 
     SET_HOVER_LINES,
     SET_LINE_MAX,
+    SET_GLOBAL_FITLER,
+    SET_GLOBAL_HOVER,
+    SET_DIFF_XY,
+    SET_STAT_XY,
 } from '../actions/actionTypes';
 
 export const initialState = {
@@ -22,6 +26,10 @@ export const initialState = {
 
     lineIndexes: null,
     lineMax: 0,
+    global_indexes: null,
+    global_hover: [],
+    diffxy: [],
+    statxy: [],
 };
 
 export const rootReducer = (state = initialState, action) => {
@@ -36,6 +44,27 @@ export const rootReducer = (state = initialState, action) => {
                 ...state,
                 lineMax: action.max
             }
+        case SET_GLOBAL_FITLER: 
+            return {
+                ...state,
+                global_indexes: action.indexes
+            }
+        case SET_GLOBAL_HOVER:
+            return {
+                ...state,
+                global_hover: action.indexes
+            }
+        case SET_DIFF_XY:
+            return {
+                ...state,
+                diffxy: action.arr
+            }
+        case SET_STAT_XY:
+            return {
+                ...state,
+                statxy: action.arr
+            }
+
         case SET_INDEXES:
             return {
                 ...state, 

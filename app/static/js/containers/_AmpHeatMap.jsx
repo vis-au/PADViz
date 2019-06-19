@@ -1,6 +1,6 @@
 import {connect} from 'react-redux';
 
-import AmpHeatMap from '../components/AmpHeatMap';
+import AmpHeatMap from '../components/_AmpHeatMap';
 import { setIndexes, setClickHm, setHover, setTime, setHMIdx } from '../redux/actions/index'
 
 

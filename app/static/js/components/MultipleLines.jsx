@@ -17,7 +17,8 @@ class MultipleLines extends Component {
     }
 
     componentDidMount() {
-        let { name, setLineMax, lineMax } = this.props;
+        let { name, setLineMax } = this.props;
+        
         fetch(this.props.initurl)
             .then(res => res.json())
             .then(data => {
@@ -35,29 +36,8 @@ class MultipleLines extends Component {
                     setLineMax(max)
                 }
                 
-                // lines = JSON.parse(data['lines'])
-                // console.log(JSON.parse(data['lines']))
-            //     this.setState({
-            //     data: JSON.parse(data['lines']),
-            //     opacity: data['opacity'],
-            //     groups: data['groups']
-            // })
         })
     }
-
-    // dataFormualater(data) {
-    //     return data;
-    //     // let keys = Object.keys(data["index"])
-    //     // console.log(data["index"])
-    //     // let keys = Object.keys(data).filter(k => k!='time');
-
-    //     // return {
-    //     //     time: Object.values(data.time),
-    //     //     values: keys.map(function(r) {
-    //     //         return Object.values(data[r])
-    //     //     })
-    //     // }
-    // }
 
     render() {
         let { time, index, data, opacity, groups } = this.state;
