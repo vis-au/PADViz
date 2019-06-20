@@ -101,9 +101,9 @@ class Dashboard1 extends Component {
                         <div key="SCA1_COL3">
                             <StatScatterPlot width="400" height="430" name="col3-stat"
                             initurl={this.state.initurls["stat_col3"]}/>
-                        </div>
+                        </div> 
 
-                        {/* <div key="SCA2_COL1">
+                        <div key="SCA2_COL1">
                             <DiffScatterPlot width="400" height="430" name="col1-diff"
                             initurl={this.state.initurls["diff_col1"]}/>
                         </div>
@@ -114,7 +114,7 @@ class Dashboard1 extends Component {
                         <div key="SCA2_COL3">
                             <DiffScatterPlot width="400" height="430" name="col3-diff"
                             initurl={this.state.initurls["diff_col3"]}/>
-                        </div> */}
+                        </div>
                         
                         
                         

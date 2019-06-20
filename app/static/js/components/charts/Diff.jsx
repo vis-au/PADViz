@@ -141,6 +141,7 @@ class Diff extends Component {
                 if(!Array.isArray(groups)) {
                     index_list = global_indexes.map(v => {
                         if(groups[v].length === 1) return groups[v][0];
+                        else return v;
                     })
                 } else index_list = global_indexes;
 

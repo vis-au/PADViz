@@ -23,12 +23,13 @@ class Stat extends Component {
 
     tooltipProps = () => {
         let {x, y, ids} = this.state.tooltip;
-        let {groups} = this.props;     
+        let { groups, data } = this.props;     
 
         if(this.state.tooltip) {
             if(!Array.isArray(groups) && ids.length === 1) {
                 ids = groups[ids].length === 1 ? groups[groups[ids][0]] : groups[ids]
             } 
+
             return {
                 content: `id: ${ids.join(" ")}`,
                 style: {top: y, left: x}
@@ -141,6 +142,7 @@ class Stat extends Component {
                 if(!Array.isArray(groups)) {
                     index_list = global_indexes.map(v => {
                         if(groups[v].length === 1) return groups[v][0];
+                        else return v;
                     })
                 } else index_list = global_indexes;
 

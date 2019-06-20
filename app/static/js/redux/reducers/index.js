@@ -8,12 +8,12 @@ import {
     SET_HM_IDX,
     SET_SELECTED,
 
-    SET_HOVER_LINES,
     SET_LINE_MAX,
     SET_GLOBAL_FITLER,
     SET_GLOBAL_HOVER,
     SET_DIFF_XY,
     SET_STAT_XY,
+    SET_HM_CELL,
 } from '../actions/actionTypes';
 
 export const initialState = {
@@ -30,15 +30,11 @@ export const initialState = {
     global_hover: [],
     diffxy: [],
     statxy: [],
+    hmcell: [],
 };
 
 export const rootReducer = (state = initialState, action) => {
     switch(action.type) {
-        case SET_HOVER_LINES:
-            return {
-                ...state,
-                lineIndexes: action.indexes
-            }
         case SET_LINE_MAX: 
             return {
                 ...state,
@@ -64,7 +60,11 @@ export const rootReducer = (state = initialState, action) => {
                 ...state,
                 statxy: action.arr
             }
-
+        case SET_HM_CELL:
+            return {
+                ...state,
+                hmcell: action.i
+            }
         case SET_INDEXES:
             return {
                 ...state, 

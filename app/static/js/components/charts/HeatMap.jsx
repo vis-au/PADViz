@@ -42,8 +42,26 @@ class HeatMap extends Component {
     }
 
     componentDidUpdate(prevProps) {
-        if(this.props.global_indexes != prevProps.global_indexes) {
+        if(this.props.global_indexes !== prevProps.global_indexes) {
             this.updateCells(this.props.global_indexes, prevProps.global_indexes)
+        }
+        if(this.props.hmcell !== prevProps.hmcell) {
+            this.updateBorder(this.props.hmcell, prevProps.hmcell);
+        }
+    }
+
+    updateBorder(curr, prev) {
+        const { name } = this.props;
+        if(prev.length > 0) {
+            d3.select(`.${name}.rect-${prev[1]}`)
+                .attr("stroke", "none");
+        }
+        if(curr.length > 0 && name === curr[0]) {
+            d3.select(`.${name}.rect-${curr[1]}`)
+                .attr("stroke", "#011f4b");
+        } else if(curr.length > 0) {
+            d3.select(`.${name}.rect-${curr[1]}`)
+                .attr("stroke", "#6497b1");
         }
     }
 
@@ -100,8 +118,9 @@ class HeatMap extends Component {
             height,
             data,
             name,
-            global_indexes,
             setGlobalFilter,
+            setHMCell,
+            hmcell,
             connectFauxDOM,
             animateFauxDOM
         } = this.props;
@@ -216,24 +235,33 @@ class HeatMap extends Component {
                 .attr("stroke", "none")
             .on('mouseover', (d, i) => {
                 if(d.count > 0) {
-                    d3.select(`.rect-${i}`)
+                    if(hmcell.length > 0 && i != hmcell[1]) {
+                        d3.select(`.rect-${i}`)
                         .attr("stroke", "	#5e9aff")
                         .attr("stroke-width", "4px");
+                    }
                     this.setToolTip(d.count, d.instances, xScale(d.time), yScale(d.amp_interval));
                 }
             })
             .on('mouseout', (d, i) => {
                 if(d.count > 0) {
-                    // if(this.state.selEle !== i) {
-                    d3.select(`.rect-${i}`)
-                        .attr("stroke", "none")
-                    // }
+                   let node = d3.select(`.rect-${i}`);
+                   let stroke = node.attr("stroke")
+                   if(stroke != "#011f4b" && stroke != "#6497b1") {
+                       node.attr("stroke", "none")
+                   }
                     this.setToolTip(null);
                 }
             })
             .on('click', (d, i) => {
-                if(d.count > 0)  setGlobalFilter(d.instances);
-                else setGlobalFilter(null);
+                if(d.count > 0)  {
+                    setGlobalFilter(d.instances);
+                    setHMCell([name, i]);
+                }
+                else {
+                    setGlobalFilter(null);
+                    setHMCell([])
+                }
             })
             .merge(rects);
             

@@ -19,13 +19,10 @@ class Lines extends Component {
     }
 
     componentDidUpdate(prevProps) {
-        // if(this.props.lineIndexes !== prevProps.lineIndexes) {
-        //     this.updateLines(this.props.lineIndexes, prevProps.lineIndexes);
-        //     this.setToolTip(this.props.lineIndexes, this.state.pos_x, this.state.pos_y);
-        // }
         if(this.props.global_hover !== prevProps.global_hover) {
             this.updateLines(this.props.global_hover, prevProps.global_hover);
-            this.setToolTip(this.props.global_hover, this.state.pos_x, this.state.pos_y);
+            if(this.props.global_hover.length > 0) this.setToolTip(this.props.global_hover, this.state.pos_x, this.state.pos_y);
+            // else this.setToolTip(null)
         }
         if(this.props.global_indexes !== prevProps.global_indexes) {
             this.renderD3("update")
@@ -36,29 +33,41 @@ class Lines extends Component {
         let {groups} = this.props;
 
         // de-highlight previous lines
-        if(prevIds !== null) {
-            if(typeof(prevIds) === "number") {
-                let t_id;
-                if(!Array.isArray(groups)) {
-                    t_id = groups[prevIds].length == 1 ? groups[prevIds][0] : prevIds;
-                } else t_id = prevIds;
-                this.deHighlight(t_id);
-            } else if(Array.isArray(prevIds) && prevIds.length > 0) {
-                prevIds.map(id => this.deHighlight(id))
-            }
-            
+        // if(prevIds !== null) {
+        //     if(typeof(prevIds) === "number") {
+        //         let t_id;
+        //         if(!Array.isArray(groups)) {
+        //             t_id = groups[prevIds].length == 1 ? groups[prevIds][0] : prevIds;
+        //         } else t_id = prevIds;
+        //         this.deHighlight(t_id);
+        //     } else if(Array.isArray(prevIds) && prevIds.length > 0) {
+        //         prevIds.map(id => this.deHighlight(id))
+        //     }
+        if(prevIds.length === 1) {
+            if(groups.length === 0) this.deHighlight(prevIds);
+            else groups[prevIds].map(id => this.deHighlight(id));
+        } else if(prevIds.length > 1) {
+            prevIds.map(id => this.deHighlight(id));
         }
+            
+        // }
         // highlight select lines
-        if(typeof(ids) === "number") {
-            if(!Array.isArray(groups)) {
-                let t_id = groups[ids].length == 1 ? groups[ids][0] : ids;
-                groups[t_id].map(id => this.highlight(id));
-            } else {
-                this.highlight(ids);
-            }
-        } else if(Array.isArray(ids) && ids.length > 0) {
+        // if(typeof(ids) === "number") {
+        //     if(!Array.isArray(groups)) {
+        //         let t_id = groups[ids].length == 1 ? groups[ids][0] : ids;
+        //         groups[t_id].map(id => this.highlight(id));
+        //     } else {
+        //         this.highlight(ids);
+        //     }
+        // } else if(Array.isArray(ids) && ids.length > 0) {
+        //     ids.map(id => this.highlight(id));
+        // } 
+        if(ids.length  === 1) {
+            if(groups.length === 0) this.highlight(ids);
+            else groups[ids].map(id => this.highlight(id));
+        } else if(ids.length > 1) {
             ids.map(id => this.highlight(id));
-        } 
+        }
     }
 
     highlight(id) {
@@ -170,9 +179,21 @@ class Lines extends Component {
         } else if(update) {
             svg = d3.select(faux).select('svg').select('g');
             if(global_indexes) {
-                data = data.filter((d, i) => global_indexes.includes(index[i]))
-                index = index.filter((d, i) => global_indexes.includes(d))
-            }
+                let index_list;
+                if(!Array.isArray(groups)) {
+                    index_list = global_indexes.map(v => {
+                        if(groups[v].length === 1) return groups[v][0];
+                        else return v;
+                    })
+                } else index_list = global_indexes;
+
+                data = data.filter((d, i) => index_list.includes(index[i]));
+                index = index.filter((d, i) => index_list.includes(d));
+            } 
+            // if(global_indexes) {
+            //     data = data.filter((d, i) => global_indexes.includes(index[i]))
+            //     index = index.filter((d, i) => global_indexes.includes(d))
+            // }
         }
         let xScale = d3.scaleBand()
                 .domain(time)
@@ -224,7 +245,8 @@ class Lines extends Component {
         path = path
                 .join("path")
                 .on("mouseover", (d, i) => {
-                    let info = groups[index[i]] ? groups[index[i]] : index[i];
+                    let info = groups[index[i]] ? groups[index[i]] : [index[i]];
+                    // console.log(info)
                     // setHoverLines(info);
                     setGlobalHover(info);
                 })
