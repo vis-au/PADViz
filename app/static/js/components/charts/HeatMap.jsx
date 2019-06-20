@@ -38,7 +38,7 @@ class HeatMap extends Component {
     }
     
     componentDidMount() {
-        this.renderD3();
+        this.renderD3("render");
     }
 
     componentDidUpdate(prevProps) {
@@ -47,6 +47,10 @@ class HeatMap extends Component {
         }
         if(this.props.hmcell !== prevProps.hmcell) {
             this.updateBorder(this.props.hmcell, prevProps.hmcell);
+        }
+        if(this.props.data !== prevProps.data) {
+            this.setState({noCells: this.props.data.length})
+            this.renderD3("load");
         }
     }
 
@@ -112,7 +116,7 @@ class HeatMap extends Component {
     }
     
 
-    renderD3() {
+    renderD3(mode) {
         const {
             width,
             height,
@@ -125,16 +129,24 @@ class HeatMap extends Component {
             animateFauxDOM
         } = this.props;
 
+        const render = mode === 'render'
+        const load = mode === 'load'
+
         const margin = {top: 20, right: 100, bottom: 50, left: 100};
         const chartWidth = width - margin.left - margin.right;
         const chartHeight = height - margin.top - margin.bottom;
 
         let faux = connectFauxDOM('div', 'chart');
-        let svg = d3.select(faux).append("svg")
+        let svg;
+        if(render) {
+            svg = d3.select(faux).append("svg")
                 .attr("width", width)
                 .attr("height", height)
                 .append("g")
                 .attr("transform", `translate(${margin.left}, ${margin.top})`);
+        } else if(load) {
+            svg = d3.select(faux).select('svg').select('g');
+        }
 
         const t_interval = d3.map(data, function(d){return d.time;}).keys();
         const amp_range = d3.map(data, function(d){return d.amp_interval;}).keys();

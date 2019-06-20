@@ -5,7 +5,6 @@ import Lines from './charts/Lines';
 class MultipleLines extends Component {
     constructor(props) {
         super(props);
-        // this.dataFormualater = this.dataFormualater.bind(this);
     }
 
     state = {
@@ -17,9 +16,19 @@ class MultipleLines extends Component {
     }
 
     componentDidMount() {
+        console.log(this.props.url)
+        this.getData(this.props.url);
+    }
+
+    componentDidUpdate(prevProps) {
+        if(this.props.url !== prevProps.url) {
+            this.getData(this.props.url);
+        }
+    }
+
+    getData(url) {
         let { name, setLineMax } = this.props;
-        
-        fetch(this.props.initurl)
+        fetch(url)
             .then(res => res.json())
             .then(data => {
                 let lines = JSON.parse(data['lines'])

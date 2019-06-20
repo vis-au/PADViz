@@ -13,12 +13,22 @@ class DiffHeatMap extends Component {
     }
 
     componentDidMount() {
-        fetch(this.props.initurl)
+        this.getData(this.props.url);
+    }
+
+    componentDidUpdate(prevProps) {
+        if(this.props.url !== prevProps.url) {
+            this.getData(this.props.url);
+        }
+    }
+
+    getData(url) {
+        fetch(url)
             .then(res => res.json())
             .then(data => this.setState({
                 data: data,
                 indexMap: this.getIndexMap(data)
-        }))
+        }));
     }
 
     getIndexMap(data) {
@@ -34,7 +44,7 @@ class DiffHeatMap extends Component {
 
     render() {
         let { data, indexMap } = this.state;
-        const { width, height } = this.props;
+        const { } = this.props;
         
         return (
             <div>

@@ -22,51 +22,41 @@ class Lines extends Component {
         if(this.props.global_hover !== prevProps.global_hover) {
             this.updateLines(this.props.global_hover, prevProps.global_hover);
             if(this.props.global_hover.length > 0) this.setToolTip(this.props.global_hover, this.state.pos_x, this.state.pos_y);
-            // else this.setToolTip(null)
+            else this.setToolTip(null)
         }
         if(this.props.global_indexes !== prevProps.global_indexes) {
             this.renderD3("update")
+        }
+        if(this.props.data !== prevProps.data) {
+            this.renderD3("load");
         }
     }
 
     updateLines(ids, prevIds) {
         let {groups} = this.props;
 
-        // de-highlight previous lines
-        // if(prevIds !== null) {
-        //     if(typeof(prevIds) === "number") {
-        //         let t_id;
-        //         if(!Array.isArray(groups)) {
-        //             t_id = groups[prevIds].length == 1 ? groups[prevIds][0] : prevIds;
-        //         } else t_id = prevIds;
-        //         this.deHighlight(t_id);
-        //     } else if(Array.isArray(prevIds) && prevIds.length > 0) {
-        //         prevIds.map(id => this.deHighlight(id))
-        //     }
         if(prevIds.length === 1) {
             if(groups.length === 0) this.deHighlight(prevIds);
             else groups[prevIds].map(id => this.deHighlight(id));
         } else if(prevIds.length > 1) {
-            prevIds.map(id => this.deHighlight(id));
+            if(!Array.isArray(groups)) {
+                prevIds.map(id => {
+                    if(groups[id].length === 1) return this.deHighlight(groups[id][0])
+                    else return this.deHighlight(id)
+                })
+            } else prevIds.map(id => this.deHighlight(id));
         }
             
-        // }
-        // highlight select lines
-        // if(typeof(ids) === "number") {
-        //     if(!Array.isArray(groups)) {
-        //         let t_id = groups[ids].length == 1 ? groups[ids][0] : ids;
-        //         groups[t_id].map(id => this.highlight(id));
-        //     } else {
-        //         this.highlight(ids);
-        //     }
-        // } else if(Array.isArray(ids) && ids.length > 0) {
-        //     ids.map(id => this.highlight(id));
-        // } 
         if(ids.length  === 1) {
-            if(groups.length === 0) this.highlight(ids);
+            if(Array.isArray(groups)) this.highlight(ids);
             else groups[ids].map(id => this.highlight(id));
         } else if(ids.length > 1) {
-            ids.map(id => this.highlight(id));
+            if(!Array.isArray(groups)) {
+                ids.map(id => {
+                    if(groups[id].length === 1) return this.highlight(groups[id][0])
+                    else return this.highlight(id)
+                })
+            } else ids.map(id => this.highlight(id));
         }
     }
 
@@ -86,7 +76,6 @@ class Lines extends Component {
         let node = d3.select(`.${name}.data-${id}`);
         if(!node.empty()) {
             let opacity = node.attr("opavalue")
-            // console.log(opacity)
             node.order()
                 .transition()
                 .attr("stroke", "#000000")
@@ -116,11 +105,11 @@ class Lines extends Component {
         const { groups } = this.props;
        
         let ids;
-        if(typeof(info) === "number") {
-            if(Array.isArray(groups) && groups.length === 0) ids = info;
+        if(info.length === 1) {
+            if(Array.isArray(groups)) ids = info;
             else if(groups[info].length === 1) ids = groups[groups[info][0]].join(" ");
             else if(groups[info].length > 1) ids = groups[info].join(" ");
-        } else if(Array.isArray(info)) {
+        } else {
             ids = info.join(" ");
         }
 
@@ -148,7 +137,6 @@ class Lines extends Component {
             opacity,
             groups,
             
-            setHoverLines,
             lineMax,
             global_indexes,
             setGlobalHover,
@@ -159,6 +147,7 @@ class Lines extends Component {
 
         const render = mode === 'render';
         const update = mode === 'update';
+        const load = mode === 'load';
         
         const margin = {top: 20, right: 100, bottom: 50, left: 100};
         const chartWidth = width - margin.left - margin.right;
@@ -177,7 +166,7 @@ class Lines extends Component {
                     .attr("stroke-linejoin", "round")
                     .attr("stroke-linecap", "round");
         } else if(update) {
-            svg = d3.select(faux).select('svg').select('g');
+            svg = d3.select(faux).select('svg');
             if(global_indexes) {
                 let index_list;
                 if(!Array.isArray(groups)) {
@@ -190,11 +179,10 @@ class Lines extends Component {
                 data = data.filter((d, i) => index_list.includes(index[i]));
                 index = index.filter((d, i) => index_list.includes(d));
             } 
-            // if(global_indexes) {
-            //     data = data.filter((d, i) => global_indexes.includes(index[i]))
-            //     index = index.filter((d, i) => global_indexes.includes(d))
-            // }
+        } else if(load) {
+            svg = d3.select(faux).select('svg');
         }
+
         let xScale = d3.scaleBand()
                 .domain(time)
                 .range([0, chartWidth]).padding(-1);
@@ -209,7 +197,7 @@ class Lines extends Component {
         let yAxis = d3.axisLeft(yScale)
                         .tickSizeInner(-chartWidth)
                         .tickSizeOuter(1)
-        // if(render) {
+        if(render || load) {
             svg.append('g')
                 .attr('class', 'x axis')
                 .attr('transform', `translate(-14, ${chartHeight})`)
@@ -232,7 +220,7 @@ class Lines extends Component {
                 .attr("transform", 'rotate(-90)')
                 .attr("text-anchor", "middle")
                 .text("power");
-        // }
+        }
 
         let line = d3.line()
                 .defined(d => !isNaN(d))
@@ -245,14 +233,10 @@ class Lines extends Component {
         path = path
                 .join("path")
                 .on("mouseover", (d, i) => {
-                    let info = groups[index[i]] ? groups[index[i]] : [index[i]];
-                    // console.log(info)
-                    // setHoverLines(info);
+                    let info = !Array.isArray(groups) ? groups[index[i]] : [index[i]];
                     setGlobalHover(info);
                 })
                 .on("mouseout", (d, i) => {
-                    // this.setToolTip(null);
-                    // setHoverLines(null);
                     setGlobalHover([]);
                 });
         path

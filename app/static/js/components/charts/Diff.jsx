@@ -28,7 +28,11 @@ class Diff extends Component {
         if(this.state.tooltip) {
             if(!Array.isArray(groups) && ids.length === 1) {
                 ids = groups[ids].length === 1 ? groups[groups[ids][0]] : groups[ids]
-            } 
+            } else if(!Array.isArray(groups)) {
+                // ids = ids.map(v => {
+                //     if(groups[v].length === 1 && !groups[groups[v][0]].includes(v) ) return groups[v][0];
+                //     else return v;});
+            }
             return {
                 content: `id: ${ids.join(" ")}`,
                 style: {top: y, left: x}
@@ -61,20 +65,29 @@ class Diff extends Component {
 
     updateDots(ids, prevIds) {
         let { groups } = this.props;
-
+        console.log(ids, this.props.name)
         // de-highlight previous dots
         if(prevIds.length === 1) {
-            if(groups.length === 0) this.deHighlight(prevIds);
+            if(!Array.isArray(groups)) this.deHighlight(prevIds);
             else groups[prevIds].map(id => this.deHighlight(id));
         } else if(prevIds.length > 1) {
             prevIds.map(id => this.deHighlight(id));
         }
         // highlight select lines
         if(ids.length  === 1) {
-            if(groups.length === 0) this.highlight(ids);
-            else groups[ids].map(id => this.highlight(id));
+            if(Array.isArray(groups)) this.highlight(ids);
+            else {
+                console.log(groups[ids]);
+                if(groups[ids].length === 1) groups[groups[ids]].map(id => this.highlight(id));
+                else groups[ids].map(id => this.highlight(id))
+            };
         } else if(ids.length > 1) {
-            ids.map(id => this.highlight(id));
+            if(!Array.isArray(groups)) {
+                ids.map(id => {
+                    if(groups[id].length === 1) this.highlight(groups[id][0]);
+                    else this.highlight(id);
+                })
+            } else ids.map(id => this.highlight(id));
         }
     }
 
@@ -144,6 +157,8 @@ class Diff extends Component {
                         else return v;
                     })
                 } else index_list = global_indexes;
+
+                this.setState({map_glabal_indexes: index_list});
 
                 data = data.filter(d => index_list.includes(d.index))
             } 
