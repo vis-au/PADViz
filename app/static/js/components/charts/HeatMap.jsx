@@ -191,13 +191,15 @@ class HeatMap extends Component {
                 .attr("transform", 'rotate(-90)')
                 .attr("text-anchor", "middle")
                 .text("bins")
-        } else if(render) {
-            svg.select(`${name} x axis`)
+        } else if(load) {
+            svg.select(`.${name}.x.axis`)
                 .transition()
-                .call(xAxis);
-            svg.select(`${name} y axis`)
+                .call(d3.axisBottom(xScale))
+                    .select(".domain").remove();
+            svg.select(`.${name}.y.axis`)
                 .transition()
-                .call(yAxis);
+                .call(d3.axisLeft(yScale).tickFormat(d => ('< ' + d.split('-')[1])))
+                .select(".domain").remove();
         }
         
         

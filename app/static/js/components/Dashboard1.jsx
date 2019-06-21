@@ -248,7 +248,6 @@ class Dashboard1 extends Component {
         event.preventDefault();
         this.setState({
             hm_col1: "/data/hm?wsize="+this.state.col1_wsize+"&step="+this.state.col1_step+"&bins="+this.state.col1_bins,
-            
         })
     }
 
@@ -280,6 +279,16 @@ class Dashboard1 extends Component {
             stat_col2: "/data/stat?k=" + this.state.col2_k + "&dist=" + this.state.col2_dist + "&rep=" + this.state.col2_rep,
             diff_col2: "/data/diff?k=" + this.state.col2_k + "&dist=" + this.state.col2_dist + "&rep=" + this.state.col2_rep
         })
+        if(this.state.col2_k > 2) {
+            this.setState((state) =>{
+                return {
+                    hm_col1: state.hm_col1 + "&alt=90",
+                    spa_col1: state.spa_col1 + "?alt=90",
+                    stat_col1: state.stat_col1 + "?alt=90",
+                    diff_col1: state.diff_col1 + "?alt=90",
+                }
+            })
+        }
     }
 
     setCol3K(event) {
@@ -293,13 +302,22 @@ class Dashboard1 extends Component {
     }
     handlecol3update(event) {
         event.preventDefault();
-        event.stopPropagation();
         this.setState({
             spa_col3: "/data/lines?k=" + this.state.col3_k + "&dist=" + this.state.col3_dist + "&rep=" + this.state.col3_rep,
             hm_col3: "/data/hm?k=" + this.state.col3_k + "&dist=" + this.state.col3_dist + "&rep=" + this.state.col3_rep+"wsize="+this.state.col1_wsize+"&step="+this.state.col1_step+"&bins="+this.state.col1_bins,
             stat_col3: "/data/stat?k=" + this.state.col3_k + "&dist=" + this.state.col3_dist + "&rep=" + this.state.col3_rep,
             diff_col3: "/data/diff?k=" + this.state.col3_k + "&dist=" + this.state.col3_dist + "&rep=" + this.state.col3_rep
         })
+        if(this.state.col2_k > 2) {
+            this.setState((state) =>{
+                return {
+                    hm_col1: state.hm_col1 + "&alt=90",
+                    spa_col1: state.spa_col1 + "?alt=90",
+                    stat_col1: state.stat_col1 + "?alt=90",
+                    diff_col1: state.diff_col1 + "?alt=90",
+                }
+            })
+        }
     }
 }
 

@@ -235,10 +235,10 @@ class Diff extends Component {
                 .attr("text-anchor", "middle")
                 .text("maximal")
         } else if(load) {
-            svg.select(`${name} x axis`)
+            svg.select(`.${name}.x.axis`)
                 .transition()
                 .call(xAxis);
-            svg.select(`${name} y axis`)
+            svg.select(`.${name}.x.axis`)
                 .transition()
                 .call(yAxis);
         }
