@@ -164,32 +164,42 @@ class HeatMap extends Component {
         let rectWidth = xScale.bandwidth();
         let rectHeight = yScale.bandwidth();
 
-        svg.append("g")
-            .style("font-size", 12)
-            .attr("transform", `translate(-${rectWidth / 2}, ${chartHeight - 55})`)
-            .attr("class", `heatmap x axis`)
-            .call(d3.axisBottom(xScale))
+        if(render) {
+            svg.append("g")
+                .style("font-size", 12)
+                .attr("transform", `translate(-${rectWidth / 2}, ${chartHeight - 55})`)
+                .attr("class", `${name} x axis`)
+                .call(d3.axisBottom(xScale))
+                    .select(".domain").remove();
+            
+            svg.append("g")
+                .style("font-size", 12)
+                .attr("transform", `translate(0, -${rectHeight / 2})`)
+                .attr("class", `${name} y axis`)
+                .call(d3.axisLeft(yScale).tickFormat(d => ('< ' + d.split('-')[1])))
                 .select(".domain").remove();
             
-        svg.append("g")
-            .style("font-size", 12)
-            .attr("transform", `translate(0, -${rectHeight / 2})`)
-            .attr("class", `heatmap y axis`)
-            .call(d3.axisLeft(yScale).tickFormat(d => ('< ' + d.split('-')[1])))
-            .select(".domain").remove();
-        
-        svg.append('text')
-            .attr("x", chartWidth / 2 )
-            .attr("y", chartHeight - 10)
-            .attr("text-anchor", "middle")
-            .text("time period");
+            svg.append('text')
+                .attr("x", chartWidth / 2 )
+                .attr("y", chartHeight - 10)
+                .attr("text-anchor", "middle")
+                .text("time period");
 
-        svg.append("text")
-            .attr("x", -(chartHeight / 2))
-            .attr("y", -50)
-            .attr("transform", 'rotate(-90)')
-            .attr("text-anchor", "middle")
-            .text("bins")
+            svg.append("text")
+                .attr("x", -(chartHeight / 2))
+                .attr("y", -50)
+                .attr("transform", 'rotate(-90)')
+                .attr("text-anchor", "middle")
+                .text("bins")
+        } else if(render) {
+            svg.select(`${name} x axis`)
+                .transition()
+                .call(xAxis);
+            svg.select(`${name} y axis`)
+                .transition()
+                .call(yAxis);
+        }
+        
         
         // COLORSCALE
         const colorHold = ['#F8F7F7', '#8b0000','#aa0e27','#c52940','#db4551','#ed645c','#fa8266','#ffa474','#ffc58a','#ffe3af','#ffffe0'];

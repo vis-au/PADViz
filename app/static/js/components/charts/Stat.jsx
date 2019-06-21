@@ -26,9 +26,13 @@ class Stat extends Component {
         let { groups, data } = this.props;     
 
         if(this.state.tooltip) {
-            if(!Array.isArray(groups) && ids.length === 1) {
-                ids = groups[ids].length === 1 ? groups[groups[ids][0]] : groups[ids]
-            } 
+            // let id_list;
+            // if(!Array.isArray(groups) && ids.length === 1) {
+            //     id_list = ids.map(id => {
+            //         if()
+            //     })
+            //     ids = groups[ids].length === 1 ? groups[groups[ids][0]] : groups[ids]
+            // } 
 
             return {
                 content: `id: ${ids.join(" ")}`,
@@ -58,6 +62,9 @@ class Stat extends Component {
             if(this.props.global_hover.length > 0) this.setToolTip(this.state.pos_x, this.state.pos_y, this.props.global_hover);
             else this.setToolTip(null);
         }
+        if(this.props.data !== prevProps.data) {
+            this.renderD3("load");
+        }
     }
 
     updateDots(ids, prevIds) {
@@ -65,17 +72,27 @@ class Stat extends Component {
 
         // de-highlight previous dots
         if(prevIds.length === 1) {
-            if(groups.length === 0) this.deHighlight(prevIds);
+            if(Array.isArray(groups)) this.deHighlight(prevIds);
             else groups[prevIds].map(id => this.deHighlight(id));
         } else if(prevIds.length > 1) {
-            prevIds.map(id => this.deHighlight(id));
+            if(!Array.isArray(groups)) {
+                prevIds.map(id => {
+                    if(groups[id].length === 1) return this.deHighlight(groups[id][0])
+                    else return this.deHighlight(id)
+                })
+            } else prevIds.map(id => this.deHighlight(id));
         }
         // highlight select lines
         if(ids.length  === 1) {
-            if(groups.length === 0) this.highlight(ids);
+            if(Array.isArray(groups)) this.highlight(ids);
             else groups[ids].map(id => this.highlight(id));
         } else if(ids.length > 1) {
-            ids.map(id => this.highlight(id));
+            if(!Array.isArray(groups)) {
+                ids.map(id => {
+                    if(groups[id].length === 1) return this.highlight(groups[id][0])
+                    else return this.highlight(id)
+                })
+            } else ids.map(id => this.highlight(id));
         }
     }
 
@@ -122,6 +139,7 @@ class Stat extends Component {
 
         const render = mode === 'render';
         const update = mode === 'update';
+        const load = mode === 'load';
 
         const margin = {top: 20, right: 20, bottom: 40, left: 80};
         const chartWidth = width - margin.left - margin.right;
@@ -136,7 +154,7 @@ class Stat extends Component {
                 .attr("height", height)
                 .append("g")
                     .attr("transform", `translate(${margin.left}, ${margin.top})`);
-        } else if (update) {
+        } else if (update ) {
             if(global_indexes) {
                 let index_list;
                 if(!Array.isArray(groups)) {
@@ -150,7 +168,10 @@ class Stat extends Component {
             } 
             
             svg = d3.select(faux).select('svg').select('g');
+        } else if(load) {
+            svg = d3.select(faux).select('svg')
         }
+
         let xScale, yScale;
     
         xScale = d3.scaleLinear()
@@ -161,7 +182,7 @@ class Stat extends Component {
             .domain([0, statxy[1]]).nice()
             .range([chartHeight, 0]);
 
-        let dots = svg.selectAll('.dot')
+        let dots = svg.selectAll('circle')
                     .data(data);
 
         dots.exit().transition().attr('r', 0).remove();
@@ -170,7 +191,7 @@ class Stat extends Component {
                 .enter()
                 .append("circle")
                 .on('mouseover', (d, i) => {
-                    let info = groups.length === 0 ? [d.index] : groups[d.index];
+                    let info = !Array.isArray(groups) ? groups[d.index] : [d.index];
                     setGlobalHover(info);
                 })
                 .on('mouseout', (d, i) => {
@@ -197,7 +218,7 @@ class Stat extends Component {
         
         if(render) {
             svg.append('g')
-                .attr('class', 'x axis')
+                .attr('class', `${name} x axis`)
                 .attr('transform', `translate(0, ${chartHeight})`)
                 .call(xAxis);
             svg.append('text')
@@ -208,7 +229,7 @@ class Stat extends Component {
         
 
             svg.append('g')
-                .attr('class', 'y axis')
+                .attr('class', `${name} y axis`)
                 .call(yAxis);
             svg.append("text")
                 .attr("x", -(chartHeight / 2))
@@ -216,6 +237,13 @@ class Stat extends Component {
                 .attr("transform", 'rotate(-90)')
                 .attr("text-anchor", "middle")
                 .text("std")
+        } else if(load) {
+            svg.select(`${name} x axis`)
+                .transition()
+                .call(xAxis);
+            svg.select(`${name} y axis`)
+                .transition()
+                .call(yAxis);
         }
         
 

@@ -36,7 +36,7 @@ class Lines extends Component {
         let {groups} = this.props;
 
         if(prevIds.length === 1) {
-            if(groups.length === 0) this.deHighlight(prevIds);
+            if(Array.isArray(groups)) this.deHighlight(prevIds);
             else groups[prevIds].map(id => this.deHighlight(id));
         } else if(prevIds.length > 1) {
             if(!Array.isArray(groups)) {
@@ -166,8 +166,8 @@ class Lines extends Component {
                     .attr("stroke-linejoin", "round")
                     .attr("stroke-linecap", "round");
         } else if(update) {
-            svg = d3.select(faux).select('svg');
-            if(global_indexes) {
+            svg = d3.select(faux).select('svg').select("g");
+            if(global_indexes.length > 0) {
                 let index_list;
                 if(!Array.isArray(groups)) {
                     index_list = global_indexes.map(v => {
@@ -180,7 +180,7 @@ class Lines extends Component {
                 index = index.filter((d, i) => index_list.includes(d));
             } 
         } else if(load) {
-            svg = d3.select(faux).select('svg');
+            svg = d3.select(faux).select('svg')
         }
 
         let xScale = d3.scaleBand()
@@ -197,15 +197,15 @@ class Lines extends Component {
         let yAxis = d3.axisLeft(yScale)
                         .tickSizeInner(-chartWidth)
                         .tickSizeOuter(1)
-        if(render || load) {
+        if(render) {
             svg.append('g')
-                .attr('class', 'x axis')
+                .attr('class', `${name} x axis`)
                 .attr('transform', `translate(-14, ${chartHeight})`)
                 .call(xAxis)
 
             svg.append('g')
-                .attr('class', 'y axis')
-                .attr('transform', `translate(-14, 0)`)
+                .attr('class', `${name} y axis`)
+                .attr('transform', `translate(-14 0)`)
                 .call(yAxis);
             
             svg.append('text')
@@ -220,6 +220,13 @@ class Lines extends Component {
                 .attr("transform", 'rotate(-90)')
                 .attr("text-anchor", "middle")
                 .text("power");
+        } else {
+            svg.select(`${name} x axis`)
+                .transition()
+                .call(xAxis);
+            svg.select(`${name} y axis`)
+                .transition()
+                .call(yAxis);
         }
 
         let line = d3.line()
@@ -227,21 +234,28 @@ class Lines extends Component {
                 .x((d, i) => xScale(time[i]))
                 .y(d => yScale(d))
         
-        let path = svg.selectAll("path")
+        let path = svg.selectAll(".lines")
                     .data(data);
-
+        path.exit()
+            .transition()
+                .attr("stroke-width", 0) 
+                .remove();
         path = path
-                .join("path")
+                .enter()
+                .append("path")
+                // .join("path")
+                // .attr("fill", "none")
                 .on("mouseover", (d, i) => {
                     let info = !Array.isArray(groups) ? groups[index[i]] : [index[i]];
                     setGlobalHover(info);
                 })
                 .on("mouseout", (d, i) => {
                     setGlobalHover([]);
-                });
+                })
+                .merge(path);
         path
             .attr('class', (d, i) =>{ 
-                return `${name} data data-${index[i]}`})
+                return `${name} lines data data-${index[i]}`})
             .attr("groupmembers", (d, i) => {
                 return groups[index[i]]
             })
@@ -255,10 +269,7 @@ class Lines extends Component {
             .transition()
             .attr("stroke-width", 2);
         
-        path.exit()
-            .transition()
-                .attr("stroke-width", 0) 
-                .remove();
+        
 
         animateFauxDOM(1300);
     }

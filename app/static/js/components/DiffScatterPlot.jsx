@@ -12,9 +12,19 @@ class DiffScatterPlot extends Component {
     }
 
     componentDidMount() {
+        this.getData(this.props.url);
+    }
+
+    componentDidUpdate(prevProps) {
+        if(this.props.url !== prevProps.url) {
+            this.getData(this.props.url);
+        }
+    }
+
+    getData(url) {
         let { name, setDiffXY } = this.props;
 
-        fetch(this.props.initurl)
+        fetch(url)
         .then(res => res.json())
         .then(data => {
             let dots = JSON.parse(data['dots']);

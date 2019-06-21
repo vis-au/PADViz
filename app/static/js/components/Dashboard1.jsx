@@ -23,7 +23,10 @@ class Dashboard1 extends Component {
     constructor(props) {
         super(props);
 
+        this.handleHeatMap = this.handleHeatMap.bind(this)
         this.setwsize = this.setwsize.bind(this);
+        this.setstep = this.setstep.bind(this);
+        this.setbins = this.setbins.bind(this);
 
         this.setCol2K = this.setCol2K.bind(this);
         this.setCol2Dist = this.setCol2Dist.bind(this);
@@ -51,27 +54,14 @@ class Dashboard1 extends Component {
 
         diff_col1: "/data/diff",
         diff_col2: "/data/diff?k=2&dist=LM&rep=mean",
+        diff_col3: "/data/diff?k=2&dist=LM&rep=median",
 
-        initurls: {
-            "spa_col1": "/data/lines",
-            "spa_col2": "/data/lines?k=2&dist=LM&rep=mean",
-            "spa_col3": "/data/lines?k=2&dist=LM&rep=median",
-
-            "hm_col1": "/data/hm?wsize=5&step=3",
-            "hm_col2": "/data/hm?k=2&dist=LM&rep=mean",
-            "hm_col3": "/data/hm?k=2&dist=LM&rep=median",
-
-            "stat_col1": "/data/stat",
-            "stat_col2": "/data/stat?k=2&dist=LM&rep=mean",
-            "stat_col3": "/data/stat",
-
-            "diff_col1": "/data/diff",
-            "diff_col2": "/data/diff?k=2&dist=LM&rep=mean",
-            "diff_col3": "/data/diff?k=2&dist=LM&rep=median",
-        },
         kvals: [2, 3, 4, 5, 6, 7],
         dists: ["Euclidean", "Self-defined", "LM", "DM"],
         reps: ["Mean", "Median"],
+        wsize: [...Array(6).keys()].map(x => x+5),
+        step: [...Array(6).keys()].map(x => x+3),
+        bins: [...Array(3).keys()].map(x => x+8),
 
         col1_wsize: 5,
         col1_step: 3,
@@ -130,21 +120,26 @@ class Dashboard1 extends Component {
                                 <Nav.Link eventKey="disabled" disabled>
                                     Dataset: energy
                                 </Nav.Link>
-                                <Form inline >
-                                    <Form.Group controlId="wsize" onSubmit={this.handleHeatMap}>
-                                        <Form.Label>Window size  </Form.Label>
-                                        {/* <Form.Control type="number" min="1" placeholder={this.state.col1_wsize} 
-                                        inputref={(ref) => {this.input = ref}}/> */}
+                                <Form inline onSubmit={this.handleHeatMap} >
+                                    <Form.Group controlId="wsize" >
+                                        <Form.Label> Window Size  </Form.Label>
+                                        <Form.Control as="select" value={this.state.col1_wsize} onChange={this.setwsize}>
+                                            {this.state.wsize.map((v, i) => <option key={i} value={v}>{v}</option>)}
+                                        </Form.Control>
                                     </Form.Group>
 
-                                    <Form.Group controlId="step">
-                                        <Form.Label>Step size</Form.Label>
-                                        <Form.Control type="number" min="1" placeholder={this.state.col1_step} />
+                                    <Form.Group controlId="step" >
+                                        <Form.Label> Step Size  </Form.Label>
+                                        <Form.Control as="select" value={this.state.col1_step} onChange={this.setstep}>
+                                            {this.state.step.map((v, i) => <option key={i} value={v}>{v}</option>)}
+                                        </Form.Control>
                                     </Form.Group>
 
-                                    <Form.Group controlId="binno">
-                                        <Form.Label>Number of bins</Form.Label>
-                                        <Form.Control type="number" min="1" placeholder={this.state.col1_bins} />
+                                    <Form.Group controlId="wsize" >
+                                        <Form.Label> Window Size  </Form.Label>
+                                        <Form.Control as="select" value={this.state.col1_wsize} onChange={this.setwsize}>
+                                            {this.state.wsize.map((v, i) => <option key={i} value={v}>{v}</option>)}
+                                        </Form.Control>
                                     </Form.Group>
                                     <Button type="submit">Update</Button>
                                 </Form>
@@ -216,31 +211,31 @@ class Dashboard1 extends Component {
                             url={this.state.hm_col3}/>
                         </div>
 
-                        {/* <div key="SCA1_COL1">
+                        <div key="SCA1_COL1">
                             <StatScatterPlot width="400" height="430" name="col1-stat"
-                            initurl={this.state.initurls["stat_col1"]}/>
+                            url={this.state.stat_col1}/>
                         </div>
                         <div key="SCA1_COL2">
                             <StatScatterPlot width="400" height="430" name="col2-stat"
-                            initurl={this.state.initurls["stat_col2"]}/>
+                            url={this.state.stat_col2}/>
                         </div>
                         <div key="SCA1_COL3">
                             <StatScatterPlot width="400" height="430" name="col3-stat"
-                            initurl={this.state.initurls["stat_col3"]}/>
-                        </div>  */}
+                            url={this.state.stat_col3}/>
+                        </div> 
 
-                        {/* <div key="SCA2_COL1">
+                        <div key="SCA2_COL1">
                             <DiffScatterPlot width="400" height="430" name="col1-diff"
-                            initurl={this.state.initurls["diff_col1"]}/>
+                            url={this.state.diff_col1}/>
                         </div>
                         <div key="SCA2_COL2" >
                             <DiffScatterPlot width="400" height="430" name="col2-diff"
-                            initurl={this.state.initurls["diff_col2"]}/>
+                            url={this.state.diff_col2}/>
                         </div>
                         <div key="SCA2_COL3">
                             <DiffScatterPlot width="400" height="430" name="col3-diff"
-                            initurl={this.state.initurls["diff_col3"]}/>
-                        </div> */}
+                            url={this.state.diff_col3}/>
+                        </div>
                         
                         
                         
@@ -254,13 +249,19 @@ class Dashboard1 extends Component {
     handleHeatMap(event) {
         event.preventDefault();
         this.setState({
-            hm_col1: "/data/hm?wsize="
+            hm_col1: "/data/hm?wsize="+this.state.col1_wsize+"&step="+this.state.col1_step+"&bins="+this.state.col1_bins,
+            
         })
     }
 
     setwsize(event) {
         this.setState({col1_wsize: event.target.value});
-        console.log(this.input.value)
+    }
+    setstep(event) {
+        this.setState({col1_step: event.target.value});
+    }
+    setbins(event) {
+        this.setState({col1_bins: event.target.value});
     }
 
     setCol2K(event) {

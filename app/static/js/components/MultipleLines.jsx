@@ -16,7 +16,6 @@ class MultipleLines extends Component {
     }
 
     componentDidMount() {
-        console.log(this.props.url)
         this.getData(this.props.url);
     }
 

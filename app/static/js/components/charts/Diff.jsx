@@ -26,13 +26,9 @@ class Diff extends Component {
         let {groups} = this.props;     
 
         if(this.state.tooltip) {
-            if(!Array.isArray(groups) && ids.length === 1) {
-                ids = groups[ids].length === 1 ? groups[groups[ids][0]] : groups[ids]
-            } else if(!Array.isArray(groups)) {
-                // ids = ids.map(v => {
-                //     if(groups[v].length === 1 && !groups[groups[v][0]].includes(v) ) return groups[v][0];
-                //     else return v;});
-            }
+            // if(!Array.isArray(groups) && ids.length === 1) {
+            //     ids = groups[ids].length === 1 ? groups[groups[ids][0]] : groups[ids]
+            // } 
             return {
                 content: `id: ${ids.join(" ")}`,
                 style: {top: y, left: x}
@@ -61,31 +57,35 @@ class Diff extends Component {
             if(this.props.global_hover.length > 0) this.setToolTip(this.state.pos_x, this.state.pos_y, this.props.global_hover);
             else this.setToolTip(null);
         }
+        if(this.props.data !== prevProps.data) {
+            this.renderD3("load");
+        }
     }
 
     updateDots(ids, prevIds) {
         let { groups } = this.props;
-        console.log(ids, this.props.name)
-        // de-highlight previous dots
+
+// de-highlight previous dots
         if(prevIds.length === 1) {
-            if(!Array.isArray(groups)) this.deHighlight(prevIds);
+            if(Array.isArray(groups)) this.deHighlight(prevIds);
             else groups[prevIds].map(id => this.deHighlight(id));
         } else if(prevIds.length > 1) {
-            prevIds.map(id => this.deHighlight(id));
+            if(!Array.isArray(groups)) {
+                prevIds.map(id => {
+                    if(groups[id].length === 1) return this.deHighlight(groups[id][0])
+                    else return this.deHighlight(id)
+                })
+            } else prevIds.map(id => this.deHighlight(id));
         }
         // highlight select lines
         if(ids.length  === 1) {
             if(Array.isArray(groups)) this.highlight(ids);
-            else {
-                console.log(groups[ids]);
-                if(groups[ids].length === 1) groups[groups[ids]].map(id => this.highlight(id));
-                else groups[ids].map(id => this.highlight(id))
-            };
+            else groups[ids].map(id => this.highlight(id));
         } else if(ids.length > 1) {
             if(!Array.isArray(groups)) {
                 ids.map(id => {
-                    if(groups[id].length === 1) this.highlight(groups[id][0]);
-                    else this.highlight(id);
+                    if(groups[id].length === 1) return this.highlight(groups[id][0])
+                    else return this.highlight(id)
                 })
             } else ids.map(id => this.highlight(id));
         }
@@ -134,6 +134,7 @@ class Diff extends Component {
 
         const render = mode === 'render';
         const update = mode === 'update';
+        const load = mode === 'load';
 
         const margin = {top: 20, right: 20, bottom: 40, left: 80};
         const chartWidth = width - margin.left - margin.right;
@@ -164,7 +165,10 @@ class Diff extends Component {
             } 
             
             svg = d3.select(faux).select('svg').select('g');
+        } else if(load) {
+            svg = d3.select(faux).select('svg')
         }
+
         let xScale, yScale;
     
         xScale = d3.scaleLinear()
@@ -175,7 +179,7 @@ class Diff extends Component {
             .domain([0, diffxy[1]]).nice()
             .range([chartHeight, 0]);
 
-        let dots = svg.selectAll('.dot')
+        let dots = svg.selectAll("circle")
                     .data(data);
 
         dots.exit().transition().attr('r', 0).remove();
@@ -184,7 +188,7 @@ class Diff extends Component {
                 .enter()
                 .append("circle")
                 .on('mouseover', (d, i) => {
-                    let info = groups.length === 0 ? [d.index] : groups[d.index];
+                    let info = !Array.isArray(groups) ? groups[d.index] : [d.index];
                     setGlobalHover(info);
                 })
                 .on('mouseout', (d, i) => {
@@ -230,6 +234,13 @@ class Diff extends Component {
                 .attr("transform", 'rotate(-90)')
                 .attr("text-anchor", "middle")
                 .text("maximal")
+        } else if(load) {
+            svg.select(`${name} x axis`)
+                .transition()
+                .call(xAxis);
+            svg.select(`${name} y axis`)
+                .transition()
+                .call(yAxis);
         }
         
 

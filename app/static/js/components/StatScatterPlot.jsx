@@ -1,7 +1,6 @@
 import React, { Component } from 'react';
 
 import Stat from "./charts/Stat";
-import { setSTATXY } from '../redux/actions';
 
 class StatScatterPlot extends Component {
     
@@ -13,9 +12,19 @@ class StatScatterPlot extends Component {
     }
 
     componentDidMount() {
+        this.getData(this.props.url);
+    }
+
+    componentDidUpdate(prevProps) {
+        if(this.props.url !== prevProps.url) {
+            this.getData(this.props.url);
+        }
+    }
+
+    getData(url) {
         let { name, setStatXY } = this.props;
 
-        fetch(this.props.initurl)
+        fetch(url)
         .then(res => res.json())
         .then(data => {
             let dots = JSON.parse(data['dots']);
