@@ -50,9 +50,9 @@ def amplitude_into_bins(w_data, no_bins=10, type='ori'):
     # print(w_min, w_max)
     if type == 'ori':
         bins = pd.interval_range(start=w_min, end=w_max, periods=10, closed='left')
-        pd.DataFrame(bins.to_tuples()).to_pickle("./dataset/ori_bins.pkl")
+        pd.DataFrame(bins.to_tuples()).to_pickle("./db/ori_bins.pkl")
     else:
-        df = pd.read_pickle("./dataset/ori_bins.pkl")
+        df = pd.read_pickle("./db/ori_bins.pkl")
         left=[]
         right=[]
         for v in df.values:

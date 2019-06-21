@@ -166,7 +166,7 @@ class Diff extends Component {
             
             svg = d3.select(faux).select('svg').select('g');
         } else if(load) {
-            svg = d3.select(faux).select('svg')
+            svg = d3.select(faux).select('svg').select('g');
         }
 
         let xScale, yScale;

@@ -180,7 +180,7 @@ class Lines extends Component {
                 index = index.filter((d, i) => index_list.includes(d));
             } 
         } else if(load) {
-            svg = d3.select(faux).select('svg')
+            svg = d3.select(faux).select('svg').select("g");
         }
 
         let xScale = d3.scaleBand()

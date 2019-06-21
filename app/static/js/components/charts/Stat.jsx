@@ -23,17 +23,8 @@ class Stat extends Component {
 
     tooltipProps = () => {
         let {x, y, ids} = this.state.tooltip;
-        let { groups, data } = this.props;     
 
         if(this.state.tooltip) {
-            // let id_list;
-            // if(!Array.isArray(groups) && ids.length === 1) {
-            //     id_list = ids.map(id => {
-            //         if()
-            //     })
-            //     ids = groups[ids].length === 1 ? groups[groups[ids][0]] : groups[ids]
-            // } 
-
             return {
                 content: `id: ${ids.join(" ")}`,
                 style: {top: y, left: x}
@@ -169,7 +160,7 @@ class Stat extends Component {
             
             svg = d3.select(faux).select('svg').select('g');
         } else if(load) {
-            svg = d3.select(faux).select('svg')
+            svg = d3.select(faux).select('svg').select('g');
         }
 
         let xScale, yScale;
