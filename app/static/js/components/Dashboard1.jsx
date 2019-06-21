@@ -10,8 +10,6 @@ import MultipleLines from '../containers/MultipleLines';
 import DiffHeatMap from '../containers/DiffHeatMap';
 import DiffScatterPlot from '../containers/DiffScatterPlot';
 import StatScatterPlot from '../containers/StatScatterPlot';
-import { event } from 'd3-selection';
-import { timingSafeEqual } from 'crypto';
 
 const GridLayout = WidthProvider(ReactGridLayout)
 
@@ -136,9 +134,9 @@ class Dashboard1 extends Component {
                                     </Form.Group>
 
                                     <Form.Group controlId="wsize" >
-                                        <Form.Label> Window Size  </Form.Label>
-                                        <Form.Control as="select" value={this.state.col1_wsize} onChange={this.setwsize}>
-                                            {this.state.wsize.map((v, i) => <option key={i} value={v}>{v}</option>)}
+                                        <Form.Label> Bins Size  </Form.Label>
+                                        <Form.Control as="select" value={this.state.col1_bins} onChange={this.setbins}>
+                                            {this.state.bins.map((v, i) => <option key={i} value={v}>{v}</option>)}
                                         </Form.Control>
                                     </Form.Group>
                                     <Button type="submit">Update</Button>
@@ -278,7 +276,7 @@ class Dashboard1 extends Component {
         event.stopPropagation();
         this.setState({
             spa_col2: "/data/lines?k=" + this.state.col2_k + "&dist=" + this.state.col2_dist + "&rep=" + this.state.col2_rep,
-            hm_col2: "/data/hm?k=" + this.state.col2_k + "&dist=" + this.state.col2_dist + "&rep=" + this.state.col2_rep,
+            hm_col2: "/data/hm?k=" + this.state.col2_k + "&dist=" + this.state.col2_dist + "&rep=" + this.state.col2_rep+"wsize="+this.state.col1_wsize+"&step="+this.state.col1_step+"&bins="+this.state.col1_bins,
             stat_col2: "/data/stat?k=" + this.state.col2_k + "&dist=" + this.state.col2_dist + "&rep=" + this.state.col2_rep,
             diff_col2: "/data/diff?k=" + this.state.col2_k + "&dist=" + this.state.col2_dist + "&rep=" + this.state.col2_rep
         })
@@ -298,7 +296,7 @@ class Dashboard1 extends Component {
         event.stopPropagation();
         this.setState({
             spa_col3: "/data/lines?k=" + this.state.col3_k + "&dist=" + this.state.col3_dist + "&rep=" + this.state.col3_rep,
-            hm_col3: "/data/hm?k=" + this.state.col3_k + "&dist=" + this.state.col3_dist + "&rep=" + this.state.col3_rep,
+            hm_col3: "/data/hm?k=" + this.state.col3_k + "&dist=" + this.state.col3_dist + "&rep=" + this.state.col3_rep+"wsize="+this.state.col1_wsize+"&step="+this.state.col1_step+"&bins="+this.state.col1_bins,
             stat_col3: "/data/stat?k=" + this.state.col3_k + "&dist=" + this.state.col3_dist + "&rep=" + this.state.col3_rep,
             diff_col3: "/data/diff?k=" + this.state.col3_k + "&dist=" + this.state.col3_dist + "&rep=" + this.state.col3_rep
         })

@@ -167,7 +167,7 @@ class Lines extends Component {
                     .attr("stroke-linecap", "round");
         } else if(update) {
             svg = d3.select(faux).select('svg').select("g");
-            if(global_indexes.length > 0) {
+            if(global_indexes &&global_indexes.length > 0) {
                 let index_list;
                 if(!Array.isArray(groups)) {
                     index_list = global_indexes.map(v => {
@@ -178,6 +178,7 @@ class Lines extends Component {
 
                 data = data.filter((d, i) => index_list.includes(index[i]));
                 index = index.filter((d, i) => index_list.includes(d));
+                opacity = opacity.filter((d) => index_list.includes(d));
             } 
         } else if(load) {
             svg = d3.select(faux).select('svg').select("g");
@@ -259,12 +260,25 @@ class Lines extends Component {
             .attr("groupmembers", (d, i) => {
                 return groups[index[i]]
             })
-            .attr("opavalue", (d, i) => `${opacity[index[i]]}`)
+            .attr("opavalue", (d, i) => {
+                if(data.length < 5) return '1';
+                else {
+                    let r = opacity.indexOf(index[i]);
+                    if(r <= 6) return 1
+                    else return 0.1
+                }
+                
+            })
             .attr("d", d=>line(d))
             .attr("stroke", "#000000")
             .attr("stroke-width", 0)
             .attr("opacity", (d, i) => {
-                return opacity[i]
+                if(data.length < 5) return '1';
+                else {
+                    let r = opacity.indexOf(index[i]);
+                    if(r <= 6) return 1
+                    else return 0.1
+                }
             })
             .transition()
             .attr("stroke-width", 2);

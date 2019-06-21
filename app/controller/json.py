@@ -116,14 +116,15 @@ def lines():
     dist_metric = request.args.get("dist") if 'dist' in request.args else None
 
     df = read_file(k, dist_metric, rep)
-    opacities = sort_global_amplitude(df)
+    
     if k:
         groups = get_groups(df)
         df = df.drop_duplicates().sort_index()
         # print(df.shape)
     else:
         groups = []
-    
+
+    opacities = sort_global_amplitude(df).tolist()
     cols = [str(idx) for idx in df.index.values]
     line_df = df
 
@@ -214,22 +215,22 @@ def sort_global_amplitude(data, percentage=[0.01, 0.05, 0.1, 0.25, 0.5, 1], opac
     # r_max, r_min = max(data),min(data)
     r_diff = r_max - r_min
     r_diff = r_diff.sort_values(ascending=False)
-
-    opacity_list = [0] * row_no
-    portion = [round(i * row_no) for i in percentage]
     
-    curr = 0
-    portion_idx = 0
-    curr_limit = portion[portion_idx]
-    for i, v in r_diff.iteritems():
-        curr += 1
-        if curr > curr_limit:
-            portion_idx += 1
-            curr_limit = portion[portion_idx]
+    # opacity_list = [0] * row_no
+    # portion = [round(i * row_no) for i in percentage]
+    
+    # curr = 0
+    # portion_idx = 0
+    # curr_limit = portion[portion_idx]
+    # for i, v in r_diff.iteritems():
+    #     curr += 1
+    #     if curr > curr_limit:
+    #         portion_idx += 1
+    #         curr_limit = portion[portion_idx]
         
-        opacity_list[i] = opacity[portion_idx]
+    #     opacity_list[i] = opacity[portion_idx]
     # print(opacity_list, len(opacity_list))
-    return opacity_list
+    return r_diff.index.values
 
 def get_groups(df):
     groups = {}
