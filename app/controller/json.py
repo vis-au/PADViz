@@ -90,9 +90,12 @@ def amplitude_into_bins(w_data, no_bins=10, type='ori'):
     amp_distr_list['instances'] = ins_arr
     return amp_distr_list
 
-def read_file(k, dm, rep):
+def read_file(k, dm, rep, alt=None):
     if not k:
-        return pd.read_pickle(file_map['ori'])
+        if alt is None:
+            return pd.read_pickle(file_map['ori'])
+        else: 
+            return pd.read_pickle(file_map['ori']).iloc[:90]
     elif int(k) == 2:
         if rep.lower() == "mean":
             df = pd.read_pickle(file_map['mean_k2'])
@@ -114,8 +117,9 @@ def lines():
 
     rep = request.args.get("rep") if 'rep' in request.args else None
     dist_metric = request.args.get("dist") if 'dist' in request.args else None
+    alt = request.args.get("alt") if 'alt' in request.args else None
 
-    df = read_file(k, dist_metric, rep)
+    df = read_file(k, dist_metric, rep, alt)
     
     if k:
         groups = get_groups(df)
@@ -141,12 +145,13 @@ def heatmap():
 
     rep = request.args.get("rep") if 'rep' in request.args else None
     dist_metric = request.args.get("dist") if 'dist' in request.args else None
+    alt = request.args.get("alt") if 'alt' in request.args else None
 
     req_wsize = int(request.args.get("wsize")) if 'wsize' in request.args else 5
     req_step = int(request.args.get("step")) if 'step' in request.args else 3
     req_bins = int(request.args.get('bins')) if 'bins' in request.args else 10
 
-    df = read_file(k, dist_metric, rep)
+    df = read_file(k, dist_metric, rep, alt)
     # df = df.iloc[:90]
     w_max, w_min, amp = slide_window_amplitude(df, w_size=req_wsize, step=req_step)
     if not k:
@@ -164,8 +169,9 @@ def stat():
 
     rep = request.args.get("rep") if 'rep' in request.args else None
     dist_metric = request.args.get("dist") if 'dist' in request.args else None
+    alt = request.args.get("alt") if 'alt' in request.args else None
 
-    df = read_file(k, dist_metric, rep)
+    df = read_file(k, dist_metric, rep, alt)
     if k:
         groups = get_groups(df)
         df = df.drop_duplicates().sort_index()
@@ -189,8 +195,9 @@ def diff():
 
     rep = request.args.get("rep") if 'rep' in request.args else None
     dist_metric = request.args.get("dist") if 'dist' in request.args else None
+    alt = request.args.get("alt") if 'alt' in request.args else None
 
-    df = read_file(k, dist_metric, rep)
+    df = read_file(k, dist_metric, rep, alt)
     if k:
         groups = get_groups(df)
         df = df.drop_duplicates().sort_index()
